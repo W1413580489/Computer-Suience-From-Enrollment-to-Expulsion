@@ -1,0 +1,88 @@
+/* HUD 布局层样式（§8.3 / §8.4） */
+
+.hud-root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--bg-image);
+  overflow: hidden;
+}
+
+.hud-main {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.hud-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  position: relative;
+}
+
+.hud-right {
+  width: var(--rightpanel-w);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 16px 16px 0;
+  overflow-y: auto;
+}
+
+.hud-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--bg-image);
+  overflow: hidden;
+}
+
+.hud-page-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.hud-page-container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding-bottom: 32px;
+}
+
+.page-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.page-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+}
+
+/* 页面进入动效（§8.7） */
+@keyframes hud-fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hud-fade-in {
+  animation: hud-fade-in 300ms ease-out both;
+}

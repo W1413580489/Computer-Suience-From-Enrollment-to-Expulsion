@@ -1,0 +1,81 @@
+<template>
+  <div class="hud-page">
+    <HudBackground />
+    <HudTopBar
+      :current-route="route.path"
+      :is-mobile="isMobile"
+      :show-home="true"
+      @on-avatar-click="settingsOpen = true"
+      @on-notification-click="go('/changelog')"
+      @on-menu-click="drawerOpen = true"
+    />
+    <main class="hud-page-body hud-fade-in">
+      <div class="hud-page-container">
+        <h1 class="page-title">{{ title }}</h1>
+        <p v-if="subtitle" class="page-subtitle">{{ subtitle }}</p>
+        <slot />
+      </div>
+    </main>
+
+    <MobileBottomTabs
+      v-if="isMobile"
+      :current-route="route.path"
+      :tabs="mobileTabs"
+      @on-tab-click="(t) => go(t.route)"
+    />
+    <NavDrawer
+      :visible="drawerOpen"
+      :items="nav.sideMenu"
+      :active-key="activeKey"
+      @on-item-click="onDrawerNav"
+      @on-close="drawerOpen = false"
+    />
+    <SettingsDrawer :visible="settingsOpen" @on-close="settingsOpen = false" />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import HudBackground from '@/components/hud/HudBackground.vue';
+import HudTopBar from '@/components/hud/HudTopBar.vue';
+import MobileBottomTabs from '@/components/nav/MobileBottomTabs.vue';
+import NavDrawer from '@/components/nav/NavDrawer.vue';
+import SettingsDrawer from '@/components/settings/SettingsDrawer.vue';
+import { useNavStore } from '@/stores/navStore';
+import { useViewport } from '@/composables/useViewport';
+import type { MobileTab } from '@/types/nav';
+
+const props = withDefaults(defineProps<{ title: string; subtitle?: string; activeKey?: string }>(), {
+  subtitle: '',
+  activeKey: '',
+});
+
+const route = useRoute();
+const router = useRouter();
+const nav = useNavStore();
+const { isMobile } = useViewport();
+
+const drawerOpen = ref(false);
+const settingsOpen = ref(false);
+
+onMounted(() => {
+  if (!nav.loaded) nav.load();
+});
+
+const mobileTabs = computed<MobileTab[]>(() => [
+  { key: 'home', label: '首页', subLabel: 'HOME', icon: 'home', route: '/' },
+  { key: 'guide', label: '攻略', subLabel: 'GUIDE', icon: 'guide', route: '/guides' },
+  { key: 'chat', label: 'AI助手', subLabel: 'AI', icon: 'chat', route: '/chat' },
+  { key: 'about', label: '关于我', subLabel: 'ABOUT', icon: 'user', route: '/about' },
+]);
+
+function go(path: string) {
+  router.push(path);
+}
+
+function onDrawerNav(path: string) {
+  drawerOpen.value = false;
+  router.push(path);
+}
+</script>

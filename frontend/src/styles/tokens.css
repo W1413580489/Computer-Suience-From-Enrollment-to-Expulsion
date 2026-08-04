@@ -1,0 +1,106 @@
+/* 设计 Token（需求文档 §8.0） */
+:root {
+  --bg-primary: #0A1428;
+  --bg-panel: #0F1F3A;
+  --bg-panel-2: #142B4D;
+  --bg-panel-3: #1A345D;
+  --border-subtle: #1E3A6B;
+  --border-glow: #378ADD;
+  --accent-primary: #378ADD;
+  --accent-bright: #5DA8FF;
+  --accent-glow: rgba(55, 138, 221, 0.45);
+  --accent-warn: #EF9F27;
+  --accent-yellow: #F5C75F;
+  /* 游戏登录界面风格主强调色（参考图：琥珀黄选中态 + 深色面板） */
+  --amber: #FFC82E;
+  --amber-deep: #F0A800;
+  --amber-glow: rgba(255, 200, 46, 0.35);
+  --on-amber: #1A1200;
+  --accent-green: #4ECCA3;
+  --text-primary: #E8F1FF;
+  --text-secondary: #9BB4D8;
+  --text-muted: #5C7AA0;
+  --text-link: #5DA8FF;
+  --danger: #FF6B6B;
+  --success: #4ECCA3;
+  --new-tag: #EF9F27;
+  --font-display: 'Orbitron', 'Rajdhani', 'PingFang SC', sans-serif;
+  --font-body: 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --shadow-glow: 0 0 16px var(--accent-glow);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --bg-image: linear-gradient(135deg, #0A1428 0%, #102347 60%, #0A1428 100%);
+
+  --topbar-h: 64px;
+  --slogan-h: 88px;
+  --footer-h: 72px;
+  --sidenav-w: 208px;
+  --rightpanel-w: 300px;
+  --bottomtabs-h: 72px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+a {
+  color: var(--text-link);
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (max-width: 767px) {
+  :root {
+    --topbar-h: 52px;
+    --slogan-h: 64px;
+    --footer-h: 56px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

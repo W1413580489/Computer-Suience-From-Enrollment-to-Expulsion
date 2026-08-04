@@ -1,0 +1,26 @@
+# ---- 运行时数据（日志/限流计数，含用户反馈信息）----
+logs/
+*.jsonl
+
+# ---- 前端依赖与构建产物 ----
+frontend/node_modules/
+frontend/dist/
+
+# ---- Python ----
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# ---- 密钥与本地配置（绝不入库）----
+.env
+.env.*
+*.key
+!id_ed25519.pub
+
+# ---- 编辑器/系统 ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

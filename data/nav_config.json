@@ -1,0 +1,228 @@
+{
+  "sideMenu": [
+    {
+      "key": "home",
+      "label": "首页",
+      "subLabel": "HOME",
+      "number": "00",
+      "route": "/",
+      "icon": "home"
+    },
+    {
+      "key": "guide",
+      "label": "攻略",
+      "subLabel": "GUIDE",
+      "number": "01",
+      "route": "/guides",
+      "icon": "guide"
+    },
+    {
+      "key": "appendix",
+      "label": "附录",
+      "subLabel": "DATABASE",
+      "number": "02",
+      "route": "/appendix",
+      "icon": "database"
+    },
+    {
+      "key": "about",
+      "label": "关于我",
+      "subLabel": "ABOUT",
+      "number": "03",
+      "route": "/about",
+      "icon": "user"
+    },
+    {
+      "key": "changelog",
+      "label": "更新日志",
+      "subLabel": "UPDATE",
+      "number": "04",
+      "route": "/changelog",
+      "icon": "history"
+    }
+  ],
+  "guides": [
+    {
+      "label": "新生指南补缺",
+      "desc": "入学前准备与新生常见问题",
+      "url": "https://tralis2671.feishu.cn/wiki/DYhvw9owZivrJskU5LicGl06nAg",
+      "icon": "doc"
+    },
+    {
+      "label": "常用链接",
+      "desc": "常用网站与系统入口汇总",
+      "url": "https://bcnjr89bg80t.feishu.cn/wiki/ZFQ4wlelJiOUkAk3L7tcn94xnKe",
+      "icon": "doc"
+    },
+    {
+      "label": "大学政策简解",
+      "desc": "奖学金/重修/毕业/处分政策",
+      "url": "https://bcnjr89bg80t.feishu.cn/wiki/HgtnwqvJUiKv58k7j3jcN0s4npg",
+      "icon": "doc"
+    },
+    {
+      "label": "学生组织介绍",
+      "desc": "学代团/团委/院会/勤助等",
+      "url": "https://bcnjr89bg80t.feishu.cn/wiki/DZUOwmJKLi6kRfkwT5Schjg3n3f",
+      "icon": "doc"
+    },
+    {
+      "label": "学术发展规划",
+      "desc": "保研/考研/双学位/进组科研",
+      "url": "https://bcnjr89bg80t.feishu.cn/wiki/GF54wCHgUiOSmdkYSTIcVSWwncb",
+      "icon": "doc"
+    },
+    {
+      "label": "就业发展规划",
+      "desc": "互联网/国企/考公/选调/简历",
+      "url": "https://bcnjr89bg80t.feishu.cn/wiki/D17ewTvi8iImXbkBxS0cVt0un0O",
+      "icon": "doc"
+    },
+    {
+      "label": "竞赛指导",
+      "desc": "A类竞赛与企业竞赛指南",
+      "url": "https://bcnjr89bg80t.feishu.cn/wiki/NCo9wYAxJilSEVki0e8cBWBInfb",
+      "icon": "doc"
+    },
+    {
+      "label": "情感与生活指南",
+      "desc": "恋爱/社交/生活经验",
+      "url": "https://bcnjr89bg80t.feishu.cn/wiki/RyTMwuuXri2JSckbc6ycZOdknYf",
+      "icon": "doc"
+    },
+    {
+      "label": "效率工具推荐",
+      "desc": "大学生必备提效工具",
+      "url": "https://tralis2671.feishu.cn/wiki/ZATTw8ddKiJwD7k4OLicQGswnad",
+      "icon": "doc"
+    },
+    {
+      "label": "美食娱乐排行",
+      "desc": "校园周边美食与娱乐",
+      "url": "https://tralis2671.feishu.cn/wiki/W1sRwXaB7iXYxrk5XKxcgivrnxg",
+      "icon": "doc"
+    },
+    {
+      "label": "Git使用指南",
+      "desc": "Git 入门到协作进阶",
+      "url": "https://tralis2671.feishu.cn/wiki/PZfdwamzGirDqOkrIIwcFIzbnlh",
+      "icon": "doc"
+    }
+  ],
+  "appendix": [
+    {
+      "label": "林家络的恋爱教学笔记",
+      "desc": "",
+      "url": "https://tralis2671.feishu.cn/wiki/QVxYwRDzxiESxMkDEPCc1zrlnaf",
+      "icon": "doc",
+      "restricted": false
+    },
+    {
+      "label": "不知来源的焚诀",
+      "desc": "",
+      "url": "https://tralis2671.feishu.cn/wiki/ZnF4wWRGRi4Rk0kqTo4c6zz4n0b",
+      "icon": "doc",
+      "restricted": false
+    },
+    {
+      "label": "学习指南(权限观看)",
+      "desc": "",
+      "url": "https://tralis2671.feishu.cn/wiki/FCATwwKbziiC7zkAL64cl3EXnCf",
+      "icon": "doc",
+      "restricted": true
+    },
+    {
+      "label": "复习资料(权限观看)",
+      "desc": "",
+      "url": "https://tralis2671.feishu.cn/wiki/ZkVTwvg7kio8vhkyuKZcthHvnWd",
+      "icon": "doc",
+      "restricted": true
+    },
+    {
+      "label": "无限战队",
+      "desc": "",
+      "url": "https://tralis2671.feishu.cn/wiki/SVZ5wPoooiKqgMkvBhScDAvPnFd",
+      "icon": "doc",
+      "restricted": false
+    },
+    {
+      "label": "SSR战队",
+      "desc": "",
+      "url": "https://tralis2671.feishu.cn/wiki/Vi6xw6sOgi6ZtAk2PHBcKVkXn2b",
+      "icon": "doc",
+      "restricted": false
+    },
+    {
+      "label": "追求策略的多元视角实证研究",
+      "desc": "",
+      "url": "https://tralis2671.feishu.cn/wiki/B4WBwQcwXiY1F1kgPJ5c4cDZnVe",
+      "icon": "doc",
+      "restricted": false
+    },
+    {
+      "label": "健身指北",
+      "desc": "",
+      "url": "https://tralis2671.feishu.cn/wiki/VpjFw9xQkiHxu6k7BnTcad2Dnmh",
+      "icon": "doc",
+      "restricted": false
+    }
+  ],
+  "quickAccess": [
+    {
+      "label": "新生任务",
+      "desc": "从入学到毕业的全程指南",
+      "url": "https://tralis2671.feishu.cn/wiki/DYhvw9owZivrJskU5LicGl06nAg"
+    },
+    {
+      "label": "学业系统",
+      "desc": "课程、成绩与培养方案",
+      "url": "https://bcnjr89bg80t.feishu.cn/wiki/GF54wCHgUiOSmdkYSTIcVSWwncb"
+    },
+    {
+      "label": "资源中心",
+      "desc": "常用网站与学习资源",
+      "url": "https://bcnjr89bg80t.feishu.cn/wiki/ZFQ4wlelJiOUkAk3L7tcn94xnKe"
+    },
+    {
+      "label": "校园生活",
+      "desc": "社团活动与校园地图",
+      "url": "https://tralis2671.feishu.cn/wiki/W1sRwXaB7iXYxrk5XKxcgivrnxg"
+    }
+  ],
+  "footerTools": [
+    {
+      "label": "教务系统",
+      "url": "https://jw.jnu.edu.cn"
+    },
+    {
+      "label": "学生邮箱",
+      "url": "https://mail.jnu.edu.cn"
+    },
+    {
+      "label": "图书馆",
+      "url": "https://lib.jnu.edu.cn"
+    },
+    {
+      "label": "校园网",
+      "url": "https://mynet.jnu.edu.cn/app/#modules/customer/myHome.html"
+    },
+    {
+      "label": "学生工作管理",
+      "url": "https://stuit.jnu.edu.cn/"
+    },
+    {
+      "label": "学院官网",
+      "url": "https://www.jnu.edu.cn/main.htm"
+    }
+  ],
+  "slogan": {
+    "main": "探索·成长·连接未来",
+    "sub": "EXPLORE  GROW  CONNECT"
+  },
+  "systemIndicator": {
+    "label": "SYSTEM ONLINE",
+    "version": "VER 1.0.0"
+  },
+  "about": "/about",
+  "chat": "/chat"
+}
