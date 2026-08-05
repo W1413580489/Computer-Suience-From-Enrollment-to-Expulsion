@@ -1,6 +1,8 @@
 # ---- 运行时数据（日志/限流计数，含用户反馈信息）----
 logs/
 *.jsonl
+# 知识库分块文件是部署必需数据，例外放行（服务器 clone 后需要它）
+!data/chunks.jsonl
 
 # ---- 前端依赖与构建产物 ----
 frontend/node_modules/
