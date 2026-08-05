@@ -152,8 +152,8 @@ function goHome() {
 }
 
 .topbar__key-chip--ok {
-  background: rgba(78, 204, 163, 0.12);
-  border: 1px solid rgba(78, 204, 163, 0.45);
+  background: var(--success-soft);
+  border: 1px solid var(--success-strong);
   color: var(--success);
 }
 
@@ -173,7 +173,7 @@ function goHome() {
   font-family: var(--font-display);
   font-size: 11px;
   letter-spacing: 1px;
-  color: var(--accent-yellow);
+  color: var(--amber);
   border: 1px solid var(--border-subtle);
   padding: 4px 10px;
   border-radius: var(--radius-sm);
@@ -203,7 +203,7 @@ function goHome() {
   padding: 0 16px;
   border-radius: var(--radius-md);
   border: 1px solid var(--amber);
-  background: rgba(255, 200, 46, 0.1);
+  background: var(--amber-soft);
   color: var(--amber);
   font-size: 14px;
   font-weight: 600;
@@ -211,7 +211,7 @@ function goHome() {
 }
 
 .topbar__back:hover {
-  background: rgba(255, 200, 46, 0.2);
+  background: var(--amber-mid);
   box-shadow: 0 0 14px var(--amber-glow);
 }
 

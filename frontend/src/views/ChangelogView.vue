@@ -47,7 +47,7 @@ const nav = useNavStore();
   font-family: var(--font-display);
   font-size: 14px;
   font-weight: 700;
-  color: var(--accent-warn);
+  color: var(--warning);
 }
 
 .changelog__date {

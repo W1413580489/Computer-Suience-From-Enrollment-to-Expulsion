@@ -125,7 +125,7 @@ watch(
 
 .msg-list__hot-label {
   font-size: 11px;
-  color: var(--accent-warn);
+  color: var(--warning);
 }
 
 .msg-list__hot-q {

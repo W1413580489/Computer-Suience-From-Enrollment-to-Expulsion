@@ -74,7 +74,7 @@ import SettingsDrawer from '@/components/settings/SettingsDrawer.vue';
 import { useNavStore } from '@/stores/navStore';
 import { useViewport, openExternal } from '@/composables/useViewport';
 import type { MobileTab } from '@/types/nav';
-import characterImg from '@/assets/images/character.png';
+import characterImg from '@/assets/images/character.webp';
 
 const route = useRoute();
 const router = useRouter();

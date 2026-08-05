@@ -20,6 +20,6 @@ withDefaults(defineProps<{ size?: number }>(), { size: 32 });
 <style scoped>
 .jnu-logo {
   flex-shrink: 0;
-  filter: drop-shadow(0 0 6px rgba(55, 138, 221, 0.5));
+  filter: drop-shadow(0 0 6px var(--accent-strong));
 }
 </style>

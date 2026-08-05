@@ -33,17 +33,26 @@
       <button class="dock__meta-btn" :disabled="!canRegenerate || sending" @click="emit('onRegenerate')">
         <NeonIcon name="refresh" :size="15" /> 重新生成
       </button>
-      <button class="dock__meta-btn" :disabled="sending" @click="emit('onClear')">
+      <button class="dock__meta-btn" :disabled="sending" @click="confirmClear">
         <NeonIcon name="close" :size="15" /> 清空会话
       </button>
       <span class="dock__meta-hint">{{ keyHint }}</span>
     </div>
+    <ConfirmModal
+      :visible="showClearConfirm"
+      title="确认清空会话"
+      message="清空后所有对话记录将无法恢复，确定要继续吗？"
+      confirm-text="确认清空"
+      @on-confirm="doClear"
+      @on-cancel="showClearConfirm = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import NeonIcon from '@/components/common/NeonIcon.vue';
+import ConfirmModal from '@/components/common/ConfirmModal.vue';
 import { useSettingsStore } from '@/stores/settingsStore';
 
 defineProps<{ sending: boolean; canRegenerate: boolean }>();
@@ -57,6 +66,7 @@ const emit = defineEmits<{
 const settings = useSettingsStore();
 const text = ref('');
 const inputEl = ref<HTMLTextAreaElement | null>(null);
+const showClearConfirm = ref(false);
 
 const keyHint = computed(() =>
   settings.hasKey ? `BYOK · ${settings.preset.label}` : '平台免费额度 · 配置 Key 解除限额',
@@ -75,6 +85,15 @@ function autoGrow() {
   if (!el) return;
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function confirmClear() {
+  showClearConfirm.value = true;
+}
+
+function doClear() {
+  showClearConfirm.value = false;
+  emit('onClear');
 }
 </script>
 

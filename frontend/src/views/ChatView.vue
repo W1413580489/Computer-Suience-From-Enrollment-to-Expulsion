@@ -164,7 +164,7 @@ function onFeedbackReason(reason: string) {
   padding: 10px 16px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--amber);
-  background: linear-gradient(135deg, rgba(255, 200, 46, 0.14) 0%, rgba(240, 168, 0, 0.06) 100%);
+  background: linear-gradient(135deg, var(--amber-soft) 0%, var(--amber-deep-soft) 100%);
   color: var(--text-primary);
   text-align: left;
   transition: box-shadow 200ms, transform 200ms;
@@ -207,7 +207,7 @@ function onFeedbackReason(reason: string) {
 
 .byok-banner__close:hover {
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--surface-glass);
 }
 
 .chat-disclaimer {

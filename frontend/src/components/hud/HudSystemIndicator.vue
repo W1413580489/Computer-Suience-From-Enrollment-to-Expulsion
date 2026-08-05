@@ -41,7 +41,7 @@ withDefaults(defineProps<{ label?: string; version: string; status?: 'online' | 
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 2px;
-  color: var(--accent-green);
+  color: var(--success);
 }
 
 .sys-indicator__version {

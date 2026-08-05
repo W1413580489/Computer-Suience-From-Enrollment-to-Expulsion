@@ -59,7 +59,7 @@ const emit = defineEmits<{ onClick: [] }>();
 
 .qa-card:hover .qa-card__icon-wrap {
   border-color: var(--amber);
-  background: rgba(255, 200, 46, 0.12);
+  background: var(--amber-soft);
 }
 
 .qa-card__icon {

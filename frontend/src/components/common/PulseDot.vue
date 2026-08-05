@@ -16,18 +16,18 @@ withDefaults(defineProps<{ status?: 'online' | 'maintenance'; size?: number }>()
   flex-shrink: 0;
 }
 .pulse-dot--online {
-  background: var(--accent-green);
-  box-shadow: 0 0 6px var(--accent-green);
+  background: var(--success);
+  box-shadow: 0 0 6px var(--success);
   animation: pulse-green 2s infinite;
 }
 .pulse-dot--maintenance {
-  background: var(--accent-warn);
-  box-shadow: 0 0 6px var(--accent-warn);
+  background: var(--warning);
+  box-shadow: 0 0 6px var(--warning);
   animation: pulse-orange 2s infinite;
 }
 @keyframes pulse-green {
-  0%, 100% { opacity: 1; box-shadow: 0 0 4px var(--accent-green); }
-  50% { opacity: 0.5; box-shadow: 0 0 10px var(--accent-green); }
+  0%, 100% { opacity: 1; box-shadow: 0 0 4px var(--success); }
+  50% { opacity: 0.5; box-shadow: 0 0 10px var(--success); }
 }
 @keyframes pulse-orange {
   0%, 100% { opacity: 1; }

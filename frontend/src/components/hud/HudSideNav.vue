@@ -89,7 +89,7 @@ const emit = defineEmits<{ onItemClick: [route: string] }>();
 }
 
 .sidenav__item--active .sidenav__sublabel {
-  color: rgba(26, 18, 0, 0.65);
+  color: var(--on-amber-muted);
 }
 
 .sidenav__number {
@@ -99,7 +99,7 @@ const emit = defineEmits<{ onItemClick: [route: string] }>();
 }
 
 .sidenav__item--active .sidenav__number {
-  color: rgba(26, 18, 0, 0.55);
+  color: var(--on-amber-faint);
 }
 
 /* 平板折叠态：仅图标 */

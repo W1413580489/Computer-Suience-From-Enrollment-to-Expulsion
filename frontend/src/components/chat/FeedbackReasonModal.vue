@@ -51,7 +51,7 @@ function submit() {
 .modal-mask {
   position: fixed;
   inset: 0;
-  background: rgba(4, 10, 24, 0.7);
+  background: var(--mask-overlay);
   z-index: 130;
   display: flex;
   align-items: center;

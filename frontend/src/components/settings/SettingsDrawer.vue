@@ -194,7 +194,7 @@ function onClear() {
 .settings-mask {
   position: fixed;
   inset: 0;
-  background: rgba(4, 10, 24, 0.6);
+  background: var(--mask-light);
   z-index: 120;
   display: flex;
   justify-content: flex-end;
@@ -269,12 +269,12 @@ function onClear() {
 }
 
 .settings__status-card--ok {
-  border-color: rgba(78, 204, 163, 0.5);
+  border-color: var(--success-strong);
 }
 
 .settings__status-card--warn {
   border-color: var(--amber);
-  background: linear-gradient(135deg, rgba(255, 200, 46, 0.1), rgba(240, 168, 0, 0.04));
+  background: linear-gradient(135deg, var(--amber-soft), var(--amber-deep-soft));
 }
 
 .settings__status-dot {
@@ -289,7 +289,7 @@ function onClear() {
 
 .settings__status-card--ok .settings__status-dot {
   background: var(--success);
-  box-shadow: 0 0 8px rgba(78, 204, 163, 0.5);
+  box-shadow: 0 0 8px var(--success-strong);
 }
 
 @keyframes status-pulse {
@@ -317,7 +317,7 @@ function onClear() {
   padding: 14px;
   border: 1px dashed var(--border-glow);
   border-radius: var(--radius-lg);
-  background: rgba(55, 138, 221, 0.05);
+  background: var(--accent-soft);
 }
 
 .settings__step {
@@ -425,14 +425,14 @@ select.settings__input {
 
 .settings__verify--ok {
   color: var(--success);
-  background: rgba(78, 204, 163, 0.1);
-  border: 1px solid rgba(78, 204, 163, 0.35);
+  background: var(--success-soft);
+  border: 1px solid var(--success-border);
 }
 
 .settings__verify--fail {
   color: var(--danger);
-  background: rgba(255, 107, 107, 0.08);
-  border: 1px solid rgba(255, 107, 107, 0.35);
+  background: var(--danger-soft);
+  border: 1px solid var(--danger-border);
 }
 
 .settings__help {
@@ -458,7 +458,7 @@ select.settings__input {
 }
 
 .settings__help-cta:hover {
-  background: #ffd65c;
+  background: var(--amber);
   box-shadow: 0 0 16px var(--amber-glow);
 }
 

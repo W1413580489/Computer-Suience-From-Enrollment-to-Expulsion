@@ -39,7 +39,7 @@ withDefaults(
     slogan?: string;
   }>(),
   {
-    ringColor: '#FFC82E',
+    ringColor: 'var(--amber)',
     mainText: '点击与我对话',
     subText: 'AI问答助手',
     slogan: '你就问吧！',
@@ -87,12 +87,12 @@ function onActivate() {
   line-height: 1.05;
   letter-spacing: 0.04em;
   color: var(--text-primary);
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 4px 24px var(--shadow-deep);
 }
 
 .character__hero-line--accent {
   color: var(--amber);
-  text-shadow: 0 0 24px var(--amber-glow), 0 4px 24px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 0 24px var(--amber-glow), 0 4px 24px var(--shadow-deep);
 }
 
 .character__hero-script {
@@ -125,7 +125,7 @@ function onActivate() {
 }
 
 .character__trigger:hover .character__image {
-  filter: drop-shadow(0 0 28px rgba(255, 200, 46, 0.45));
+  filter: drop-shadow(0 0 28px var(--amber-halo));
 }
 
 .character__trigger:active {
@@ -167,7 +167,7 @@ function onActivate() {
   position: absolute;
   inset: -10%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 200, 46, 0.14) 0%, transparent 65%);
+  background: radial-gradient(circle, var(--amber-soft) 0%, transparent 65%);
   animation: ring-breathe 2s infinite ease-in-out;
 }
 
@@ -194,7 +194,7 @@ function onActivate() {
   height: auto;
   max-height: 48vh;
   object-fit: contain;
-  filter: drop-shadow(0 0 18px rgba(255, 200, 46, 0.28));
+  filter: drop-shadow(0 0 18px var(--amber-strong));
   transition: filter 200ms;
   mask-image: linear-gradient(to bottom, black 82%, transparent 100%);
   -webkit-mask-image: linear-gradient(to bottom, black 82%, transparent 100%);
@@ -211,13 +211,13 @@ function onActivate() {
   padding: 8px 24px;
   border-radius: 999px;
   border: 2px solid var(--amber);
-  background: linear-gradient(135deg, rgba(255, 200, 46, 0.18) 0%, rgba(240, 168, 0, 0.08) 100%);
+  background: linear-gradient(135deg, var(--amber-mid) 0%, var(--amber-deep-mid) 100%);
   box-shadow: 0 0 16px var(--amber-glow);
   transition: box-shadow 200ms, background 200ms;
 }
 
 .character__trigger:hover .character__cta {
-  background: linear-gradient(135deg, rgba(255, 200, 46, 0.3) 0%, rgba(240, 168, 0, 0.15) 100%);
+  background: linear-gradient(135deg, var(--amber-strong) 0%, var(--amber-deep-strong) 100%);
   box-shadow: 0 0 24px var(--amber-glow);
 }
 

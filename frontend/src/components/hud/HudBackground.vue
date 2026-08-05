@@ -22,8 +22,8 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(55, 138, 221, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(55, 138, 221, 0.05) 1px, transparent 1px);
+    linear-gradient(var(--accent-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--accent-soft) 1px, transparent 1px);
   background-size: 48px 48px;
   mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
 }
@@ -39,12 +39,12 @@
 .hud-background__glow--tl {
   top: -160px;
   left: -120px;
-  background: rgba(55, 138, 221, 0.12);
+  background: var(--accent-mid);
 }
 
 .hud-background__glow--br {
   bottom: -200px;
   right: -140px;
-  background: rgba(239, 159, 39, 0.06);
+  background: var(--warning-soft);
 }
 </style>

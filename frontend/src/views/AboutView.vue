@@ -5,7 +5,8 @@
       <p class="about-p">
         信科院智能助手（XKZ-Agent）是面向暨南大学信息科学技术学院学生的校园知识问答机器人。
         问答内容基于指南《信科院-从入学到被开除》（文档11章节11子文档，共8.1万余字），
-        支持自带大模型 API Key（BYOK）免费提问，未配置 Key 的用户每日享有限量免费额度。但是我没这么多钱，所以我根本没有提供免费额度！！！
+        支持自带大模型 API Key（BYOK）免费提问，未配置 Key 的用户每日享有限量免费额度。
+        受服务器资源限制，免费额度有限，建议配置自己的 API Key 以获得更稳定完整的体验。
       </p>
     </section>
 
@@ -77,7 +78,7 @@ import PageShell from '@/components/common/PageShell.vue';
 }
 
 .about-p--warn {
-  color: var(--accent-warn);
+  color: var(--warning);
 }
 
 .about-link {

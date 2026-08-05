@@ -43,7 +43,7 @@ function open() {
 .citation__badge {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--accent-warn);
+  color: var(--warning);
   flex-shrink: 0;
 }
 

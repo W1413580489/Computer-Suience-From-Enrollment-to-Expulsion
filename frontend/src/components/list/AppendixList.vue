@@ -81,8 +81,8 @@ const emit = defineEmits<{ onItemClick: [item: AppendixItem] }>();
 
 .appendix-list__restricted {
   font-size: 10px;
-  color: var(--accent-warn);
-  border: 1px solid var(--accent-warn);
+  color: var(--warning);
+  border: 1px solid var(--warning);
   border-radius: var(--radius-sm);
   padding: 1px 5px;
   flex-shrink: 0;
