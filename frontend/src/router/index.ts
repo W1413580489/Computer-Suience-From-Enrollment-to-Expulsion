@@ -6,6 +6,7 @@ const routes = [
   { path: '/appendix', name: 'appendix', component: () => import('@/views/AppendixView.vue') },
   { path: '/about', name: 'about', component: () => import('@/views/AboutView.vue') },
   { path: '/changelog', name: 'changelog', component: () => import('@/views/ChangelogView.vue') },
+  { path: '/quest', name: 'quest', component: () => import('@/views/QuestView.vue') },
   { path: '/chat', name: 'chat', component: () => import('@/views/ChatView.vue') },
   { path: '/:pathMatch(.*)*', redirect: '/' },
 ];

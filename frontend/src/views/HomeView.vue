@@ -28,7 +28,7 @@
       </section>
 
       <aside class="hud-right">
-        <HudQuickAccess :items="nav.quickAccess" @on-item-click="(i) => openExternal(i.url)" />
+        <HudQuickAccess :items="questAccessItems" @on-item-click="onQuickAccess" />
       </aside>
     </main>
 
@@ -73,7 +73,7 @@ import NavDrawer from '@/components/nav/NavDrawer.vue';
 import SettingsDrawer from '@/components/settings/SettingsDrawer.vue';
 import { useNavStore } from '@/stores/navStore';
 import { useViewport, openExternal } from '@/composables/useViewport';
-import type { MobileTab } from '@/types/nav';
+import type { MobileTab, QuickAccessItem } from '@/types/nav';
 import characterImg from '@/assets/images/character.webp';
 
 const route = useRoute();
@@ -106,6 +106,26 @@ function go(path: string) {
 
 function goChat() {
   router.push(nav.chatRoute);
+}
+
+/** 快速入口 —— 把第一张卡片置为「新手任务」，其余保持飞书跳转 */
+const questAccessItems = computed<QuickAccessItem[]>(() => {
+  const questCard: QuickAccessItem = {
+    label: '🎮 新手任务',
+    desc: '新玩家账号登录 · 大地图探索 · 攻略手册',
+    url: '/quest',
+  };
+  // 替换第一张，其余保留
+  const rest = nav.quickAccess.slice(1).map(i => ({ ...i }));
+  return [questCard, ...rest];
+});
+
+function onQuickAccess(item: QuickAccessItem) {
+  if (item.url.startsWith('/')) {
+    router.push(item.url);
+  } else {
+    openExternal(item.url);
+  }
 }
 
 function onDrawerNav(path: string) {
