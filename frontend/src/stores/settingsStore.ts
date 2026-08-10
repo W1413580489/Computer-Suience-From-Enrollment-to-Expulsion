@@ -17,7 +17,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     key: 'deepseek',
     label: 'DeepSeek-V4（默认）',
     baseUrl: 'https://api.deepseek.com/v1',
-    model: 'deepseek-chat',
+    model: 'deepseek-v4-flash',
     keyHelpUrl: 'https://platform.deepseek.com/api_keys',
   },
   {

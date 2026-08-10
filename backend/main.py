@@ -95,7 +95,7 @@ def _resolve_upstream(req_provider: str | None, req_base_url: str | None,
     provider = (req_provider or "deepseek").lower()
     if req_base_url:  # custom
         base_url = req_base_url.rstrip("/")
-        model = req_model or "deepseek-chat"
+        model = req_model or "deepseek-v4-flash"
     else:
         preset = config.PROVIDERS.get(provider, config.PROVIDERS["deepseek"])
         base_url = preset["base_url"]

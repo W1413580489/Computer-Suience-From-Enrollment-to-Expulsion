@@ -30,11 +30,11 @@ MAX_CHUNK_TEXT = 800                                       # FR-RT-03 单块截�
 # ---- 平台兜底模型（FR-BY-MODEL）----
 PLATFORM_API_KEY = os.getenv("XKZ_PLATFORM_API_KEY", "")   # 平台兜底 DeepSeek Key（不填则免费模式不可用）
 PLATFORM_BASE_URL = os.getenv("XKZ_PLATFORM_BASE_URL", "https://api.deepseek.com/v1")
-PLATFORM_MODEL = os.getenv("XKZ_PLATFORM_MODEL", "deepseek-chat")
+PLATFORM_MODEL = os.getenv("XKZ_PLATFORM_MODEL", "deepseek-v4-flash")
 
 # ---- BYOK 服务商预设（OpenAI 兼容协议）----
 PROVIDERS = {
-    "deepseek": {"base_url": "https://api.deepseek.com/v1", "model": "deepseek-chat"},
+    "deepseek": {"base_url": "https://api.deepseek.com/v1", "model": "deepseek-v4-flash"},
     "qwen":     {"base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1", "model": "qwen-plus"},
     "kimi":     {"base_url": "https://api.moonshot.cn/v1", "model": "moonshot-v1-8k"},
     "zhipu":    {"base_url": "https://open.bigmodel.cn/api/paas/v4", "model": "glm-4-flash"},
