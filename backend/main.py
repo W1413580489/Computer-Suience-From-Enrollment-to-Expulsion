@@ -224,13 +224,14 @@ async def ask(req: AskRequest, request: Request):
         return StreamingResponse(no_content(), media_type="text/event-stream")
 
     citations = [
-        {"id": i + 1, "title": f"{r['doc']}-{r['section']}", "url": r["source_url"],
+        {"id": i + 1, "title": r.get("section_path", f"{r['doc']}-{r['section']}"),
+         "url": r["source_url"],
          "excerpt": r["text"].split("\n")[0][:80]}
         for i, r in enumerate(results)
     ]
 
     ref_block = "\n".join(
-        f"[来源{i + 1}]（{r['doc']}-{r['section']}）: {r['text']}" for i, r in enumerate(results)
+        f"[来源{i + 1}]（{r.get('section_path', r['section'])}）: {r['text']}" for i, r in enumerate(results)
     )
 
     # ---- 组装消息（§7.2，多轮最多 6 轮 FR-QA-05）----
