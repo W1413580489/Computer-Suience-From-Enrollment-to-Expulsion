@@ -31,7 +31,7 @@ const rawContent = `# 🔗 常用链接
 
 财务管理信息系统 https://cw.jnu.edu.cn/CASLogin.aspx
 
-本科教务系统（教务系统网上办事服务大厅）jw.jnu.edu.cn
+本科教务系统（教务系统网上办事服务大厅）https://jw.jnu.edu.cn/
 
 暨南大学图书馆（可查阅全国各期刊论文）https://lib.jnu.edu.cn/
 
@@ -41,8 +41,6 @@ const rawContent = `# 🔗 常用链接
 
 一键生成 EVA 风格的图片 https://lab.magiconch.com/eva-title/
 
-> 💻 笔记本电脑选购指南 —— 参见 23网安梵某学长 编撰的电脑推荐文档
-
 ---
 
 **一些神奇妙妙小工具，需要一些神奇魔法：**
@@ -51,17 +49,7 @@ https://gemini.google.com/
 https://chatgpt.com/
 https://openai.com/
 
-下载就对了，这是计算机学生的必经之路 https://www.yuanshen.com/
-
----
-
-📎 **常用文档下载：**
-
-- 暨南大学大学生创新创业训练计划项目重大事项变更审批表
-- 本科学生主动退学申请表
-- 转专业申请表（外招生）
-- 转专业申请表（内招生）
-- 2026年暨南大学本科生临时困难补助申请表`;
+下载就对了，这是计算机学生的必经之路 https://www.yuanshen.com/`;
 
 const contentHtml = computed(() => renderMarkdown(rawContent));
 </script>

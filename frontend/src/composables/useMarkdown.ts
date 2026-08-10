@@ -28,6 +28,10 @@ export function renderMarkdown(md: string): string {
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
 
+  // Auto-link bare URLs (not already inside <a> tag)
+  html = html.replace(/(?<!href="|">)(https?:\/\/[^\s<>"')]+)/g,
+    '<a href="$1" target="_blank" rel="noopener">$1</a>');
+
   // === STEP 4: Block-level markdown ===
   html = html.replace(/^---+\s*$/gm, '<hr />');
   html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
