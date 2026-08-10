@@ -20,11 +20,26 @@ export interface AskCallbacks {
 }
 
 async function sha256Short(text: string): Promise<string> {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text.trim().toLowerCase()));
-  return Array.from(new Uint8Array(buf))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
-    .slice(0, 16);
+  const normalized = text.trim().toLowerCase();
+  // 非安全上下文（http://IP:port）下 crypto.subtle 不可用，降级为 FNV-1a 哈希
+  try {
+    if (crypto?.subtle) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(normalized));
+      return Array.from(new Uint8Array(buf))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('')
+        .slice(0, 16);
+    }
+  } catch {
+    /* 降级走 FNV-1a */
+  }
+  // FNV-1a 32-bit，均匀且快速，足以作为会话内反馈标识
+  let h = 0x811c9dc5;
+  for (let i = 0; i < normalized.length; i++) {
+    h ^= normalized.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(16).padStart(8, '0');
 }
 
 export { sha256Short };
