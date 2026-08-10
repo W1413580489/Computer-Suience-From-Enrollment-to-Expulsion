@@ -443,6 +443,54 @@ function scrollToTop() {
 .reader-section__body :deep(ul),
 .reader-section__body :deep(ol) { padding-left: clamp(16px, 3vw, 22px); margin: .6em 0; }
 .reader-section__body :deep(li) { margin-bottom: .3em; }
+
+/* === Callout blocks — game-style player comments === */
+.reader-section__body :deep(.quest-callout) {
+  display: flex; gap: clamp(10px, 2vw, 14px);
+  background: var(--bg-panel-3);
+  border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--amber);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: clamp(12px, 2vw, 16px) clamp(14px, 2vw, 18px);
+  margin: 1em 0;
+  position: relative;
+}
+.reader-section__body :deep(.quest-callout__avatar) {
+  font-size: clamp(22px, 3vw, 28px);
+  flex-shrink: 0;
+  line-height: 1;
+  margin-top: 2px;
+  filter: drop-shadow(0 0 4px var(--amber-glow));
+}
+.reader-section__body :deep(.quest-callout__body) {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.reader-section__body :deep(.quest-callout__tag) {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: clamp(9px, 1.3vw, 10px);
+  color: var(--amber);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  align-self: flex-start;
+  border: 1px solid var(--amber-glow);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+  opacity: .8;
+}
+.reader-section__body :deep(.quest-callout__body p) {
+  font-size: clamp(12px, 1.8vw, 14px);
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-style: italic;
+  margin: 0;
+}
+.reader-section__body :deep(.quest-callout__body a) {
+  color: var(--text-link);
+  font-style: normal;
+}
+
 .reader-section__body :deep(table) {
   width: 100%; border-collapse: collapse; margin: .8em 0; font-size: .92em;
   display: block; overflow-x: auto; -webkit-overflow-scrolling: touch;
