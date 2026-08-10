@@ -26,7 +26,7 @@
 
 好课，事少不点。给张老师的表情包。
 
-![图片展示了一位身着浅色西装、佩戴深色领带的女性，她右手举起，做出敬礼手势。图片下方有“respect”字样。该图片位于文档中“慢性病预防与调理”课程介绍部分，作为给张老师的表情包出现，可能是对张老师在该课程中的教学或表现表示敬意。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=ZTYzYjg0ZTQ1YjYxOGU5N2YyOTIwNjQxNmJkNTEyNmVfY2I1Yzg4YmMyMjllZjM1ZGU5ODY2MmU2YzQyZGU0MzlfSUQ6NzY1NzQ2NDY1MTMwMjczNDgyM18xNzg1ODMxNTc3OjE3ODU4MzUxNzdfVjM)
+![图片展示了一位身着浅色西装、佩戴深色领带的女性，她右手举起，做出敬礼手势。图片下方有“respect”字样。该图片位于文档中“慢性病预防与调理”课程介绍部分，作为给张老师的表情包出现，可能是对张老师在该课程中的教学或表现表示敬意。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=M2IxY2JjNDljM2VlMTRmOWJiNmZmY2ZkODA0ZTYwY2VfOWE1NmE5NDE2MTlmNTZmNDk0NDFkNDJkZjlhZjgxNTBfSUQ6NzY1NzQ2NDY1MTMwMjczNDgyM18xNzg2MzU1MzQwOjE3ODYzNTg5NDBfVjM)
 
 ### 大数据分析
 
@@ -108,7 +108,7 @@
 
 补：跑步跑的快的话其实这课也还好 就是给你张地图 按点位顺序打卡跑 就是晒太阳有点热了 最后有90+
 
-![图片展示的是2024年10月22日上午11:10进行的户外跑步数据。路线从“学生浮”出发，经“化学与材料学院”等地点，终点为“中心实验室”，总距离2.46公里，用时20分35秒，平均配速8分21秒，累计上升74.5米，累计下降73.8米，总卡路里241kcal，步数2714步，平均心率167BPM，平均步幅90cm。该图与文档中定向越野课程内容相关，直观呈现了跑步考试的运动数据。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=YzNiOTRmMmMxNzZlMTMwZTg4MjA2OWFhMmZkZjI0MzhfOGFiYWI3NjIxYjRmZjk2OGUyMjJiMTZlZTgwYWIzMWJfSUQ6NzY1NzQ2NjQ5Njg0NzU0NzU4OV8xNzg1ODMxNTc3OjE3ODU4MzUxNzdfVjM)
+![图片展示的是2024年10月22日上午11:10进行的户外跑步数据。路线从“学生浮”出发，经“化学与材料学院”等地点，终点为“中心实验室”，总距离2.46公里，用时20分35秒，平均配速8分21秒，累计上升74.5米，累计下降73.8米，总卡路里241kcal，步数2714步，平均心率167BPM，平均步幅90cm。该图与文档中定向越野课程内容相关，直观呈现了跑步考试的运动数据。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=YWIyNGVhYjA2NDVlOTgwNjM3NGZiYWEzMjY3ODIwYWZfODI3MjI5NjA4N2U2ZTFlOGJmMTQ0N2JhZDk3NzRkYjFfSUQ6NzY1NzQ2NjQ5Njg0NzU0NzU4OV8xNzg2MzU1MzQwOjE3ODYzNTg5NDBfVjM)
 
 # 关于毕设
 
@@ -202,36 +202,5 @@
 
   先说说我是怎么找实习的。首先学校好像是有一个实习计划，你把你的资料交上去之后，会点对点给你发岗位，具体岗位不一定是跟你专业相关的，我那时候填的技术岗，然后给了个行政岗。当然每个人不一样，也有同学拿到了专业对口的，总之这个可以试试。
 
-  然后就是面对外招同学的。香港的同学可以关注一下沪港青年会，这个就是香港和上海联合组成的一个实习计划，先是一面，通过了之后要交3k（不成功的话可以退的），然后就去填你想去的企业，之后企业会面试，然后就可以去上海实习了。澳门的情况我不是很了解，但听他们说过珠海也是有这种计划的。
-
-  如果以上的你都不喜欢，那就得关注校内的实习招聘，或者去boss直聘这种平台上。我的实习就是在boss上找的。
-
-  关于去找啥公司我就不在这里说了（怕被ota），有兴趣私聊我。我个人的建议是去找你感兴趣的，比如你喜欢做计算机视觉就可以找一些汽车公司之内。
-
-# 关于研究生
-
-## 外招同学
-
-  先说说想留暨大的同学，暨大对外招同学有两个途径一个是保研一个是申请。
-
-### 先说说保研
-
-  保研一般是下半年开始，要求是专业绩点前50%的同学，记得前50%只是能进复试，进复试后才是你跟其他同学竞争的地方。研招办会让你交你的材料，材料包括成绩单，简历，个人获奖经历等。按学长们以前的经验，材料占3成，你复试的表现占7成。所以准备保的同学要背熟专业知识，把自己参加过的项目，比赛和实习回顾一下。
-
-### 然后是申请
-
-  申请的话，其实跟保研差不多。但不是在学生管理系统里进的，是在研招网上进的（https://yz.jnu.edu.cn/ 链接放这）。然后进入系统依旧是交材料，然后等复试通知。研招办会对你的材料进行审核，一共3个方向，满分300要180且3个方向分数不能低于60才能过初试。
-
-# 暂时先写到这，有问题直接评论区问，我会拿出来回答的。
-
-
-
-
-
-<callout emoji="🙊">
-你知道的，“我不可以这样随便谈论一位，德高望重的大学教授”，**所以我不对他的任何言论负责**--王凌骏
-</callout>
-
----
-
-<callout emoji="🐳"><h3>返回导航页：<cite doc-id="VvKVwsHo2iIIC4ko0PmcKs4lnKd" file-type="wiki" title="信科院-从入学到被开除" type="doc"></cite></h3></callout>
+  然后就是面对外招同学的。香港的同学可以关注一下沪港青年会，这个就是香港和上海联合组成的一个实习计划，先是一面，通过了之后要交3k（不成功的话可以退的），然后就去填你想去的企业，之后企业会面
+...Total: 4814 chars

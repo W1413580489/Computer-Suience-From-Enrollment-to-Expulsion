@@ -6,7 +6,7 @@
 
 本章节主要列举大学生有关竞赛，具体内容请参考最后一列**ACM**与**其他文档**：
 
-<figure view-type="Card"><source name="2026年全国普通高校大学生竞赛.pdf" href="https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=Y2U0NTA1NWJkYzc0NDhiOTY5ODZhM2QzNjg0ODYwNWZfNDNlYTY0ZWMwNzI5OGM5OGZhMmZiNTA5YzY1NzU0ZDhfSUQ6NzY1NzQwNjAwNDAzNjI3NTE4MV8xNzg1ODMxNTY2OjE3ODU4MzUxNjZfVjM" mime="application/pdf" size="141404" token="KqeCbYv0LopJDrxHIZgcmXfkn5e"/></figure>
+<figure view-type="Card"><source name="2026年全国普通高校大学生竞赛.pdf" href="https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=YzQ1NTg2MDYxYTY1N2JjYjM1NDgyZDFmYWY1NjlmZDlfZjYxZGU3NTU5ODMzMGU2MDA2YTcxYzFmODUxYjExNjJfSUQ6NzY1NzQwNjAwNDAzNjI3NTE4MV8xNzg2MzU1MzMxOjE3ODYzNTg5MzFfVjM" mime="application/pdf" size="141404" token="KqeCbYv0LopJDrxHIZgcmXfkn5e"/></figure>
 
 计算机专业竞赛主要分为国家认证的a类竞赛和商业竞赛，前者通常用作保研/考研面试加分，后者则多为企业举办用于招募人才，需要注意的是，二者相对冲突，商业竞赛基本不受高校加分政策认证，而a类竞赛对就业帮助极为有限
 
@@ -14,7 +14,7 @@
 
 > 由企业举办的商业竞赛可在在各企业官网查询，或直接搜索“抖音/腾讯/华为/...+比赛”
 
-![这是一张趣味创意海报，主体是身着黑色高领上衣的雷军，他手持一个外观类似特摄剧中变身道具的装置，装置旁标注有“小米驱动器”“轻装上阵”以及“XIAO MI RIVER”的字样。海报左侧有小米创始人雷军的标识，底部还带有特摄相关的包装图案和抖音水印，整体是将雷军相关元素与特摄道具结合的二次创作内容，和文档中提及的小米相关品牌主体形成关联。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=NGI3OGQyYjBmNWYxNTlkMjA0YjhlOWEzOTI3ZDg3N2JfN2MyMzIwODg3ZjVmMjA0NWU2YzZhMmMzMDhhOGNkOTRfSUQ6NzY1NzQwNjAwMzQyODEzMzg1OF8xNzg1ODMxNTY2OjE3ODU4MzUxNjZfVjM)
+![这是一张趣味创意海报，主体是身着黑色高领上衣的雷军，他手持一个外观类似特摄剧中变身道具的装置，装置旁标注有“小米驱动器”“轻装上阵”以及“XIAO MI RIVER”的字样。海报左侧有小米创始人雷军的标识，底部还带有特摄相关的包装图案和抖音水印，整体是将雷军相关元素与特摄道具结合的二次创作内容，和文档中提及的小米相关品牌主体形成关联。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=MGM3ODdmMDljMWY3YWUwNmNlYzAwZTE1ZTRiZjg5YmZfNmM3YjZiNDNjYzU3YzJiMjhjOWFiODMyOTQwZTM5NTJfSUQ6NzY1NzQwNjAwMzQyODEzMzg1OF8xNzg2MzU1MzMxOjE3ODYzNTg5MzFfVjM)
 
 ### **华为**
 
@@ -41,7 +41,7 @@
 - 腾讯云黑客松智能渗透挑战赛：面向高校及极客开发者的AI安全赛事。参赛者需构建自主渗透智能体，完成漏洞发现与利用。
 - AI CAN DO IT 游戏开发黑客松：由腾讯云发起，面向全球开发者和学生的游戏开发黑客松。
 
-![图片展示的是一个卡通企鹅形象，头戴红色五角星帽子，表情严肃。其胸前有“你充Q币吗？”的白色文字。该图片位于介绍腾讯CodeBuddy杯的文档中，腾讯CodeBuddy杯是腾讯冠名的广东省大学生程序设计竞赛，图片可能用于增添趣味性，与文档内容形成对比，引发读者兴趣。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=ODI2MWY3YWFkNmVhNmNiZDk0NDk0MWE2MDU1YjdmOTRfYjk5Y2Y2OTFiYmM2Y2ZhYWM0YjM5YjdkMzkwYWFlZTlfSUQ6NzY1NzQwNjAwMjU1MTcwNDc1Nl8xNzg1ODMxNTY2OjE3ODU4MzUxNjZfVjM)
+![图片展示的是一个卡通企鹅形象，头戴红色五角星帽子，表情严肃。其胸前有“你充Q币吗？”的白色文字。该图片位于介绍腾讯CodeBuddy杯的文档中，腾讯CodeBuddy杯是腾讯冠名的广东省大学生程序设计竞赛，图片可能用于增添趣味性，与文档内容形成对比，引发读者兴趣。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=MWI3NWExZjI4Yzc5NmY5ZjVmYzA3MjVkZmM4ZmJiOWNfMDM1NDFhYTYwNDlmNGY5YzYxMmI3Zjg2YzMzZGM5MDhfSUQ6NzY1NzQwNjAwMjU1MTcwNDc1Nl8xNzg2MzU1MzMxOjE3ODYzNTg5MzFfVjM)
 
 ### **台积电 (TSMC)**
 
@@ -92,3 +92,4 @@ http://acm.zju.edu.cn/
 ---
 
 <callout emoji="🛠️"><h3><b>无限战队 (综合创新类)见此文档：</b><b><cite doc-id="SVZ5wPoooiKqgMkvBhScDAvPnFd" file-type="wiki" title="♾️无限战队" type="doc"></cite></b></h3><h3><b>ssr战队(机器人类)见此文档：</b><b><cite doc-id="Vi6xw6sOgi6ZtAk2PHBcKVkXn2b" file-type="wiki" title="🤖SSR战队" type="doc"></cite></b></h3><h3>返回导航页：<cite doc-id="VvKVwsHo2iIIC4ko0PmcKs4lnKd" file-type="wiki" title="信科院-从入学到被开除" type="doc"></cite></h3></callout>
+...Total: 3856 chars, rev: 120

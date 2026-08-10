@@ -1,24 +1,123 @@
 <title>🧑‍🎓新生指南补缺</title>
 
-已知的是我们计算机系，在新生对应的26计算机系水群公告上有一个新生指南<cite doc-id="QQ9AdeSiVoPLSTx2fYZc3cmpnDc" file-type="docx" title="2025新生入学问题汇总" type="doc"></cite>
+> **修复了过去仅面向同一专业新生的bug，**部分内容计算机系可在新生对应的26计算机系水群公告上有一个新生指南，对于其他专业或其他学院的学生，可以继续阅读本文档
 
-![图片展示的是暨南大学信息科学技术学院计算机系的新生指南页面。页面上方显示“JNU - 信科院”，右上角有学号、年份、班级等信息。左侧有“首页”“大学政策”“学业指南”“资源地图”等导航栏。右侧是“学业指南”板块，包含任务方案、选课系统、考试成绩、保研政策等内容；“资源地图”板块有数字资源、实验平台等；“校园生活”板块有校园卡服务、食堂餐饮等；“发展规划”板块有升学渠道、实习就业等。页面底部有“暨南大学信息科学技术学院计算机系”标识及多个服务系统图标。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=NzE2YmM1MTk2YjBlZTE5ZTg4ZGIzNjZiYjVkNzJhZThfZmFlZDA5MjUzNGM4YjY3ZmYxYTBiNDRiZjg5NWNiNjFfSUQ6NzY2NDkyMTYzMjcwNDQ4MjI3N18xNzg1ODMxNTU2OjE3ODU4MzUxNTZfVjM)
+# 新玩家账号登录
+
+入学前请打开你的「角色背包」，检查以下装备是否齐全：
+
+| 名称 | 获取方式 | 备注 |
+|-|-|-|
+| 录取通知书 | 内招学生学校发放，外教学生可能需要自行打印 | 全文复印1份备用，以备不时之需；外招凭打印版报到后，将来会补发实物 |
+| 身份证件 | 角色出生自带 | 将身份证件正反面打印在同一面，外招同学报考/入学使用注册的同一张证件，后续学校内的各种注册事务都要使用相同证件，避免麻烦， |
+| 证件照 | 照相馆掉落 | 入学的要求中已经具体标注证件照的规格，在此不多做解释 |
+| 团组织档案 | 高中副本结算 | 入学的要求中已经具体标注证件照的规格，在此不多做解释 |
+| JNUID账号 | 线上提前激活 | 8月下旬关注「暨南大学官方服务号」（微信号：JinanUniversity）→ 菜单栏「欢迎新生-新生服务」→ 设置密码 → 完成激活 |
+
+> JNUID是最重要的通行证——它同时是教务系统、校园网、图书馆、选课系统、体测查询等所有校内功能的登录钥匙。
+
+
+
+## 1.技能预加点
+
+在正式开学前，建议你学习好以下的一些技能
+
+**① 「信息检索」Lv.1**
+
+- 关注暨南大学官方微信公众号并完成JNUID绑定
+- 提前截图或保存好查看入学事项公告、报到信息、缴费信息——有需要的公告，信息，教程，由于开学人数过多，有概率网络较差，人群密集处，网络或流量都难以幸免
+
+  <callout emoji="🌐">
+  [新生登录说明](https://netc.jnu.edu.cn/2023/0814/c10374a760871/page.htm)
+  </callout>
+
+**② 「行李收纳」Lv.Max**
+
+- 快递大件行李到学校：地址「广东省广州市番禺区南村镇兴业大道东855号暨南大学番禺校区菜鸟驿站」→ 快递中心在T11架空层
+- 开学时学长学姐真的搬不动你的行李箱，**大件请全部走快递，到了再取**，如果自己不想太累，可以联系你认识的在校/可提供帮助的学长学姐，提前帮你取好行李并寄存，避免快递站的爆满，导致挤不进去
+
+
+
+**③ 「防诈骗」Lv.1**
+
+- 凡是**学院专业官方群**以外的任何通知都不保证真实！
+- 所有涉及金钱的通知，只会通过**官方群聊**下达！
+- 任何通过诱骗、恐吓等手段以报班学习为目的的机构均不真实！
+- 查看更多反诈情报：<cite doc-id="Pl6jwyfb0iDe4LkuJtXcpiZBnjg" file-type="wiki" title="🧱大学反诈篇" type="doc"></cite>
+
+
+
+## 2.npc任务
+
+### **任务一：引路学长/学姐（面向全体新生）**
+
+- 微信小程序搜索「暨大迎新」→ 登录查询你的对点引路学长/学姐
+- 加上微信后可以进行学生事务的询问，或者聊天，在你的引路学长有空的情况下，可以申请帮助，商量报道当天碰头，带你行走校园，由于学校的装修扩建，旧的地图可能有一定变化，加上开学人数众多，老生带路比地图效率更高
+- 但不可以强制，避免掉npc好感度
+
+
+
+### **任务二：加入班级微信群（面向全体新生）**
+
+- 按照你的专业加入对应的班级群（26+专业+名字实名）群聊会由你的引路学长拉你进群
+- **禁水群用来接收重要通知，不要在里面发消息**
+- 有问题可在水群提问，或者自行私聊，但要保持小心
+
+### **任务三：确认电脑配置（面向理工科）**
+
+- 尽量买Windows游戏本（已购买不必观看，还未购买的同学注意）
+- iPad自愿选购，iPadOS写不了很多作业，仅能代替纸质笔记本
+- **五人寝**桌子比较小，可以放24寸16:9显示器，台式机慎重，**四人寝**的空间极为足够，可以随意配置，
+- 详细选购参考：<cite doc-id="Y9OIw8JXKiGsdtkP5RCcDxc3nge" file-type="wiki" title="笔记本电脑推荐——面向所有大学生的推荐向" type="doc"></cite>
+
+
+
+## 3.前往“新手村”
+
+### **地铁+公交**
+
+**地铁线路：**地铁4号线 → **新造站** A1出口
+
+**公交接驳：**出站后搭乘番87路公交 → 金光西大道站（暨南大学南校区）下车 → 步行约800米到达暨南大学番禺校区南门
+
+### 各大交通枢纽出发
+
+| 出发地 | 推荐路线 |
+|-|-|
+| **白云机场** | 乘地铁3号线（体育西路方向）在体育西路站转乘3号线（海傍方向）到客村站转乘8号线（万胜围方向）到万胜围站转乘4号线（南沙客运港方向）到新造站，步行1.4公里或乘公交车暨南大学至新造地铁站直达专线到暨南大学番禺校区。 |
+| **广州南站** | 乘地铁7号线（燕山方向）到大学城南站转乘4号线（南沙客运港方向）到新造站，步行1.4公里或乘公交车暨南大学至新造地铁站直达专线到暨南大学番禺校区。 |
+| **广州火车站** | 乘地铁5号线（黄埔新港方向）到车陂南转乘4号线（南沙客运港方向）到新造站，步行1.4公里或乘公交车暨南大学至新造地铁站直达专线到暨南大学番禺校区。 |
+| **广州火车东站** | 乘地铁1号线（西塱方向）到杨箕站转乘5号线（黄埔新港方向）到车陂南转乘4号线（南沙客运港方向）到新造站，步行1.4公里或乘公交车暨南大学至新造地铁站直达专线到暨南大学番禺校区。 |
+
+### 自驾/打车
+
+导航搜索"暨南大学番禺校区"（广州市番禺区兴业大道东855号）迎新报到当天，社会车辆禁止入校，需在南门下车，换乘校内接驳车，由于东门车道狭窄，容易堵塞，强烈不建议在东门下车
+
+---
 
 # 新生主线任务篇
 
-> 新生学习的第一课，就是先把各篇章都看了！
-> 
-> 想读研，论文文献比这更晦涩；想工作，工作文档比这更复杂
-> 
-> 如果你连这点文档都没有耐心阅读，期末周你只会比阅读文档更痛苦
+> 新生学习的第一课，就是先把各篇章都看了！想读研，论文文献比这更晦涩；想工作，工作文档比这更复杂。如果你连这点文档都没有耐心阅读，期末周你只会比阅读文档更痛苦
 
-下列简单介绍信科院学生入学过程：开学时，校门口将有接驳车把你送到报道点，完成手续后前往宿舍，你也可以选择先前往宿舍入住，然后再去报道报道，手续完成后你需要去医务室体检，鉴于广东天气原因，建议提前带上降温工具，完成一系列手续后，开始取回快递和宿舍打理，大一作为整个大学最轻松的阶段，有充足的时间进行自己的个人活动，这时你会开始思考自己要不要竞选班委，参加各种社团和组织，迷茫自己的发展规划，此时请参考：
+入学需要的物品已经详细的写在了入学须知中，下列简单介绍学生入学过程：
+
+1. **抵达南门/东门** → 新生及家长从步行入校（迎新期间机动车不进校）
+2. **换乘接驳车** → 有迎新大巴接驳前往宿舍区和报到点，你走也行，走几步就到了
+3. **办理入住** → 先到宿舍放行李，领取宿舍钥匙/门禁卡
+4. **学院报到** → 前往所在学院迎新点，提交材料、领取新生资料袋
+5. **体检** → 按安排参加新生入学体检（早晨空腹）
+6. **校园卡激活** → 激活校园卡，充值开通使用
+7. **班会/新生见面会** → 这玩意可能有可能没有，总之先去**拿快递**吧
+
+鉴于广东天气原因，建议提前带上降温工具，完成一系列手续后，开始取回快递和宿舍打理，大一作为整个大学最轻松的阶段，有充足的时间进行自己的个人活动，这时你会开始思考自己要不要竞选班委，参加各种社团和组织，迷茫自己的发展规划，此时请参考：
 
 <cite doc-id="DZUOwmJKLi6kRfkwT5Schjg3n3f" file-type="wiki" title="🏛️学生组织介绍（待完善）" type="doc"></cite>
 
 <cite doc-id="D17ewTvi8iImXbkBxS0cVt0un0O" file-type="wiki" title="💻就业发展规划" type="doc"></cite>
 
 <cite doc-id="GF54wCHgUiOSmdkYSTIcVSWwncb" file-type="wiki" title="🎓学术发展规划" type="doc"></cite>
+
+
 
 ## **1.新生四道坎**
 
@@ -30,11 +129,11 @@
 > 
 > 面对**第三道坎**，你需要扪心自问，你是一个爱干净的人吗？你们宿舍需要打扫吗。趁着大家还没有熟起来，做好宿舍值日的规划，一个干净舒适的宿舍环境，能给大学带来极不一样的体验。这边建议购买浴室前的地毯，拖把1\~2个，扫把1个，抹布，马桶刷。
 > 
-> ![图片展示了一只卡通猪形象，头戴黄色草帽，身穿红色中式服装，腰间系着绿色腰带，手持一把扫帚，背景是草地和一些垃圾。该图片位于介绍新生宿舍四道坎中第三道坎内容之后，用以幽默地表达面对宿舍值日规划时，一个干净舒适的宿舍环境能带来不一样的大学体验，同时通过猪的形象和扫帚，形象地传达了宿舍值日的场景，增添趣味性。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=ODFiZjc5YjlhZjdhZTRkYmRhYTNiMjcxYTMwMDkxOTBfMGYyMTU2Zjk2ZDQzMDRjYTgyMmM5ZTMyODc5ZTA1YWFfSUQ6NzY2NDgyNDI1NzI1NTg4NTgwNV8xNzg1ODMxNTU2OjE3ODU4MzUxNTZfVjM)
+> ![图片展示了一只卡通猪形象，头戴黄色草帽，身穿红色中式服装，腰间系着绿色腰带，手持一把扫帚，背景是草地和一些垃圾。该图片位于介绍新生宿舍四道坎中第三道坎内容之后，用以幽默地表达面对宿舍值日规划时，一个干净舒适的宿舍环境能带来不一样的体验，建议购买相关清洁用品，如浴室前地毯、拖把、扫把、抹布、马桶刷等，以营造良好的宿舍环境。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=YjY1MWM1NmVmMTRlNmYyZThmZjY1NDhjMDQ4M2FjNmRfMWFkNWQ2NTIxN2IwZmViNTQ3ODc2MDNiYWQ4YWE4YzZfSUQ6NzY2NDgyNDI1NzI1NTg4NTgwNV8xNzg2MzU0Njc5OjE3ODYzNTgyNzlfVjM)
 > 
 > **第四道坎**是最重要的，这完全取决了你的大学作息安排，宿舍几点关灯？几点静音？各位务必要提前交流敲定！等你明天还有早八，然后现在是凌晨2:30，你的舍友还在开着台灯打游戏，大声敲键盘，以及大吼大叫的时候，你将知道什么叫绝望。如果不想演化成校园自由搏击，请注意沟通
 > 
-> ![这张图呈现了一处格斗赛场场景：一名赤裸上身的男子，面部沾有血迹，胸口与手臂带有纹身，正伸出右手食指指向前方。他身后是红色围绳的擂台，围栏后站着众多神态各异的围观者，结合文档中新生第四道坎的内容，该图可被用来类比宿舍作息冲突时，那种因作息差异引发的、如同赛场般的紧张对抗状态，直观呈现出沟通不及时可能产生的激烈矛盾氛围。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=YmNlZDVlMWQ5YWZlM2Q4NWM4NDhlYmExN2EwMjRiOTBfOTA4ZDhhYmUwMzY2ZDY3NzRjMWQ4ZDcwYmRkZTFmMDdfSUQ6NzY2NDgyMzY4NTA3Njk3ODY2MF8xNzg1ODMxNTU2OjE3ODU4MzUxNTZfVjM)
+> ![图片展示的是电影《死侍》中死侍在拳击场的场景。画面中死侍赤裸上身，肌肉发达，左手手腕处有绷带，右臂上有纹身，胸前有圆形图案。他右手高举，手指指向画面左侧，表情严肃。背景是拳击场，观众席上观众众多，氛围紧张。此图与上下文关系紧密，上下文提到“如果不想演化成校园自由搏击，请注意沟通”，图片中的死侍形象与“校园自由搏击”相呼应，暗示沟通的重要性。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=MDU4MzVmOTRiODdmYzM2NmIyYzQ2YTIwYjYzNjVmYmNfMTMyMzgwNjU5N2I1NWM1MjA1NzQxNjI4MzY5YWY1ZWZfSUQ6NzY2NDgyMzY4NTA3Njk3ODY2MF8xNzg2MzU0Njc5OjE3ODYzNTgyNzlfVjM)
 
 
 
@@ -55,6 +154,8 @@
 <blockquote><p>我们直接查看常用链接篇，里面有许多有用的网站链接<cite doc-id="ZFQ4wlelJiOUkAk3L7tcn94xnKe" file-type="wiki" title="🔗常用链接" type="doc"></cite></p></blockquote>
 
 <callout emoji="🌐"><p><cite doc-id="Y9OIw8JXKiGsdtkP5RCcDxc3nge" file-type="wiki" title="笔记本电脑推荐——面向所有大学生的推荐向" type="doc"></cite></p><p>选课，当然要买一部好电脑了，但是我没有接到转转的广告，所以只能分享由<b>23网安梵某学长</b>编撰的电脑选购指南</p></callout>
+
+
 
 ## 3.新生上课
 
@@ -78,9 +179,9 @@
 
 ## 4.新生考试
 
-根据不同的时间安排，学校会公布1\~2周的复习周（注意，新生可能没有复习周！），复习周通常已经结课，由学生自行复习，
+> **本章主要面向理工科**，根据不同的时间安排，学校会公布1\~2周的复习周（注意，新生可能没有复习周！），复习周通常已经结课，由学生自行复习，
 
-![图片为一张文字图片，背景为黑色，白色字体写着“现在我的最大矛盾是考试的知识文化需要同落后的记忆力之间的矛盾”。该图片位于介绍新生考试相关内容的文档中，与上下文紧密相关，是对新生在考试前可能面临知识与记忆力矛盾这一心态的真实写照，反映了新生在面对考试时的困惑与无奈，与上下文对考试复习的讨论相呼应。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=ZTdiYmY5OTE3YmZkNDU3OTZjMzgzZGRjNGMzNTkxOWJfZmQ1MjEzNjA1M2QyYjUwMzA3YzlkNjJjOTdkNThiNGVfSUQ6NzY2NDkyNTI3MTM1MTAwNDM5MF8xNzg1ODMxNTU2OjE3ODU4MzUxNTZfVjM)
+![图片为一张文字图片，背景为黑色，白色字体写着“现在我的最大矛盾是考试的知识文化需要同落后的记忆力之间的矛盾”。该图片位于介绍新生考试相关内容的文档中，与上下文紧密相关，是对新生在面对考试时可能遇到的困难的幽默表达，反映了学生在考试前对知识掌握与记忆力不足的矛盾心理，增加了文档的趣味性。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=OGUxODUwNDc1ZTA5NmI2ZmVmNWQ1NDY2ZTY3YmVjMGRfMDdiNTNjNTQzMjBjN2QwZDRmMTVjZDllNDA2MzAyNWFfSUQ6NzY2NDkyNTI3MTM1MTAwNDM5MF8xNzg2MzU0Njc5OjE3ODYzNTgyNzlfVjM)
 
 来不及哀悼高考生的结束了，接下来奔赴战场的是高数，线代，c语言三幻神，
 
@@ -90,13 +191,13 @@
 
 当然大一可以说是最简单的考试了，正常2-3天**高强度复习**可以让一门课速成到及格，如果想要及格以上的分数，那请好好学习，可以参考：
 
-![框框老师，高数线代期末新晋真神，基础讲解到位，题型教学清晰，虽然是速成，但是冲击高分未必梦幻泡影](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=MTZkMTQ2NjQ4ODEzM2EwZjFhYTJlM2Y2NWIwMjJhMGRfZmI5ZmJlNGZkZTkyZWY1MDViNjM3ZDkwZTY1ZjVjNjRfSUQ6NzY2NDY0NzU2MDQzMDE2MDg1NV8xNzg1ODMxNTU2OjE3ODU4MzUxNTZfVjM)
+![框框老师，高数线代期末新晋真神，基础讲解到位，题型教学清晰，虽然是速成，但是冲击高分未必梦幻泡影](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=Zjc0NTg2NDEwNTE3YThkM2Y1ZjRkZjQ4YTVkZjhiNTRfZThjMThhOTg5MjAxODIzMDJlNTM5OThlNjJkOGY5ZWJfSUQ6NzY2NDY0NzU2MDQzMDE2MDg1NV8xNzg2MzU0Njc5OjE3ODYzNTgyNzlfVjM)
 
-![看猴博士之后考试急的跟猴一样，这就是猴博士的含义，也许他不能让你的分数大富大贵，但是可以给你一些信心，好让你睡一个好觉，然后明天迎接考试](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=MTA5YjlhYWZlNzRhN2Q1ZGYyMTFlMmMzMzgwYzJjOTNfOWJkMDhjYTRlZWRjYzRlOTc3ZDMxNzg5OWVkYjdjYzdfSUQ6NzY2NDY0Nzc1MTgxMjA3NDQ2MF8xNzg1ODMxNTU2OjE3ODU4MzUxNTZfVjM)
+![看猴博士之后考试急的跟猴一样，这就是猴博士的含义，也许他不能让你的分数大富大贵，但是可以给你一些信心，好让你睡一个好觉，然后明天迎接考试](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=MzAwZDY1Y2FjMTFlODk3NDhlMjljMjEwYTQ2MmIyN2JfNzEzOTQ4ZWFhNDgxZTE4ODZiY2QyN2U2ZmIxZGY1ODlfSUQ6NzY2NDY0Nzc1MTgxMjA3NDQ2MF8xNzg2MzU0Njc5OjE3ODYzNTgyNzlfVjM)
 
-![高数线代离散物理c语言，考试所有的课，基本都在这里存在期末速成](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=ZWZhZjNjZWQ2NGIwMzY3YjA0ZDYyMDdkM2VmYTE3YjBfYmRmNjk4NGJjNGE1YTdjMmNjZDBkMGUyZjBkOWU2NWFfSUQ6NzY2NDgxMTYyMTg2MDg1NDc2MF8xNzg1ODMxNTU2OjE3ODU4MzUxNTZfVjM)
+![高数线代离散物理c语言，考试所有的课，基本都在这里存在期末速成](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=MWZlYzA1ZmI4YzcwYzZkYzA4NWRhMDcxOGRkNDFmNjhfMjM2ODI4MzFhMDA1NDA0OWE5MDFlY2ZiOWRlYjhhZjhfSUQ6NzY2NDgxMTYyMTg2MDg1NDc2MF8xNzg2MzU0Njc5OjE3ODYzNTgyNzlfVjM)
 
-![高等数学播放量仅b站即高达两亿，不会有人年年看宋浩，但年年一定有人看宋浩，上课不学，就只能在这里学了](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=MDZkYjFjYWE2NzVlMWIwODFiMGUwZmIyMGY2NmM3MTJfMDlmZjUxNmJhNDNiNTBjYTYwYTdhOGM5YWQ2ZjQ4ZmRfSUQ6NzY2NDgzMzgwOTMwMDQwOTYyOV8xNzg1ODMxNTU2OjE3ODU4MzUxNTZfVjM)
+![高等数学播放量仅b站即高达两亿，不会有人年年看宋浩，但年年一定有人看宋浩，上课不学，就只能在这里学了](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=Y2UzNTA5NDdlOWFjZDhmNzFkNzA3MDUxOWNlOWNhY2RfMWZhNTNmOTc4NjNlNjQ4ZmE4ZTFhYmFlYWE1ZTIxNzNfSUQ6NzY2NDgzMzgwOTMwMDQwOTYyOV8xNzg2MzU0Njc5OjE3ODYzNTgyNzlfVjM)
 
 ## 5.新生模型后训练
 
@@ -104,7 +205,7 @@
 
 读书必须明确一点，大学仅仅是提供一个平台以及学历证明，目前就业市场跟学校培养是失衡的，市场需求技术飞速发展，但大学课程的培养方案需要时间规划，我们必须善用学校平台以及自学，尽量在大二之前确定自己的发展路线规划，是准备直接就业，还是继续提升学历？
 
-![图片是一幅卡通风格的插画，画面中一个灰发角色被多人用手指指向，背景有其他角色。画面下方有文字“天才在左 疯子在右 我在中间 我是天子”。该图片位于“新生绩点综测”部分内容之后，与上下文形成对比，通过夸张幽默的方式，以自嘲的语气表达对自身定位的调侃，与前文新生在学业、就业、提升学历等方面的规划形成反差，增添趣味性。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=OWZmYTFmYjdjNzAzMDVhZjExMmUzMmMzOThkMDk2ZGFfZGM5MWVmOWYwMzNjZmVkYmJlZTYyMzY4ZTQ2YWI4YmFfSUQ6NzY2NDkyNTQzMzQzOTU3MDg3Ml8xNzg1ODMxNTU2OjE3ODU4MzUxNTZfVjM)
+![图片是一幅卡通风格的插画，画面中一个灰发角色被多人用手指指向，背景有其他角色。画面下方有文字“天才在左 疯子在右 我在中间 我是天子”。该图片位于“新生绩点综测”部分内容之后，与上下文形成对比，通过夸张幽默的方式，以自嘲和幽默的方式表达对自身定位的调侃，与前文新生在学业、就业、提升学历等方面的规划形成反差，增添趣味性。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=NmM1NTI1ZGY0MTBlODMyZTRhNDllNDg3NDhjNWQ0YjZfOTAxNjBhYmRkYzAzYmQzNWJlZGRjZDkyMDU3NjBiMDFfSUQ6NzY2NDkyNTQzMzQzOTU3MDg3Ml8xNzg2MzU0Njc5OjE3ODYzNTgyNzlfVjM)
 
 如果准备就业的话，应该在大一到大二的时间段积累基础技术，增加项目，并且于大三/大二进行实习，具体可以参考就业发展规划篇
 
@@ -120,7 +221,7 @@
 
 你可以通过点击网页版教务系统，点击成绩查询，点击全部，再点击最好成绩，可以导出你的完整成绩单以及帮你计算总绩点。
 
-![图片展示的是网页版教务系统中的成绩查询界面。上方有“最近两学期”和“全部”两个选项卡，当前选中“全部”。下方有课程名和课程号的输入框。最下方有“导出”按钮，以及“最好成绩”“历次成绩”“双学位成绩”三个选项卡，其中“最好成绩”被蓝色边框突出显示。该图片与上文提到的可通过点击网页版教务系统成绩查询等操作导出完整成绩单以及计算总绩点的内容相关，直观呈现了成绩查询的操作界面。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=ZmQzNWM2NTFjZmZhZjc3MjA1MzZiODhkYTQ5OTdkMTFfYjdmZDdiZDA1YzZkY2E0NzgwNTZhM2NiNGY0YzkzNTNfSUQ6NzY2NDg0MTc2NTQwMDI1MTYyN18xNzg1ODMxNTU2OjE3ODU4MzUxNTZfVjM)
+![图片展示的是网页版教务系统中的成绩查询界面。上方有“最近两学期”和“全部”两个选项卡，当前选中“全部”。下方有课程名和课程号的输入框。最下方有“导出”按钮，以及“最好成绩”“历次成绩”“双学位成绩”三个选项卡，其中“最好成绩”被蓝色边框突出显示。该图片与上文提到的可通过点击网页版教务系统成绩查询等操作导出完整成绩单以及计算总绩点的内容相关，直观呈现了成绩查询的操作界面。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=OTFlMjg3Y2VlY2U4YWYwNTc5MGViNWMzYTM5ZTRmNGNfN2ZkMmNmZDM1ZWJkOGJhZTliOTZkN2JkMWM3MjAyZWRfSUQ6NzY2NDg0MTc2NTQwMDI1MTYyN18xNzg2MzU0Njc5OjE3ODYzNTgyNzlfVjM)
 
 综测方面，学代团收到通知，今年会更新综测规则，在此不做介绍，综测主要作用于奖学金等，请点击常用链接查看学生工作管理系统
 
@@ -136,7 +237,7 @@
 
 称号中，班长，团支书，学委，学代属于特殊称号，前三者对比其他班委有更大概率获得信息差资讯，综测加分，学生干部活动优先，学生干部奖学金等，但是事务繁忙；第四个称号--“学生代表”，将自动加入势力“学生代表团”
 
-![图片展示了一位身着古代官服的男子，他手持一方古色古香的印章，印章上刻有图案。画面右侧有文字“已加入【信科院】”。该图片与文档中“加入势力”部分内容相关，可能是游戏或虚拟世界中加入“信科院”势力的场景，体现了加入势力后的身份确认，与文档中介绍学生组织/社团势力的内容相呼应。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=MzIyZDkxMmIzMjI0NjBjOWY1MzUyN2RhMzIyMTk3NWFfZWY2Y2UwZThjYWUxNjMzYjk1MzY3YzJjZDc3ODAzYWZfSUQ6NzY2NDkxMDgzNjg2NjE3NDIyNF8xNzg1ODMxNTU2OjE3ODU4MzUxNTZfVjM)
+![图片展示了一位身着古代官服的男子，他手持一方古色古香的印章，印章上刻有图案。画面右侧有文字“已加入【信科院】”。该图片与文档中“加入势力”部分内容相关，可能是游戏或虚拟世界中加入“信科院”势力的场景，体现了加入势力后的身份确认，与文档中介绍学生组织/社团势力的内容相呼应。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=NjVjMWJiNWYyYWQ3ZGE1YjA0YTkwYTFlOTM1ODJmOTJfMGZkYTg0ZWIwNDBiNzYwYzg5Mzg5NzBlNTJlYjQwYTNfSUQ6NzY2NDkxMDgzNjg2NjE3NDIyNF8xNzg2MzU0Njc5OjE3ODYzNTgyNzlfVjM)
 
 > 本院玩家创立的势力包括：
 > 
@@ -186,7 +287,7 @@
 
 东门侧面有东操场，兴安后方有西操场与游泳馆，操场全日开放供学生使用，游泳馆需查看开放通知，支线任务：体测章，将于地图东操场开展
 
-![这是一张大学校园建筑群的规划效果图，呈现了校区的整体布局，涵盖教学楼、图书馆、体育场馆、湖泊、道路及绿化区域等设施，各类建筑错落分布，周围环绕茂密绿植，部分区域设有大面积运动场，清晰展现了该校园片区的空间规划样貌，对应新生指南中提及的大地图探索相关内容，为新生了解校园布局提供了直观参考。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=ZTRiMTQxODI3MzUzYzg4MTc5YjhjOTI4MTNjN2JlZmNfYTYzNWUzZmVkMmNmMzgxZjRlYTQ2MjI4OTdmNjc2ZjlfSUQ6NzY2NDkxMjUxNDUzODU4OTE2N18xNzg1ODMxNTU2OjE3ODU4MzUxNTZfVjM)
+![这是一张大学校园建筑群的规划效果图，呈现了校区的整体布局，涵盖教学楼、图书馆、体育场馆、湖泊、道路及绿化区域等设施，各类建筑错落分布，周围环绕茂密绿植，部分区域设有大面积运动场，清晰展现了该校园片区的空间规划样貌，对应新生指南中提及的大地图探索相关内容，为新生了解校园布局提供了直观参考。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=MWJkNjM3Y2Y2ODEwYjNjOGM2N2MzYTk4NTNiMDc1NGRfYzc5NWM4OWEwZGQ3OGNhYjYwZWZjNzRkYTU5ZjFkYjRfSUQ6NzY2NDkxMjUxNDUzODU4OTE2N18xNzg2MzU0Njc5OjE3ODYzNTgyNzlfVjM)
 
 ## 3.支线剧情攻略
 
@@ -221,11 +322,29 @@
 
 ---
 
+
+
+# 道具攻略
+
+| 类别 | 物品 | 备注 |
+|-|-|-|
+| **床上用品** | 床垫、被子、枕头、床单、枕套、床帘 | 宿舍床铺尺寸：1.9m × 0.9m，番禺校区蚊虫极多，床帘建议选择全包，全包坏处是稍微有点热，可备一小风扇在床上 |
+| **洗漱用品** | 牙刷、牙膏、毛巾、漱口杯、洗发水、沐浴露、洗面奶、脸盆、水桶 | 可到校后超市购买，但是超市价格真的偏贵。。。 |
+| **衣物类** | 衣物、**拖鞋**、运动鞋、晾衣杆、衣架、夹子 | 广州夏天长，冬天非常短，多备夏装，基本12月中下旬才会转寒 |
+| **清洁用品** | **洗衣液/洗衣粉**、垃圾桶、垃圾袋、拖把、扫把、抹布 | 宿舍公共用品可AA合买，岭南恶劣之地，勤扔垃圾，免招广东双马尾 |
+| **电子设备** | 手机+充电器、电脑+充电器、充电宝、排插（多口）、耳机、网线 | 排插还是挺有用的，如果需要电池之类的小东西，直接去兴安买就行 |
+| **医药用品** | **驱蚊水**、感冒药、肠胃药、创可贴、退烧药、风油精、防晒霜 | 广东蚊虫非常多，但是宿舍并没有安装网纱，通风时会导致蚊子入侵，驱蚊药或者蚊香还是很需要的，药品可以直接在校医室买，有医保更便宜，**不要相信天气预报**，莫名其妙就会来一场过云雨 |
+| **其他** | **雨伞**、水杯、指甲剪套装、台灯、小风扇 | 广州多雨，伞必备， |
+
+---
+
 # 补缺篇
 
 > 新生指南你就看吧，虽然有些内容有点旧了，但是大部分政策都是对的
 
-![这是一张展示暨南大学新生相关信息的表格，涵盖新生物品、住宿、费用、选课、校园网络等多类内容的来源与详情。表格左侧为需了解的问题，中间列明确定位这些信息的来源，多为官方新生指南，少数信息来自官方新生指南的补缺或美食排行。右侧为对应问题的具体详情，包括所需材料清单、宿舍情况、选课操作方法、课程学分计算方式、校园网络使用建议、英语分级考试相关规则、校园交通信息、食堂及银行卡相关办理方式等内容，整体为新生提供实用参考指引。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=YjkxN2Y1OGQwY2IyNDFiNDM3MTRlZjc3MTU3MjRmODRfZmM4ZDBjN2Y2ZmYxNzY5YTMxMzY1MTFlNDljZTk2ODBfSUQ6NzY2OTgxMDA5OTEzNzIwMzQwOV8xNzg1ODMxNTU2OjE3ODU4MzUxNTZfVjM)
+![图片为新生指南补缺篇中“官方新生指南”部分内容，以表格形式呈现。表格包含问题、来源、详情三列。问题涵盖新生报到全流程、宿舍与住宿、学费缴纳等12项内容，来源均为官方新生指南，详情涉及时间/地点、方式/时间、操作流程等具体信息，如住宿为5人间/床尺寸90×190cm/水电费/门禁，学费缴纳为方式/时间/银行卡激活等。该表与上下文紧密相关，是对新生指南中相关内容的补充说明。](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=YjYzNDIwMGFkOGQ1N2I5NjkzNzg2MWNkNjBiNGY4ZDNfMTM3ZWFmYTE0Mjk3ZWY1ZTFmNzY3YjMwOWQyNjQyMjFfSUQ6NzY2OTgxMDA5OTEzNzIwMzQwOV8xNzg2MzU0Njc5OjE3ODYzNTgyNzlfVjM)
+
+
 
 #### **校园卡**
 
@@ -233,9 +352,13 @@
 
 > [暨南大学校园卡使用指南](https://netc.jnu.edu.cn/2019/0910/c108a416311/page.psp)（**提及：充值方式/挂失补办流程/补办费用）**
 
+
+
 #### 课本/教材获取
 
 学校不统一发教材，需自行购买  二手书群（微信群、闲鱼）、上一届学长学姐出书是最实惠的方式  部分老师会提供电子版教材或PPT， 一般老师第一节课会告知推荐教材和版本，不用提前购买
+
+
 
 #### 班委/班主任/辅导员制度
 
@@ -245,13 +368,17 @@
 
 班委组成：班长、团支书、学习委员、生活委员、心理委员、学生代表等  班委一般开学后1-2周内由班级选举产生，有竞选演讲环节  作用为评优加分、锻炼组织能力、接触老师更多  
 
+
+
 #### 军训/新训信息 
 
 一般为新生训练营期间，地点校内（番禺校区操场） 学校统一发放军训/新训服（看通知），建议带备防晒，大容量水杯，防暑药品，扇子/风扇，具体好物可以自行参考小红书等社交平台，在训练过程中，主要以军姿，队列，军体拳（新训的同学可能会变为暨南拳）为主，中途插入讲座/活动等，有休闲日，新生需注意于休息日进行取快递，整理等事宜
 
 <callout emoji="🩺">
-免训/缓训：有特殊身体状况的同学提前准备医院证明申请  
+免训/缓训：有特殊身体状况的同学，可凭医院证明申请免训或缓训。提前准备好相关医疗证明材料，报到后及时向辅导员申请。
 </callout>
+
+
 
 #### 选课  
 
@@ -265,19 +392,43 @@
 
 在后续的选课中，我们要提前记好课程编号，方便快速搜索，但是新生只需要选择方案内，然后选择其中的课程即可。
 
+#### 体育课选课具体攻略
+
+体育课是新生第一学期为数不多有选择空间的课程，但需要注意每个学院新生可选的体育课，可能存在不同，
+
+| 体育课项目 | 抢手程度 |
+|-|-|
+| 羽毛球 | 最热项目，秒没是常态，不建议作为第一目标抢，太难了 |
+| 乒乓球 | 室内，我都不知道还有没有这门课？ |
+| 篮球 | 男生抢手程度高于女生，根据过往经历，考核难度普遍不高，上课受天气影响，下雨/恶劣天气时可能不必上课 |
+| 排球 | 需要一定基础，他运动本身就具有门槛，而且打起来小臂还会有点疼 |
+| 健身 | 虽然叫健身课，但是难度不高，跟老师聊好，想练什么练什么，也适合想健身的人 |
+| 定向越野 | 户外跑图，也是一种会受天气影响的课程，比较有趣，其实对体能要求不是很高，更高的要求是学会看地图 |
+| 健美操 | 我不知道啊，我一个男生怎么选这个 |
+| 男女混合舞蹈 | 主要分老师，有些老师是可以女女组队，有些要求男女配队，考试有一定的难度，可以自行选择队友或者是由老师配对，选到一个雷霆队友就完犊子啦 |
+| 武术 | 教过通备八极拳和太极拳，教哪一种拳种基本凭老师心情，太极拳就非常简单，通备八极有一定的难度，但是只有一套动作，练完后面就会了，上课也是在划水 |
+| 散打 | 教的东西也不难，但是热身有点疼，要拉筋，对比之下稍微还是有点强度的，考试就考几个规定动作，还有一套自己编的动作 |
+| 女子防身术 | 不知道啊，我没法选，有啥选啥吧，女生本来给的体育课选择就不多 |
+
+> 注：每年可选项目可能有变动，以上根据多学期数据整理，仅供参考。
+
+
+
 #### **抢课技巧：**
 
-多设备同时登陆，并且在高峰拥堵期刷新，电脑上插网线会比WiFi更快，
+**不要研究哪个项目最好，先研究哪些项目你抢得到。** 一个被抢光的羽毛球课，比一个还剩名额的定向越野差100倍，因为你最后可能既没有羽毛球也没有定向越野。
 
-令人遗憾的是，连点器是没有用的，网速和服务器响应速度才是决定因素，其中有一定的运气成分。
+**多设备+插网线+选一个冷门备选。** 电脑插网线 > 电脑连WiFi > 手机。同时打开选课页面，高峰拥堵期刷新。抢不到首选就立刻切备选，犹豫一秒就什么都没了。
 
-不建议使用脚本，没有意义，但选课网站因拥堵而崩溃时，所有脚本都只会是凶手，害人害己
+令人遗憾的是，连点器是没有用的，网速和服务器响应速度才是决定因素，其中有一定的运气成分。不建议使用脚本，没有意义，但选课网站因拥堵而崩溃时，所有脚本都只会是凶手，害人害己
 
-对于不了解应该选择什么课程或老师，可以直接咨询自己的引入学长或者添加的学长学姐，
+对于不了解应该选择什么课程或老师，可以直接咨询自己的引路学长或者添加的学长学姐，
 
 <callout emoji="🤡">
 抢不到必修课的同学，请立刻向班长报备，通知学校进行扩容
 </callout>
+
+
 
 #### 宿舍用品：
 
@@ -295,11 +446,52 @@
 
 内招床位分配好，外招在无分配的情况下先到先得，但具体宿舍问题，需要等待最新通知
 
+
+
+#### 学生医保
+
+- **参保原则：**自愿缴费，应参尽参
+- **保险类型：**广州市城乡居民基本医疗保险
+- **缴费标准：**约460元/人·年（以最新通知为准）
+- **参保方式：**学校统一组织办理，登录自助缴费平台缴费
+- **医保网：**https://gyb.jnu.edu.cn/
+- **咨询电话：**020-85220116
+
+
+
+#### 校医院/医务室
+
+**番禺校区医务室急诊电话：**白天 020-37330127，夜间 020-37330120
+
+日常小病小痛可以去校医院就诊，费用低廉，如果在军训期间发现中暑或者皮肤病问题，也可以去开药，甚至申请休息，但是医疗资源有限，身体极度不适的情况下尽快打车去医院
+
+
+
+#### 心理健康中心
+
+**位置与预约**：番禺校区心理健康教育中心，预约可以通过「暨南大学心理健康教育中心」微信公众号或电话预约。心理健康为学校提供的基础服务，**不需要付费**。心理咨询师对你的谈话内容负有法定保密义务。除非你对自己或他人构成明确且即刻的危险，否则你的隐私不会被泄露给任何人——包括你的辅导员和父母。
+
+**什么时候该去？**
+
+- 连续两周以上情绪低落、失眠、对平时喜欢的事情提不起兴趣
+- 大一适应期——想家、感到孤独、跟室友关系紧张、对自己的专业迷茫——这些都是正常的求助理由
+- 考试周前焦虑到影响复习效率
+- 失恋或者人际关系出现严重裂痕
+- 你觉得自己"说不上哪里不对，但就是不对劲"
+
+> ⚠️ **重要**：去心理咨询不等于你有问题。**去心理咨询=你有勇气面对问题。** 大学生心理咨询中最常见的来访者不是"病人"，而是"正常人遇到了需要帮助的时刻"。你感冒了去校医室没人觉得奇怪，心理感冒了去心理中心同样理所应当。
+
+
+
 #### 新生常见陷阱
 
 必须注意！凡是学院专业官方群以外的任何通知都不保证真实！所有涉及金钱的通知，只会通过官方群聊下达，同时如果有通过诱骗，恐吓等手段，以报班学习为目的的机构，均不真实
 
 <callout emoji="🤨"><p><cite doc-id="Pl6jwyfb0iDe4LkuJtXcpiZBnjg" file-type="wiki" title="🧱大学反诈篇" type="doc"></cite></p></callout>
+
+
+
+![新生指南与信科院指南，将更新为网站与智能问答机器人，待工信部备案后上线](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=YjIyOWMyZDA0ODgxZmIwOTMxNjBmOTI2ZDdiNjJmMjJfZmY3OTQ5YzE2MjI1NzE1NzE2YWUyOTFlN2QwOWJmYzRfSUQ6NzY3MTk3MzY1NzkzMzAwNzg1NV8xNzg2MzU0Njc5OjE3ODYzNTgyNzlfVjM)
 
 ---
 
