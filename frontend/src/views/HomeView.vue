@@ -115,9 +115,15 @@ const questAccessItems = computed<QuickAccessItem[]>(() => {
     desc: '新玩家账号登录 · 大地图探索 · 攻略手册',
     url: '/quest',
   };
-  // 替换第一张，其余保留
-  const rest = nav.quickAccess.slice(1).map(i => ({ ...i }));
-  return [questCard, ...rest];
+  const resourceCard: QuickAccessItem = {
+    label: '🔗 资源中心',
+    desc: '常用网站与学习资源',
+    url: '/resources',
+  };
+  const items = nav.quickAccess.map(i => ({ ...i }));
+  items[0] = questCard;
+  items[2] = resourceCard;
+  return items;
 });
 
 function onQuickAccess(item: QuickAccessItem) {
