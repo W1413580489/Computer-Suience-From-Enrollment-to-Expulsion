@@ -6,7 +6,8 @@ logs/
 
 # ---- 前端依赖与构建产物 ----
 frontend/node_modules/
-frontend/dist/
+# 前端 dist 是部署必需（服务器无 Node.js 环境无法本地构建），例外放行
+!frontend/dist/
 
 # ---- Python ----
 __pycache__/
