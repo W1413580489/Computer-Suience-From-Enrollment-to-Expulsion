@@ -8,7 +8,9 @@ export function renderMarkdown(md: string): string {
   let html = md.replace(/:::callout\s+emoji="([^"]*)"\s*\n([\s\S]*?):::/g,
     (_: string, emoji: string, content: string) => {
       const tag = getCalloutTag(emoji);
-      const calloutHtml = `<div class="quest-callout"><span class="quest-callout__avatar">${emoji}</span><div class="quest-callout__body"><span class="quest-callout__tag">${tag}</span><div class="quest-callout__content">${content.trim()}</div></div></div>`;
+      // Auto-link bare URLs in callout content
+      const linked = autoLinkUrls(content.trim());
+      const calloutHtml = `<div class="quest-callout"><span class="quest-callout__avatar">${emoji}</span><div class="quest-callout__body"><span class="quest-callout__tag">${tag}</span><div class="quest-callout__content">${linked}</div></div></div>`;
       callouts.push(calloutHtml);
       return `@@CALLOUT_${callouts.length - 1}@@`;
     });
@@ -109,4 +111,10 @@ function getCalloutTag(emoji: string): string {
     '🐳': '导航',
   };
   return map[emoji] ?? '玩家评论';
+}
+
+/** Wrap bare URLs in <a> tags */
+function autoLinkUrls(text: string): string {
+  return text.replace(/(?<!href="|">)(https?:\/\/[^\s<>"')]+)/g,
+    '<a href="$1" target="_blank" rel="noopener">$1</a>');
 }
