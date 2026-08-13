@@ -21,8 +21,8 @@
         v-for="item in navItems"
         :key="item.key"
         class="topbar__nav-item"
-        :class="{ 'topbar__nav-item--active': item.route === '/' ? currentRoute === '/' : currentRoute.startsWith(item.route) }"
-        @click="goNav(item.route)"
+        :class="{ 'topbar__nav-item--active': item.route && (item.route === '/' ? currentRoute === '/' : currentRoute.startsWith(item.route)) }"
+        @click="goNav(item)"
       >
         {{ item.label }}
       </button>
@@ -67,10 +67,17 @@ const nav = useNavStore();
 
 const isHome = computed(() => props.currentRoute === '/');
 
-const navItems = [
+interface NavItem {
+  key: string;
+  label: string;
+  route?: string;
+  url?: string;
+}
+
+const navItems: NavItem[] = [
   { key: 'home', label: '首页', route: '/' },
-  { key: 'guide', label: '攻略', route: '/guides' },
-  { key: 'database', label: '资源', route: '/resources' },
+  { key: 'guide', label: '起点', url: 'https://tralis2671.feishu.cn/wiki/VvKVwsHo2iIIC4ko0PmcKs4lnKd' },
+  { key: 'zzz', label: 'zzz', url: 'https://zzz.mihoyo.com/' },
 ];
 
 const routeLabel = computed(() => {
@@ -85,8 +92,12 @@ function goHome() {
   router.push('/');
 }
 
-function goNav(route: string) {
-  router.push(route);
+function goNav(item: NavItem) {
+  if (item.url) {
+    window.open(item.url, '_blank', 'noopener');
+    return;
+  }
+  if (item.route) router.push(item.route);
 }
 </script>
 

@@ -6,7 +6,7 @@
     </header>
 
     <div class="dest__grid">
-      <!-- 01 新手任务 — 左对齐，宽 -->
+      <!-- 01 新手任务 — 左上 -->
       <button class="dcard dcard--01" @click="go(quests[0].route)">
         <span class="dcard__num">01</span>
         <div class="dcard__body">
@@ -18,7 +18,7 @@
         <span class="dcard__shape dcard__shape--01" />
       </button>
 
-      <!-- 02 攻略 — 右对齐，偏移 -->
+      <!-- 02 攻略 — 右上 -->
       <button class="dcard dcard--02" @click="go(quests[1].route)">
         <span class="dcard__num">02</span>
         <div class="dcard__body">
@@ -30,7 +30,7 @@
         <span class="dcard__shape dcard__shape--02" />
       </button>
 
-      <!-- 03 资源中心 — 居中，窄 -->
+      <!-- 03 资源中心 — 左下（01 下方） -->
       <button class="dcard dcard--03" @click="go(quests[2].route)">
         <span class="dcard__num">03</span>
         <div class="dcard__body">
@@ -42,7 +42,7 @@
         <span class="dcard__shape dcard__shape--03" />
       </button>
 
-      <!-- 04 附录 — 右对齐，宽 -->
+      <!-- 04 附录 — 右下（02 下方） -->
       <button class="dcard dcard--04" @click="go(quests[3].route)">
         <span class="dcard__num">04</span>
         <div class="dcard__body">
@@ -108,7 +108,7 @@ function go(route: string) {
   text-transform: uppercase;
 }
 
-/* ---- 不对称网格 ---- */
+/* ---- 桌面端：田字格 2×2 ---- */
 .dest__grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -201,49 +201,21 @@ function go(route: string) {
   transform: translateX(4px);
 }
 
-/* ---- 不对称位移（幅度减小，留白增加，让背景可见） ---- */
+/* ---- 拼图式斜切角：四卡组成规整 2×2，角部斜切留出 X 形缝隙 ---- */
 .dcard--01 {
-  clip-path: polygon(var(--cut-lg) 0, 100% 0, 100% 100%, 0 100%, 0 var(--cut-lg));
-  margin-right: 36px;
+  clip-path: polygon(var(--cut-md) 0, 100% 0, 100% 100%, 0 100%, 0 var(--cut-md));
 }
 
 .dcard--02 {
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--cut-lg)), calc(100% - var(--cut-lg)) 100%, 0 100%);
-  margin-top: 18px;
-  margin-left: 36px;
-  text-align: right;
-  align-items: flex-end;
-}
-
-.dcard--02 .dcard__body {
-  align-items: flex-end;
+  clip-path: polygon(0 0, calc(100% - var(--cut-md)) 0, 100% var(--cut-md), 100% 100%, 0 100%);
 }
 
 .dcard--03 {
-  clip-path: polygon(var(--cut-md) 0, 100% 0, 100% 100%, 0 100%, 0 var(--cut-md));
-  grid-column: 1 / -1;
-  max-width: 56%;
-  margin: 6px auto 0;
-  text-align: center;
-  align-items: center;
-}
-
-.dcard--03 .dcard__body {
-  align-items: center;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, var(--cut-md) 100%, 0 calc(100% - var(--cut-md)));
 }
 
 .dcard--04 {
-  clip-path: polygon(0 0, 100% 0, 100% 100%, calc(100% - var(--cut-lg)) 100%, 0 calc(100% - var(--cut-lg)));
-  grid-column: 1 / -1;
-  margin-left: auto;
-  margin-right: 36px;
-  max-width: 62%;
-  text-align: right;
-  align-items: flex-end;
-}
-
-.dcard--04 .dcard__body {
-  align-items: flex-end;
+  clip-path: polygon(0 0, 100% 0, calc(100% - var(--cut-md)) 100%, 0 100%);
 }
 
 /* ---- 装饰几何图形 — 平面设计感 ---- */
@@ -265,7 +237,7 @@ function go(route: string) {
 
 .dcard__shape--02 {
   top: 14px;
-  left: 14px;
+  right: 14px;
   width: 32px;
   height: 32px;
   border: 1.5px solid var(--neon-cyan);
@@ -274,9 +246,8 @@ function go(route: string) {
 }
 
 .dcard__shape--03 {
-  top: 50%;
+  bottom: 14px;
   right: 18px;
-  transform: translateY(-50%);
   width: 3px;
   height: 44px;
   background: var(--amber);
@@ -285,7 +256,7 @@ function go(route: string) {
 
 .dcard__shape--04 {
   bottom: 14px;
-  left: 14px;
+  right: 14px;
   width: 46px;
   height: 1.5px;
   background: var(--amber);
@@ -302,7 +273,7 @@ function go(route: string) {
   opacity: 0.5;
 }
 
-/* ---- 响应式 ---- */
+/* ---- 响应式：小屏/移动端单列，不强制田字格 ---- */
 @media (max-width: 767px) {
   .dest {
     padding: 8px 16px 28px;
@@ -330,24 +301,7 @@ function go(route: string) {
   .dcard--02,
   .dcard--03,
   .dcard--04 {
-    margin: 0;
-    max-width: 100%;
-    text-align: left;
-    align-items: flex-start;
-  }
-
-  .dcard--02 .dcard__body,
-  .dcard--03 .dcard__body,
-  .dcard--04 .dcard__body {
-    align-items: flex-start;
-  }
-
-  .dcard--03 {
-    grid-column: auto;
-  }
-
-  .dcard--04 {
-    grid-column: auto;
+    clip-path: polygon(var(--cut-sm) 0, 100% 0, 100% calc(100% - var(--cut-sm)), calc(100% - var(--cut-sm)) 100%, 0 100%, 0 var(--cut-sm));
   }
 
   .dcard__num {

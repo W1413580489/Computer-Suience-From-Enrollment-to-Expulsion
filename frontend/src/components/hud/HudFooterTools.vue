@@ -35,7 +35,7 @@ const emit = defineEmits<{ onItemClick: [item: FooterToolItem] }>();
 
 .ext-system__label {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 3px;
   color: var(--text-muted);
@@ -46,14 +46,14 @@ const emit = defineEmits<{ onItemClick: [item: FooterToolItem] }>();
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
 }
 
 .ext-system__item {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  font-size: 13px;
+  gap: 8px;
+  font-size: 15.6px;
   color: var(--text-secondary);
   white-space: nowrap;
   transition: color 200ms;
@@ -82,11 +82,11 @@ const emit = defineEmits<{ onItemClick: [item: FooterToolItem] }>();
   }
 
   .ext-system__list {
-    gap: 14px;
+    gap: 16px;
   }
 
   .ext-system__item {
-    font-size: 12px;
+    font-size: 14.4px;
   }
 }
 </style>
