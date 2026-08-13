@@ -11,12 +11,8 @@
           <span class="ticket__label">AI ASSISTANT</span>
         </div>
         <div class="ticket__bubble">
-          <p class="ticket__greet">今天想了解什么？</p>
-          <p class="ticket__options">
-            <span>选课？</span>
-            <span>保研？</span>
-            <span>还是校园生活？</span>
-          </p>
+          <p class="ticket__greet">信科院探索通行证</p>
+          <p class="ticket__desc">凭此票据进入智能体回答区域，有效期至 2026.02.31（api自己配！）</p>
         </div>
         <span class="ticket__cta">START CHAT →</span>
       </div>
@@ -123,17 +119,11 @@ function startChat() {
   margin-bottom: 6px;
 }
 
-.ticket__options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+.ticket__desc {
   font-size: 14.5px;
   color: var(--text-secondary);
+  line-height: 1.6;
 }
-
-.ticket__options span:nth-child(1) { color: var(--amber); }
-.ticket__options span:nth-child(2) { color: var(--neon-magenta); }
-.ticket__options span:nth-child(3) { color: var(--neon-cyan); }
 
 .ticket__cta {
   align-self: flex-end;

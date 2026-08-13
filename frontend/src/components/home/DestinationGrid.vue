@@ -74,7 +74,7 @@ function go(route: string) {
 
 <style scoped>
 .dest {
-  padding: 80px 32px;
+  padding: 40px 32px 80px;
   max-width: 1120px;
   margin: 0 auto;
   width: 100%;

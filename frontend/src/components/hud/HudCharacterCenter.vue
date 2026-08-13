@@ -9,6 +9,11 @@
       <div class="hero__left">
         <span class="hero__kicker">JNU INFORMATION</span>
         <h1 class="hero__title glitch-title" data-text="信科院指南">信科院指南</h1>
+        <div class="hero__intro">
+          <p>主要面向对象：信科院/学习编程的学生</p>
+          <p class="hero__intro--mid">其他专业可参考就业发展规划以外的内容</p>
+          <p>本文档11章节11子文档，共8.1万余字</p>
+        </div>
         <div class="hero__actions">
           <button class="hero__btn hero__btn--primary" @click="emit('onGoDest')">
             <span>目的地</span>
@@ -107,12 +112,30 @@ const emit = defineEmits<{
 }
 
 .hero__kicker {
+  display: inline-flex;
+  align-items: center;
   font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 700;
-  letter-spacing: 4px;
+  letter-spacing: 3px;
   color: var(--amber);
   text-transform: uppercase;
+  border: 1px solid var(--amber);
+  padding: 6px 14px;
+}
+
+.hero__intro {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.hero__intro--mid {
+  color: var(--amber);
+  font-weight: 600;
 }
 
 .hero__title {
@@ -251,10 +274,10 @@ const emit = defineEmits<{
 }
 
 .hero__figure:hover .hero__image {
-  filter: drop-shadow(0 0 26px var(--amber-halo));
+  filter: blur(6px) brightness(0.65);
 }
 
-/* 悬停透出的介绍文字 */
+/* 悬停透出的介绍文字：无蒙版，直接浮在模糊人物上 */
 .hero__overlay {
   position: absolute;
   inset: 0;
@@ -263,10 +286,6 @@ const emit = defineEmits<{
   justify-content: center;
   gap: 10px;
   padding: 28px;
-  background: rgba(10, 10, 10, 0.84);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
-  clip-path: polygon(var(--cut-md) 0, 100% 0, 100% calc(100% - var(--cut-md)), calc(100% - var(--cut-md)) 100%, 0 100%, 0 var(--cut-md));
   opacity: 0;
   transition: opacity 260ms ease;
   pointer-events: none;
@@ -282,6 +301,7 @@ const emit = defineEmits<{
   color: var(--text-primary);
   text-align: center;
   letter-spacing: 0.5px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
 }
 
 /* ---- 响应式 ---- */
