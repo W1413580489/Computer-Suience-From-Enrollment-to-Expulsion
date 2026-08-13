@@ -25,6 +25,9 @@
 
       <!-- 数据面板 -->
       <DataPanel />
+
+      <!-- 个人配置 -->
+      <PersonalConfig />
     </main>
 
     <main v-else class="home-main home-main--loading">
@@ -64,6 +67,7 @@ import HudFooterTools from '@/components/hud/HudFooterTools.vue';
 import DestinationGrid from '@/components/home/DestinationGrid.vue';
 import AiInvitation from '@/components/home/AiInvitation.vue';
 import DataPanel from '@/components/home/DataPanel.vue';
+import PersonalConfig from '@/components/home/PersonalConfig.vue';
 import MobileBottomTabs from '@/components/nav/MobileBottomTabs.vue';
 import NavDrawer from '@/components/nav/NavDrawer.vue';
 import SettingsDrawer from '@/components/settings/SettingsDrawer.vue';
