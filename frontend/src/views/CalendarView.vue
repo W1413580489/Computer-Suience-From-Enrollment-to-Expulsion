@@ -211,11 +211,13 @@ const sem2: Row[] = [
 <style scoped>
 /* 纯黑底白字：取消所有切角、霓虹、彩色 */
 .cal-root {
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   background: #000000;
   color: #ffffff;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .cal-topbar {
@@ -259,6 +261,9 @@ const sem2: Row[] = [
 
 .cal-body {
   flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;

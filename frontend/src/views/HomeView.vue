@@ -27,7 +27,7 @@
       <DataPanel />
 
       <!-- 个人配置 -->
-      <PersonalConfig />
+      <PersonalConfig @on-open-api="settingsOpen = true" />
     </main>
 
     <main v-else class="home-main home-main--loading">

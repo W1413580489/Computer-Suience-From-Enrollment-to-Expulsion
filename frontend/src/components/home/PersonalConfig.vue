@@ -11,7 +11,7 @@
       <div class="pc__btns">
         <button class="pc__btn pc__btn--primary" @click="goCalendar">校历 <em>CALENDAR</em></button>
         <button class="pc__btn pc__btn--secondary" @click="goProject">项目 <em>PROJECT</em></button>
-        <button class="pc__btn pc__btn--neon" @click="openDevtools">设置 <em>SETTINGS</em></button>
+        <button class="pc__btn pc__btn--neon" @click="emit('onOpenApi')">设置 <em>SETTINGS</em></button>
       </div>
     </div>
 
@@ -130,7 +130,7 @@
               ref="settingsBtn"
               class="pc__toggle"
               :class="{ 'pc__toggle--on': flags.settings }"
-              @click="onSettingsClick"
+              @click="toggle('settings')"
             >
               <span class="pc__toggle-thumb" />
               <span class="pc__toggle-text">{{ flags.settings ? 'ON' : 'OFF' }}</span>
@@ -156,16 +156,6 @@
         </div>
       </div>
     </div>
-
-    <!-- 打开 F12 提示弹窗（设置按钮） -->
-    <div v-if="showDevtools" class="pc__modal-mask" @click.self="showDevtools = false">
-      <div class="pc__modal">
-        <button class="pc__alert-close" aria-label="关闭" @click="showDevtools = false">×</button>
-        <p class="pc__alert-title">// DEVTOOLS</p>
-        <p>按 <kbd>F12</kbd> 或 <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd> 打开浏览器开发者工具</p>
-        <p class="pc__alert-sub">本站无法通过 JS 直接唤起 DevTools（浏览器安全策略）</p>
-      </div>
-    </div>
   </section>
 </template>
 
@@ -175,6 +165,8 @@ import { useRouter } from 'vue-router';
 import SectionHeader from './SectionHeader.vue';
 
 const router = useRouter();
+
+const emit = defineEmits<{ onOpenApi: [] }>();
 
 const flags = reactive({
   rail: false,
@@ -186,7 +178,6 @@ const flags = reactive({
 });
 
 const showSettingsAlert = ref(false);
-const showDevtools = ref(false);
 const settingsBtn = ref<HTMLButtonElement | null>(null);
 const alertStyle = ref<Record<string, string>>({});
 
@@ -196,10 +187,6 @@ function goCalendar() {
 
 function goProject() {
   window.open('https://tralis2671.feishu.cn/wiki/FCATwwKbziiC7zkAL64cl3EXnCf', '_blank', 'noopener');
-}
-
-function openDevtools() {
-  showDevtools.value = true;
 }
 
 // 跳转类开关：跳完后 ~600ms 自动回弹关闭
@@ -237,7 +224,7 @@ function closeAlert() {
 
 <style scoped>
 .pc {
-  padding: 0 32px 96px;
+  padding: 80px 32px 96px;
   max-width: 1120px;
   margin: 0 auto;
   width: 100%;
@@ -535,28 +522,16 @@ function closeAlert() {
 .pc__bar-fill {
   width: var(--w, 0%);
   height: 100%;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--amber) 0 6px,
-    var(--neon-cyan) 6px 12px
-  );
+  background: linear-gradient(90deg, var(--amber), var(--neon-cyan));
   transition: width 300ms;
 }
 
 .pc__bar-fill--red {
-  background: repeating-linear-gradient(
-    90deg,
-    var(--neon-cyan) 0 6px,
-    var(--neon-magenta) 6px 12px
-  );
+  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
 }
 
 .pc__bar-fill--green {
-  background: repeating-linear-gradient(
-    90deg,
-    var(--amber) 0 6px,
-    var(--success) 6px 12px
-  );
+  background: linear-gradient(90deg, var(--amber), var(--success));
 }
 
 /* ---- 弹窗 ---- */
