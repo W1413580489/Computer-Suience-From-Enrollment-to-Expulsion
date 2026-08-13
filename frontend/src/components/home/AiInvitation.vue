@@ -99,13 +99,13 @@ const credits = [
 
 <style scoped>
 .ai-invite {
-  padding: 8px 24px 40px;
-  max-width: 1000px;
+  padding: 8px 32px 40px;
+  max-width: 1120px;
   margin: 0 auto;
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 28px;
 }
 
 /* ===== 票据 ===== */
@@ -319,7 +319,7 @@ const credits = [
   list-style: none;
   margin: 0;
   padding: 0;
-  animation: credits-scroll 18s linear infinite;
+  animation: credits-scroll 30s linear infinite;
 }
 
 .credits__list li {
