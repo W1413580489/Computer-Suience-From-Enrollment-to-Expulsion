@@ -42,7 +42,7 @@ const emit = defineEmits<{ onConfirm: []; onCancel: [] }>();
   max-width: 100%;
   background: var(--bg-panel);
   border: 1px solid var(--border-glow);
-  border-radius: var(--radius-lg);
+  clip-path: var(--clip-md);
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -69,7 +69,7 @@ const emit = defineEmits<{ onConfirm: []; onCancel: [] }>();
 .modal__btn {
   flex: 1;
   min-height: 48px;
-  border-radius: var(--radius-md);
+  clip-path: var(--clip-sm);
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
   font-size: 13px;

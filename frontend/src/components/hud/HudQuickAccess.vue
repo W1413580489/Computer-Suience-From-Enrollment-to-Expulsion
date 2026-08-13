@@ -1,6 +1,7 @@
 <template>
   <section class="quick-access">
     <header class="quick-access__header">
+      <span class="quick-access__num">// 01</span>
       <h2 class="quick-access__title">快捷入口</h2>
       <span class="quick-access__subtitle">QUICK ACCESS</span>
     </header>
@@ -34,6 +35,16 @@ const icons = ['guide', 'academics', 'globe', 'user'];
   align-items: baseline;
   gap: 10px;
   padding: 0 4px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 4px;
+}
+
+.quick-access__num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--amber);
+  letter-spacing: 1px;
 }
 
 .quick-access__title {
@@ -64,10 +75,18 @@ const icons = ['guide', 'academics', 'globe', 'user'];
 
   .quick-access__list :deep(.qa-card) {
     flex-direction: column;
-    gap: 8px;
-    padding: 14px 10px;
     min-height: 0;
     text-align: center;
+  }
+
+  .quick-access__list :deep(.qa-card__main) {
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 10px;
+  }
+
+  .quick-access__list :deep(.qa-card__stub) {
+    display: none;
   }
 
   .quick-access__list :deep(.qa-card__icon-wrap) {
@@ -75,8 +94,7 @@ const icons = ['guide', 'academics', 'globe', 'user'];
     height: 48px;
   }
 
-  .quick-access__list :deep(.qa-card__desc),
-  .quick-access__list :deep(.qa-card__arrow) {
+  .quick-access__list :deep(.qa-card__desc) {
     display: none;
   }
 

@@ -42,7 +42,7 @@ const emit = defineEmits<{ onItemClick: [item: AppendixItem] }>();
   padding: 14px 16px;
   background: var(--bg-panel);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  clip-path: var(--clip-md);
   color: var(--text-primary);
   text-align: left;
   transition: border-color 200ms, box-shadow 200ms, transform 200ms;
@@ -83,7 +83,7 @@ const emit = defineEmits<{ onItemClick: [item: AppendixItem] }>();
   font-size: 10px;
   color: var(--warning);
   border: 1px solid var(--warning);
-  border-radius: var(--radius-sm);
+  clip-path: var(--clip-sm);
   padding: 1px 5px;
   flex-shrink: 0;
 }

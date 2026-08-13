@@ -39,8 +39,9 @@ function isActive(route: string): boolean {
   bottom: 0;
   height: var(--bottomtabs-h);
   display: flex;
-  background: var(--bg-panel);
-  border-top: 1px solid var(--border-subtle);
+  background: rgba(10, 10, 10, 0.92);
+  backdrop-filter: blur(12px);
+  border-top: 2px solid var(--amber);
   z-index: 50;
   padding-bottom: env(safe-area-inset-bottom);
 }
@@ -64,13 +65,13 @@ function isActive(route: string): boolean {
   left: 25%;
   width: 50%;
   height: 2px;
-  background: var(--accent-primary);
+  background: var(--amber);
   transform: scaleX(0);
   transition: transform 200ms;
 }
 
 .bottom-tabs__tab--active {
-  color: var(--accent-bright);
+  color: var(--amber);
 }
 
 .bottom-tabs__tab--active::before {
@@ -79,15 +80,15 @@ function isActive(route: string): boolean {
 
 .bottom-tabs__tab--core .bottom-tabs__icon-wrap {
   transform: translateY(-8px);
-  background: var(--bg-panel-3);
-  border: 1px solid var(--border-glow);
+  background: var(--amber);
+  border: 1px solid var(--amber);
   border-radius: 50%;
   width: 44px;
   height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 12px var(--accent-glow);
+  box-shadow: 0 0 12px var(--amber-glow);
 }
 
 .bottom-tabs__label {

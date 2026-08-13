@@ -1,47 +1,11 @@
 /**
- * 自托管字体声明（国内部署）
- * Orbitron / Rajdhani / JetBrains Mono — latin 子集已本地化
+ * 字体声明 — 绝区零风格
+ * Bebas Neue / Noto Sans SC — 通过 Google Fonts 加载（index.html）
+ * JetBrains Mono — 自托管 latin 子集 woff2
  * 中文回退：PingFang SC / Microsoft YaHei（系统字体）
- *
- * 来源：Google Fonts（2026-08 下载，latin 子集 woff2）
- * 无需网络请求，微信内置浏览器可正常加载。
  */
 
-/* Orbitron（游戏风格展示字体，Google Fonts 提供可变字体，覆盖 400-900） */
-@font-face {
-  font-family: 'Orbitron';
-  src: url('@/assets/fonts/Orbitron-Regular.woff2') format('woff2');
-  font-weight: 400 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Rajdhani（技术感辅助字体） */
-@font-face {
-  font-family: 'Rajdhani';
-  src: url('@/assets/fonts/Rajdhani-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Rajdhani';
-  src: url('@/assets/fonts/Rajdhani-Medium.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Rajdhani';
-  src: url('@/assets/fonts/Rajdhani-SemiBold.woff2') format('woff2');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* JetBrains Mono（等宽代码字体） */
+/* JetBrains Mono（等宽代码字体，自托管） */
 @font-face {
   font-family: 'JetBrains Mono';
   src: url('@/assets/fonts/JetBrainsMono-Regular.woff2') format('woff2');

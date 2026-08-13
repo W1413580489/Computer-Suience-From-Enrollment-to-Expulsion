@@ -229,7 +229,7 @@ function onClear() {
   justify-content: center;
   width: 44px;
   height: 44px;
-  border-radius: var(--radius-md);
+  clip-path: var(--clip-sm);
   color: var(--text-secondary);
 }
 
@@ -253,7 +253,7 @@ function onClear() {
   line-height: 1.6;
   background: var(--bg-panel-2);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  clip-path: var(--clip-sm);
   padding: 10px 12px;
 }
 
@@ -263,7 +263,7 @@ function onClear() {
   align-items: center;
   gap: 12px;
   padding: 14px;
-  border-radius: var(--radius-lg);
+  clip-path: var(--clip-md);
   border: 1px solid var(--border-subtle);
   background: var(--bg-panel-2);
 }
@@ -316,7 +316,7 @@ function onClear() {
   gap: 10px;
   padding: 14px;
   border: 1px dashed var(--border-glow);
-  border-radius: var(--radius-lg);
+  clip-path: var(--clip-md);
   background: var(--accent-soft);
 }
 
@@ -361,7 +361,7 @@ function onClear() {
   padding: 12px 14px;
   background: var(--bg-primary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  clip-path: var(--clip-sm);
   color: var(--text-primary);
   font-size: 14px;
   font-family: var(--font-mono);
@@ -389,7 +389,7 @@ select.settings__input {
 .settings__btn {
   flex: 1;
   min-height: 44px;
-  border-radius: var(--radius-md);
+  clip-path: var(--clip-sm);
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
   font-size: 13px;
@@ -420,7 +420,7 @@ select.settings__input {
 .settings__verify {
   font-size: 12px;
   padding: 8px 12px;
-  border-radius: var(--radius-md);
+  clip-path: var(--clip-sm);
 }
 
 .settings__verify--ok {
@@ -449,7 +449,7 @@ select.settings__input {
   justify-content: center;
   gap: 8px;
   min-height: 48px;
-  border-radius: var(--radius-md);
+  clip-path: var(--clip-sm);
   background: var(--amber);
   color: var(--on-amber);
   font-size: 14px;

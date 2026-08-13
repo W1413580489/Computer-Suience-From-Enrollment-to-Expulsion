@@ -133,7 +133,7 @@ const contentHtml = computed(() => renderMarkdown(rawContent));
 .res-content :deep(.quest-callout__tag) {
   display: inline-block; font-family: var(--font-display);
   font-size: clamp(9px, 1.3vw, 10px); color: var(--amber); letter-spacing: 1px;
-  border: 1px solid var(--amber-glow); border-radius: var(--radius-sm); padding: 2px 8px; opacity: .8;
+  border: 1px solid var(--amber-glow); clip-path: var(--clip-sm); padding: 2px 8px; opacity: .8;
   align-self: flex-start;
 }
 .res-content :deep(.quest-callout__body p) { font-size: clamp(12px, 1.8vw, 14px); line-height: 1.7; font-style: italic; margin: 0; }

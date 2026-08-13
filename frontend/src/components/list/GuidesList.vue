@@ -39,15 +39,15 @@ const emit = defineEmits<{ onItemClick: [item: GuideItem] }>();
   padding: 14px 16px;
   background: var(--bg-panel);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  clip-path: var(--clip-md);
   color: var(--text-primary);
   text-align: left;
   transition: border-color 200ms, box-shadow 200ms, transform 200ms;
 }
 
 .guides-list__item:hover {
-  border-color: var(--accent-primary);
-  box-shadow: var(--shadow-glow);
+  border-color: var(--amber);
+  box-shadow: 0 0 18px var(--amber-glow);
   transform: translateY(-1px);
 }
 
@@ -56,7 +56,7 @@ const emit = defineEmits<{ onItemClick: [item: GuideItem] }>();
 }
 
 .guides-list__icon {
-  color: var(--accent-primary);
+  color: var(--amber);
   flex-shrink: 0;
 }
 

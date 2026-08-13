@@ -5,7 +5,7 @@
       x="20"
       y="26"
       text-anchor="middle"
-      font-family="Orbitron, sans-serif"
+      font-family="'Bebas Neue', 'Noto Sans SC', sans-serif"
       font-size="12"
       font-weight="700"
       fill="var(--accent-bright)"

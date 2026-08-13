@@ -30,7 +30,7 @@ function open() {
   padding: 8px 10px;
   background: var(--bg-panel-2);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  clip-path: var(--clip-sm);
   color: var(--text-primary);
   text-align: left;
   transition: border-color 200ms;

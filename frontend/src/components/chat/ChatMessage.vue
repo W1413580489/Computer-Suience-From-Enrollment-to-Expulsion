@@ -82,20 +82,20 @@ const showKeyFixHint = computed(
   flex-direction: column;
   gap: 8px;
   padding: 12px 14px;
-  border-radius: var(--radius-lg);
+  clip-path: var(--clip-md);
   line-height: 1.7;
 }
 
 .msg--user .msg__bubble {
   background: var(--bg-panel-3);
-  border: 1px solid var(--border-glow);
-  border-bottom-right-radius: var(--radius-sm);
+  border: 1px solid var(--amber);
+  border-top: 3px solid var(--amber);
 }
 
 .msg--assistant .msg__bubble {
   background: var(--bg-panel);
   border: 1px solid var(--border-subtle);
-  border-bottom-left-radius: var(--radius-sm);
+  border-left: 3px solid var(--neon-cyan);
 }
 
 .msg__content {
@@ -141,7 +141,7 @@ const showKeyFixHint = computed(
   justify-content: center;
   width: 44px;
   height: 40px;
-  border-radius: var(--radius-md);
+  clip-path: var(--clip-sm);
   border: 1px solid var(--border-subtle);
   background: var(--bg-panel-2);
   color: var(--text-muted);
@@ -149,8 +149,8 @@ const showKeyFixHint = computed(
 }
 
 .msg__action:hover:not(:disabled) {
-  border-color: var(--accent-primary);
-  color: var(--accent-bright);
+  border-color: var(--amber);
+  color: var(--amber);
 }
 
 .msg__action:disabled {

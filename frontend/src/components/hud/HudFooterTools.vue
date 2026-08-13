@@ -1,65 +1,92 @@
 <template>
-  <nav class="footer-tools" aria-label="常用工具">
-    <button
-      v-for="(item, i) in items"
-      :key="item.label"
-      class="footer-tools__item"
-      @click="emit('onItemClick', item)"
-    >
-      <NeonIcon :name="icons[i % icons.length]" :size="20" />
-      <span class="footer-tools__label">{{ item.label }}</span>
-    </button>
+  <nav class="ext-system" aria-label="外部系统">
+    <span class="ext-system__label">EXTERNAL SYSTEM</span>
+    <div class="ext-system__list">
+      <button
+        v-for="item in items"
+        :key="item.label"
+        class="ext-system__item"
+        @click="emit('onItemClick', item)"
+      >
+        <span class="ext-system__dot" />
+        <span>{{ item.label }}</span>
+      </button>
+    </div>
   </nav>
 </template>
 
 <script setup lang="ts">
-import NeonIcon from '@/components/common/NeonIcon.vue';
 import type { FooterToolItem } from '@/types/nav';
 
 defineProps<{ items: FooterToolItem[] }>();
 const emit = defineEmits<{ onItemClick: [item: FooterToolItem] }>();
-
-// 图标按顺序循环（装饰性），数据全部来自 nav_config.json → footerTools
-const icons = ['doc', 'mail', 'guide', 'globe', 'settings', 'home'];
 </script>
 
 <style scoped>
-.footer-tools {
+.ext-system {
   flex-shrink: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-  height: var(--footer-h);
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 24px;
   background: var(--bg-panel);
   border-top: 1px solid var(--border-subtle);
-  position: relative;
-  z-index: 1;
-  overflow-x: auto;
-  padding: 0 16px;
 }
 
-.footer-tools__item {
+.ext-system__label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.ext-system__list {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 20px;
+}
+
+.ext-system__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
   color: var(--text-secondary);
-  font-size: 14px;
   white-space: nowrap;
   transition: color 200ms;
-  min-height: 52px;
 }
 
-.footer-tools__item:hover {
-  color: var(--accent-bright);
-  text-decoration: underline;
+.ext-system__item:hover {
+  color: var(--amber);
+}
+
+.ext-system__dot {
+  width: 5px;
+  height: 5px;
+  background: currentColor;
+  opacity: 0.6;
+  transition: opacity 200ms;
+}
+
+.ext-system__item:hover .ext-system__dot {
+  opacity: 1;
 }
 
 @media (max-width: 767px) {
-  .footer-tools {
-    justify-content: flex-start;
-    gap: 18px;
-    height: 52px;
+  .ext-system {
+    padding: 12px 16px;
+    gap: 8px;
+  }
+
+  .ext-system__list {
+    gap: 14px;
+  }
+
+  .ext-system__item {
+    font-size: 12px;
   }
 }
 </style>

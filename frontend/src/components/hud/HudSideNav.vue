@@ -43,7 +43,7 @@ const emit = defineEmits<{ onItemClick: [route: string] }>();
   gap: 12px;
   min-height: 64px;
   padding: 10px 14px;
-  border-radius: var(--radius-lg);
+  clip-path: var(--clip-md);
   border: 1px solid var(--border-subtle);
   background: var(--bg-panel);
   color: var(--text-secondary);
@@ -58,7 +58,7 @@ const emit = defineEmits<{ onItemClick: [route: string] }>();
 }
 
 .sidenav__item--active {
-  background: linear-gradient(135deg, var(--amber) 0%, var(--amber-deep) 100%);
+  background: var(--amber);
   border-color: var(--amber);
   color: var(--on-amber);
   box-shadow: 0 4px 20px var(--amber-glow);
@@ -78,12 +78,12 @@ const emit = defineEmits<{ onItemClick: [route: string] }>();
 
 .sidenav__label {
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .sidenav__sublabel {
-  font-family: var(--font-display);
-  font-size: 11px;
+  font-family: var(--font-mono);
+  font-size: 10px;
   letter-spacing: 2px;
   color: var(--text-muted);
 }

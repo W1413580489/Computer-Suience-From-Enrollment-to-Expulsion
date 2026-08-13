@@ -9,36 +9,28 @@
       @on-menu-click="drawerOpen = true"
     />
 
-    <main v-if="nav.loaded" class="hud-main hud-fade-in">
-      <template v-if="!isMobile">
-        <HudSideNav :items="nav.sideMenu" :active-key="activeKey" @on-item-click="go" />
-      </template>
+    <main v-if="nav.loaded" class="home-main hud-fade-in">
+      <!-- 第一视觉：Hero 角色主视觉 -->
+      <HudCharacterCenter
+        :character-image="characterImg"
+        @on-activate="goChat"
+      />
 
-      <section class="hud-center">
-        <HudCharacterCenter
-          :character-image="characterImg"
-          @on-activate="goChat"
-        />
-        <HudSystemIndicator
-          v-if="!isMobile"
-          class="hud-center__sys"
-          :label="nav.systemIndicator.label"
-          :version="nav.systemIndicator.version"
-        />
-      </section>
+      <!-- 第二视觉：四大核心目的地 -->
+      <DestinationGrid />
 
-      <aside class="hud-right">
-        <HudQuickAccess :items="questAccessItems" @on-item-click="onQuickAccess" />
-      </aside>
+      <!-- 第三视觉：AI 助手邀请 -->
+      <AiInvitation />
     </main>
 
-    <main v-else class="hud-main hud-main--loading">
+    <main v-else class="home-main home-main--loading">
       <p v-if="nav.loadError" class="hud-load-error">
         配置加载失败：{{ nav.loadError }}（请确认后端服务已启动）
       </p>
       <p v-else class="hud-loading">SYSTEM LOADING…</p>
     </main>
 
+    <!-- 第四视觉：外部系统（低视觉层级） -->
     <HudFooterTools :items="nav.footerTools" @on-item-click="(i) => openExternal(i.url)" />
 
     <MobileBottomTabs
@@ -63,17 +55,16 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import HudBackground from '@/components/hud/HudBackground.vue';
 import HudTopBar from '@/components/hud/HudTopBar.vue';
-import HudSideNav from '@/components/hud/HudSideNav.vue';
-import HudQuickAccess from '@/components/hud/HudQuickAccess.vue';
 import HudCharacterCenter from '@/components/hud/HudCharacterCenter.vue';
-import HudSystemIndicator from '@/components/hud/HudSystemIndicator.vue';
 import HudFooterTools from '@/components/hud/HudFooterTools.vue';
+import DestinationGrid from '@/components/home/DestinationGrid.vue';
+import AiInvitation from '@/components/home/AiInvitation.vue';
 import MobileBottomTabs from '@/components/nav/MobileBottomTabs.vue';
 import NavDrawer from '@/components/nav/NavDrawer.vue';
 import SettingsDrawer from '@/components/settings/SettingsDrawer.vue';
 import { useNavStore } from '@/stores/navStore';
 import { useViewport, openExternal } from '@/composables/useViewport';
-import type { MobileTab, QuickAccessItem } from '@/types/nav';
+import type { MobileTab } from '@/types/nav';
 import characterImg from '@/assets/images/character.webp';
 
 const route = useRoute();
@@ -92,7 +83,6 @@ const activeKey = computed(
   () => nav.sideMenu.find((i) => (i.route === '/' ? route.path === '/' : route.path.startsWith(i.route)))?.key ?? '',
 );
 
-// 移动端底部 Tab（校园动态已按需求移除，时景 Tab 一并取消）
 const mobileTabs = computed<MobileTab[]>(() => [
   { key: 'home', label: '首页', subLabel: 'HOME', icon: 'home', route: '/' },
   { key: 'guide', label: '攻略', subLabel: 'GUIDE', icon: 'guide', route: '/guides' },
@@ -108,32 +98,6 @@ function goChat() {
   router.push(nav.chatRoute);
 }
 
-/** 快速入口 —— 把第一张卡片置为「新手任务」，其余保持飞书跳转 */
-const questAccessItems = computed<QuickAccessItem[]>(() => {
-  const questCard: QuickAccessItem = {
-    label: '🎮 新手任务',
-    desc: '新玩家账号登录 · 大地图探索 · 攻略手册',
-    url: '/quest',
-  };
-  const resourceCard: QuickAccessItem = {
-    label: '🔗 资源中心',
-    desc: '常用网站与学习资源',
-    url: '/resources',
-  };
-  const items = nav.quickAccess.map(i => ({ ...i }));
-  items[0] = questCard;
-  items[2] = resourceCard;
-  return items;
-});
-
-function onQuickAccess(item: QuickAccessItem) {
-  if (item.url.startsWith('/')) {
-    router.push(item.url);
-  } else {
-    openExternal(item.url);
-  }
-}
-
 function onDrawerNav(path: string) {
   drawerOpen.value = false;
   router.push(path);
@@ -141,14 +105,17 @@ function onDrawerNav(path: string) {
 </script>
 
 <style scoped>
-.hud-center__sys {
-  position: absolute;
-  left: 24px;
-  bottom: 24px;
-  width: 200px;
+.home-main {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.hud-main--loading {
+.home-main--loading {
   align-items: center;
   justify-content: center;
 }

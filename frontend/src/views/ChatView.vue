@@ -162,7 +162,7 @@ function onFeedbackReason(reason: string) {
   width: min(860px, calc(100% - 32px));
   min-height: 56px;
   padding: 10px 16px;
-  border-radius: var(--radius-lg);
+  clip-path: var(--clip-md);
   border: 1px solid var(--amber);
   background: linear-gradient(135deg, var(--amber-soft) 0%, var(--amber-deep-soft) 100%);
   color: var(--text-primary);
@@ -200,7 +200,7 @@ function onFeedbackReason(reason: string) {
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: var(--radius-md);
+  clip-path: var(--clip-sm);
   color: var(--text-muted);
   flex-shrink: 0;
 }

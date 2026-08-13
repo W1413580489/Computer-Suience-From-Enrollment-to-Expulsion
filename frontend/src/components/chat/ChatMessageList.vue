@@ -113,7 +113,7 @@ watch(
   min-height: 64px;
   background: var(--bg-panel);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  clip-path: var(--clip-sm);
   text-align: left;
   transition: border-color 200ms, box-shadow 200ms;
 }

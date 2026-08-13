@@ -100,8 +100,9 @@ function doClear() {
 <style scoped>
 .dock {
   flex-shrink: 0;
-  border-top: 1px solid var(--border-subtle);
-  background: var(--bg-panel);
+  border-top: 2px solid var(--amber);
+  background: rgba(10, 10, 10, 0.92);
+  backdrop-filter: blur(12px);
   padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
 }
 
@@ -119,7 +120,7 @@ function doClear() {
   padding: 12px 14px;
   background: var(--bg-primary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  clip-path: var(--clip-sm);
   color: var(--text-primary);
   font-size: 14px;
   font-family: var(--font-body);
@@ -129,7 +130,7 @@ function doClear() {
 }
 
 .dock__input:focus {
-  border-color: var(--accent-primary);
+  border-color: var(--amber);
 }
 
 .dock__input:disabled {
@@ -139,7 +140,7 @@ function doClear() {
 .dock__btn {
   width: 52px;
   height: 52px;
-  border-radius: var(--radius-lg);
+  clip-path: var(--clip-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -148,12 +149,13 @@ function doClear() {
 }
 
 .dock__btn--send {
-  background: var(--accent-primary);
-  color: #fff;
+  background: var(--amber);
+  color: var(--on-amber);
 }
 
 .dock__btn--send:hover:not(:disabled) {
-  background: var(--accent-bright);
+  background: var(--amber);
+  filter: brightness(1.15);
 }
 
 .dock__btn--send:disabled {
@@ -180,14 +182,14 @@ function doClear() {
   gap: 6px;
   min-height: 40px;
   padding: 0 12px;
-  border-radius: var(--radius-md);
+  clip-path: var(--clip-sm);
   font-size: 13px;
   color: var(--text-muted);
   transition: color 200ms, background 200ms;
 }
 
 .dock__meta-btn:hover:not(:disabled) {
-  color: var(--accent-bright);
+  color: var(--amber);
   background: var(--bg-panel-2);
 }
 

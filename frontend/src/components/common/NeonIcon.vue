@@ -110,6 +110,6 @@ withDefaults(
 <style scoped>
 .neon-icon {
   flex-shrink: 0;
-  filter: drop-shadow(0 0 4px var(--accent-faint));
+  filter: drop-shadow(0 0 4px var(--amber-strong));
 }
 </style>

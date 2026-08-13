@@ -59,15 +59,16 @@ import PageShell from '@/components/common/PageShell.vue';
 .about-section {
   background: var(--bg-panel);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  border-top: 3px solid var(--amber);
+  clip-path: var(--clip-md);
   padding: 18px 20px;
   margin-bottom: 14px;
 }
 
 .about-h2 {
   font-size: 15px;
-  font-weight: 600;
-  color: var(--accent-bright);
+  font-weight: 700;
+  color: var(--amber);
   margin-bottom: 10px;
 }
 

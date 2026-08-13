@@ -45,8 +45,8 @@ const emit = defineEmits<{ onItemClick: [route: string]; onClose: [] }>();
 .drawer {
   width: 100%;
   background: var(--bg-panel);
-  border-top: 1px solid var(--border-glow);
-  border-radius: 16px 16px 0 0;
+  border-top: 2px solid var(--amber);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
   padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
@@ -66,7 +66,7 @@ const emit = defineEmits<{ onItemClick: [route: string]; onClose: [] }>();
   align-items: center;
   gap: 14px;
   padding: 16px 14px;
-  border-radius: var(--radius-md);
+  clip-path: var(--clip-sm);
   color: var(--text-secondary);
   text-align: left;
   min-height: 60px;
@@ -77,7 +77,7 @@ const emit = defineEmits<{ onItemClick: [route: string]; onClose: [] }>();
 }
 
 .drawer__item--active {
-  color: var(--accent-bright);
+  color: var(--amber);
   background: var(--bg-panel-2);
 }
 
@@ -98,7 +98,7 @@ const emit = defineEmits<{ onItemClick: [route: string]; onClose: [] }>();
 }
 
 .drawer__sublabel {
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 2px;
   color: var(--text-muted);

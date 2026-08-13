@@ -1,79 +1,97 @@
-/* 设计 Token（需求文档 §8.0） */
+/* 设计 Token — 绝区零（ZZZ）风格设计系统 */
 :root {
-  /* 背景层级 */
-  --bg-primary: #0A1428;
-  --bg-panel: #0F1F3A;
-  --bg-panel-2: #142B4D;
-  --bg-panel-3: #1A345D;
+  /* 背景层级 — 纯黑/深灰 */
+  --bg-primary: #0A0A0A;
+  --bg-panel: #121212;
+  --bg-panel-2: #1A1A1A;
+  --bg-panel-3: #2A2A2A;
 
   /* 边框 */
-  --border-subtle: #1E3A6B;
-  --border-glow: #378ADD;
+  --border-subtle: #3A3A3A;
+  --border-glow: #FFD93D;
 
-  /* 品牌蓝（交互强调） */
-  --accent-primary: #378ADD;
-  --accent-bright: #5DA8FF;
-  --accent-glow: rgba(55, 138, 221, 0.45);
+  /* 主色：标志性亮黄 */
+  --accent-primary: #FFD93D;
+  --accent-bright: #FFD93D;
+  --accent-glow: rgba(255, 217, 61, 0.35);
 
-  /* 琥珀黄（游戏风格主强调色） */
-  --amber: #FFC82E;
-  --amber-deep: #F0A800;
-  --amber-glow: rgba(255, 200, 46, 0.35);
-  --on-amber: #1A1200;
+  /* 主色变体（原 amber 槽位，统一切换为 ZZZ 黄） */
+  --amber: #FFD93D;
+  --amber-deep: #C9A800;
+  --amber-glow: rgba(255, 217, 61, 0.35);
+  --on-amber: #0A0A0A;
+
+  /* 辅色：霓虹青 / 品红 */
+  --neon-cyan: #00F0FF;
+  --neon-cyan-glow: rgba(0, 240, 255, 0.3);
+  --neon-magenta: #FF2D95;
+  --neon-magenta-glow: rgba(255, 45, 149, 0.3);
 
   /* 文本层级 */
-  --text-primary: #E8F1FF;
-  --text-secondary: #9BB4D8;
-  --text-muted: #88AAD8; /* 提升对比度至 WCAG AA（≥4.5:1） */
-  --text-link: #5DA8FF;
+  --text-primary: #F5F5F5;
+  --text-secondary: #888888;
+  --text-muted: #555555;
+  --text-link: #00F0FF;
 
   /* 系统状态色 */
   --success: #4ECCA3;
-  --danger: #FF6B6B;
+  --danger: #FF2D95;
   --warning: #EF9F27;
 
-  /* 半透明状态色变体（替代硬编码 rgba，保持层级一致） */
-  --mask-light: rgba(4, 10, 24, 0.6);
-  --mask-overlay: rgba(4, 10, 24, 0.7);
-  --mask-strong: rgba(4, 10, 24, 0.75);
-  --accent-soft: rgba(55, 138, 221, 0.05);
-  --accent-mid: rgba(55, 138, 221, 0.12);
-  --accent-faint: rgba(55, 138, 221, 0.35);
-  --accent-strong: rgba(55, 138, 221, 0.5);
+  /* 半透明状态色变体 */
+  --mask-light: rgba(10, 10, 10, 0.6);
+  --mask-overlay: rgba(10, 10, 10, 0.7);
+  --mask-strong: rgba(10, 10, 10, 0.85);
+  --accent-soft: rgba(255, 217, 61, 0.05);
+  --accent-mid: rgba(255, 217, 61, 0.12);
+  --accent-faint: rgba(255, 217, 61, 0.35);
+  --accent-strong: rgba(255, 217, 61, 0.5);
   --success-soft: rgba(78, 204, 163, 0.1);
   --success-border: rgba(78, 204, 163, 0.35);
   --success-strong: rgba(78, 204, 163, 0.45);
-  --danger-soft: rgba(255, 107, 107, 0.08);
-  --danger-border: rgba(255, 107, 107, 0.35);
-  --amber-soft: rgba(255, 200, 46, 0.1);
-  --amber-mid: rgba(255, 200, 46, 0.2);
-  --amber-strong: rgba(255, 200, 46, 0.3);
-  --amber-halo: rgba(255, 200, 46, 0.45);
-  --amber-deep-soft: rgba(240, 168, 0, 0.06);
-  --amber-deep-mid: rgba(240, 168, 0, 0.08);
-  --amber-deep-strong: rgba(240, 168, 0, 0.15);
+  --danger-soft: rgba(255, 45, 149, 0.08);
+  --danger-border: rgba(255, 45, 149, 0.35);
+  --amber-soft: rgba(255, 217, 61, 0.1);
+  --amber-mid: rgba(255, 217, 61, 0.2);
+  --amber-strong: rgba(255, 217, 61, 0.3);
+  --amber-halo: rgba(255, 217, 61, 0.45);
+  --amber-deep-soft: rgba(201, 168, 0, 0.06);
+  --amber-deep-mid: rgba(201, 168, 0, 0.08);
+  --amber-deep-strong: rgba(201, 168, 0, 0.15);
   --warning-soft: rgba(239, 159, 39, 0.06);
   --surface-glass: rgba(255, 255, 255, 0.06);
   --shadow-deep: rgba(0, 0, 0, 0.6);
-  --on-amber-muted: rgba(26, 18, 0, 0.65);
-  --on-amber-faint: rgba(26, 18, 0, 0.55);
+  --on-amber-muted: rgba(10, 10, 10, 0.65);
+  --on-amber-faint: rgba(10, 10, 10, 0.55);
 
-  /* 字体 */
-  --font-display: 'Orbitron', 'Rajdhani', 'PingFang SC', sans-serif;
-  --font-body: 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  /* 字体 — ZZZ 风格 */
+  --font-display: 'Bebas Neue', 'Noto Sans SC', sans-serif;
+  --font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* 圆角 */
+  /* 圆角（保留兼容，但 ZZZ 风格优先使用切角） */
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
 
-  /* 阴影 */
-  --shadow-glow: 0 0 16px var(--accent-glow);
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+  /* 斜切角参数 */
+  --cut-sm: 8px;
+  --cut-md: 14px;
+  --cut-lg: 20px;
 
-  /* 背景 */
-  --bg-image: linear-gradient(135deg, #0A1428 0%, #102347 60%, #0A1428 100%);
+  /* 切角 clip-path（可直接 clip-path: var(--clip-md) 使用） */
+  --clip-sm: polygon(var(--cut-sm) 0, 100% 0, 100% calc(100% - var(--cut-sm)), calc(100% - var(--cut-sm)) 100%, 0 100%, 0 var(--cut-sm));
+  --clip-md: polygon(var(--cut-md) 0, 100% 0, 100% calc(100% - var(--cut-md)), calc(100% - var(--cut-md)) 100%, 0 100%, 0 var(--cut-md));
+  --clip-lg: polygon(var(--cut-lg) 0, 100% 0, 100% calc(100% - var(--cut-lg)), calc(100% - var(--cut-lg)) 100%, 0 100%, 0 var(--cut-lg));
+
+  /* 阴影 */
+  --shadow-glow: 0 0 20px var(--accent-glow);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.6);
+  --shadow-glow-cyan: 0 0 20px var(--neon-cyan-glow);
+  --shadow-glow-magenta: 0 0 20px var(--neon-magenta-glow);
+
+  /* 背景 — ZZZ 黑底+扫描线 */
+  --bg-image: linear-gradient(135deg, #0A0A0A 0%, #121212 60%, #0A0A0A 100%);
 
   /* 布局尺寸 */
   --topbar-h: 64px;
@@ -102,6 +120,18 @@ body {
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
+  /* ZZZ 全局扫描线背景 */
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 2px,
+      rgba(255, 255, 255, 0.015) 2px,
+      rgba(255, 255, 255, 0.015) 4px
+    ),
+    radial-gradient(circle at 20% 0%, rgba(255, 217, 61, 0.04), transparent 50%),
+    radial-gradient(circle at 80% 100%, rgba(0, 240, 255, 0.03), transparent 50%);
+  background-attachment: fixed;
 }
 
 a {
@@ -117,16 +147,17 @@ button {
   color: inherit;
 }
 
+/* ZZZ 滚动条 */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border-subtle);
-  border-radius: 3px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--bg-panel);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--amber-deep);
+  clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
 }
 
 @media (max-width: 767px) {
@@ -147,13 +178,12 @@ button {
   }
 }
 
-/* 全局焦点样式（键盘导航可见性） */
+/* 全局焦点样式 */
 :focus-visible {
   outline: 2px solid var(--amber);
   outline-offset: 2px;
 }
 
-/* 移除鼠标点击时的默认轮廓 */
 :focus:not(:focus-visible) {
   outline: none;
 }

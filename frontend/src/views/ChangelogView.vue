@@ -32,7 +32,7 @@ const nav = useNavStore();
 .changelog__entry {
   background: var(--bg-panel);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  clip-path: var(--clip-md);
   padding: 16px 20px;
 }
 

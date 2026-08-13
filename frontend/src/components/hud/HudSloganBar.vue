@@ -19,8 +19,8 @@ defineProps<{ main: string; sub: string }>();
   justify-content: center;
   gap: 4px;
   min-height: var(--slogan-h);
-  background: var(--bg-panel);
-  border-top: 1px solid var(--border-subtle);
+  background: rgba(10, 10, 10, 0.92);
+  border-top: 2px solid var(--amber);
   position: relative;
   z-index: 1;
   padding: 8px;
@@ -28,16 +28,16 @@ defineProps<{ main: string; sub: string }>();
 
 .slogan-bar__main {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 500;
   letter-spacing: 6px;
-  color: var(--accent-primary);
-  text-shadow: 0 0 14px var(--accent-glow);
+  color: var(--amber);
+  text-shadow: 0 0 14px var(--amber-glow);
 }
 
 .slogan-bar__sub {
-  font-family: var(--font-display);
-  font-size: 11px;
+  font-family: var(--font-mono);
+  font-size: 10px;
   letter-spacing: 8px;
   color: var(--text-muted);
 }

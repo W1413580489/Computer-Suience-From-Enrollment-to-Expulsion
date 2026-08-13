@@ -283,7 +283,7 @@ function scrollToTop() {
 .level-card {
   background: var(--bg-panel);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  clip-path: var(--clip-md);
   cursor: pointer;
   transition: border-color 200ms, transform 150ms, box-shadow 200ms;
   text-align: left; overflow: hidden;
@@ -367,7 +367,7 @@ function scrollToTop() {
 .reader-section {
   background: var(--bg-panel);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  clip-path: var(--clip-md);
   margin-bottom: clamp(16px, 3vw, 24px);
   overflow: hidden;
   transition: border-color 200ms;
@@ -382,7 +382,7 @@ function scrollToTop() {
   font-family: var(--font-display);
   font-size: clamp(12px, 1.8vw, 14px); color: var(--amber);
   border: 1px solid var(--amber-glow);
-  border-radius: var(--radius-sm);
+  clip-path: var(--clip-sm);
   width: clamp(28px, 4vw, 32px); height: clamp(28px, 4vw, 32px);
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
@@ -475,7 +475,7 @@ function scrollToTop() {
   text-transform: uppercase;
   align-self: flex-start;
   border: 1px solid var(--amber-glow);
-  border-radius: var(--radius-sm);
+  clip-path: var(--clip-sm);
   padding: 2px 8px;
   opacity: .8;
 }
@@ -508,7 +508,7 @@ function scrollToTop() {
   max-width: min(100%, 600px);
   max-height: min(60vh, 500px);
   width: auto; height: auto;
-  border-radius: var(--radius-md);
+  clip-path: var(--clip-sm);
   margin: .8em auto;
   display: block;
   border: 1px solid var(--border-subtle);
@@ -527,7 +527,7 @@ function scrollToTop() {
   font-size: clamp(14px, 2vw, 16px); font-weight: 700; color: var(--text-muted);
   background: var(--bg-panel-3);
   border: 1px solid var(--amber-glow);
-  border-radius: var(--radius-md);
+  clip-path: var(--clip-sm);
   cursor: pointer;
   transition: all 250ms;
   overflow: hidden;
@@ -579,7 +579,7 @@ function scrollToTop() {
   font-size: clamp(14px, 2.2vw, 17px); font-weight: 700; color: var(--amber);
   background: var(--amber-soft);
   border: 1px solid var(--amber-glow);
-  border-radius: var(--radius-md);
+  clip-path: var(--clip-sm);
   cursor: pointer;
   transition: background 200ms, transform 200ms, box-shadow 200ms;
   box-shadow: 0 0 0 0 var(--amber-glow);
@@ -610,7 +610,7 @@ function scrollToTop() {
   padding: clamp(20px, 4vw, 32px);
   background: var(--success-soft);
   border: 1px solid var(--success-border);
-  border-radius: var(--radius-lg);
+  clip-path: var(--clip-md);
   margin-top: 8px;
 }
 .reader-done__icon { font-size: clamp(32px, 5vw, 42px); display: block; margin-bottom: 8px; }
@@ -622,7 +622,7 @@ function scrollToTop() {
   font-size: clamp(13px, 2vw, 15px); font-weight: 600; color: var(--amber);
   background: var(--amber-soft);
   border: 1px solid var(--amber-glow);
-  border-radius: var(--radius-sm);
+  clip-path: var(--clip-sm);
   cursor: pointer;
   transition: background 150ms, transform 150ms;
 }
