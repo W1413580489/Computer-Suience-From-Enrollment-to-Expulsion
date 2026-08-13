@@ -68,9 +68,9 @@ const nav = useNavStore();
 const isHome = computed(() => props.currentRoute === '/');
 
 const navItems = [
-  { key: 'home', label: 'HOME', route: '/' },
-  { key: 'guide', label: 'GUIDE', route: '/guides' },
-  { key: 'database', label: 'DATABASE', route: '/resources' },
+  { key: 'home', label: '首页', route: '/' },
+  { key: 'guide', label: '攻略', route: '/guides' },
+  { key: 'database', label: '资源', route: '/resources' },
 ];
 
 const routeLabel = computed(() => {

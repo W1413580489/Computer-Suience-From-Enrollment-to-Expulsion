@@ -2,29 +2,29 @@
   <section class="dest">
     <header class="dest__header">
       <span class="dest__num">// DESTINATIONS</span>
-      <h2 class="dest__title">四大目的地</h2>
+      <h2 class="dest__title">目的地</h2>
     </header>
 
     <div class="dest__grid">
-      <!-- 01 入学指南 — 左对齐，宽 -->
+      <!-- 01 新手任务 — 左对齐，宽 -->
       <button class="dcard dcard--01" @click="go(quests[0].route)">
         <span class="dcard__num">01</span>
         <div class="dcard__body">
-          <span class="dcard__en">NEW STUDENT</span>
-          <h3 class="dcard__cn">入学指南</h3>
-          <p class="dcard__desc">新生报到 · 学院制度 · 培养方案</p>
+          <span class="dcard__en">NEW QUEST</span>
+          <h3 class="dcard__cn">新手任务</h3>
+          <p class="dcard__desc">账号登录 · 关卡解锁 · 入学指南</p>
         </div>
         <span class="dcard__cta">EXPLORE →</span>
         <span class="dcard__shape dcard__shape--01" />
       </button>
 
-      <!-- 02 学业规划 — 右对齐，偏移 -->
+      <!-- 02 攻略 — 右对齐，偏移 -->
       <button class="dcard dcard--02" @click="go(quests[1].route)">
         <span class="dcard__num">02</span>
         <div class="dcard__body">
-          <span class="dcard__en">ACADEMIC / FUTURE</span>
-          <h3 class="dcard__cn">学业规划</h3>
-          <p class="dcard__desc">课程 · 成绩 · 保研 · 考研 · 就业</p>
+          <span class="dcard__en">GUIDE</span>
+          <h3 class="dcard__cn">攻略</h3>
+          <p class="dcard__desc">全部指南 · 图文教程</p>
         </div>
         <span class="dcard__cta">EXPLORE →</span>
         <span class="dcard__shape dcard__shape--02" />
@@ -42,13 +42,13 @@
         <span class="dcard__shape dcard__shape--03" />
       </button>
 
-      <!-- 04 校园生活 — 右对齐，宽 -->
+      <!-- 04 附录 — 右对齐，宽 -->
       <button class="dcard dcard--04" @click="go(quests[3].route)">
         <span class="dcard__num">04</span>
         <div class="dcard__body">
-          <span class="dcard__en">CAMPUS LIFE</span>
-          <h3 class="dcard__cn">校园生活</h3>
-          <p class="dcard__desc">社团 · 活动 · 地图 · 学院资讯</p>
+          <span class="dcard__en">APPENDIX</span>
+          <h3 class="dcard__cn">附录</h3>
+          <p class="dcard__desc">表格 · 政策 · 补充文档</p>
         </div>
         <span class="dcard__cta">EXPLORE →</span>
         <span class="dcard__shape dcard__shape--04" />
@@ -76,8 +76,8 @@ function go(route: string) {
 
 <style scoped>
 .dest {
-  padding: 24px 24px 32px;
-  max-width: 920px;
+  padding: 8px 24px 40px;
+  max-width: 860px;
   margin: 0 auto;
   width: 100%;
 }
@@ -86,8 +86,8 @@ function go(route: string) {
   display: flex;
   align-items: baseline;
   gap: 14px;
-  margin-bottom: 24px;
-  padding-bottom: 12px;
+  margin-bottom: 22px;
+  padding-bottom: 10px;
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -112,28 +112,30 @@ function go(route: string) {
 .dest__grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 14px;
 }
 
-/* ---- 通用卡片 ---- */
+/* ---- 通用卡片：半透明玻璃面板，不遮死背景光晕 ---- */
 .dcard {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 22px 24px;
-  background: var(--bg-panel);
-  border: 1px solid var(--border-subtle);
+  gap: 8px;
+  padding: 18px 22px;
+  background: rgba(18, 18, 18, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 217, 61, 0.14);
   color: var(--text-primary);
   text-align: left;
   transition: border-color 200ms, background 200ms, transform 200ms;
   overflow: hidden;
-  min-height: 140px;
+  min-height: 118px;
 }
 
 .dcard:hover {
   border-color: var(--amber);
-  background: var(--bg-panel-2);
+  background: rgba(26, 26, 26, 0.85);
   transform: translateY(-3px);
 }
 
@@ -143,7 +145,7 @@ function go(route: string) {
 
 .dcard__num {
   font-family: var(--font-display);
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 900;
   line-height: 1;
   color: var(--amber);
@@ -168,7 +170,7 @@ function go(route: string) {
 }
 
 .dcard__cn {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: 1px;
   color: var(--text-primary);
@@ -199,16 +201,16 @@ function go(route: string) {
   transform: translateX(4px);
 }
 
-/* ---- 不对称位移 ---- */
+/* ---- 不对称位移（幅度减小，留白增加，让背景可见） ---- */
 .dcard--01 {
   clip-path: polygon(var(--cut-lg) 0, 100% 0, 100% 100%, 0 100%, 0 var(--cut-lg));
-  margin-right: 24px;
+  margin-right: 36px;
 }
 
 .dcard--02 {
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--cut-lg)), calc(100% - var(--cut-lg)) 100%, 0 100%);
-  margin-top: 32px;
-  margin-left: 24px;
+  margin-top: 18px;
+  margin-left: 36px;
   text-align: right;
   align-items: flex-end;
 }
@@ -220,8 +222,8 @@ function go(route: string) {
 .dcard--03 {
   clip-path: polygon(var(--cut-md) 0, 100% 0, 100% 100%, 0 100%, 0 var(--cut-md));
   grid-column: 1 / -1;
-  max-width: 70%;
-  margin: 0 auto;
+  max-width: 56%;
+  margin: 6px auto 0;
   text-align: center;
   align-items: center;
 }
@@ -234,7 +236,8 @@ function go(route: string) {
   clip-path: polygon(0 0, 100% 0, 100% 100%, calc(100% - var(--cut-lg)) 100%, 0 calc(100% - var(--cut-lg)));
   grid-column: 1 / -1;
   margin-left: auto;
-  max-width: 75%;
+  margin-right: 36px;
+  max-width: 62%;
   text-align: right;
   align-items: flex-end;
 }
@@ -252,19 +255,19 @@ function go(route: string) {
 }
 
 .dcard__shape--01 {
-  top: 16px;
-  right: 16px;
-  width: 40px;
-  height: 40px;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
   border: 1.5px solid var(--amber);
   clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
 }
 
 .dcard__shape--02 {
-  top: 16px;
-  left: 16px;
-  width: 36px;
-  height: 36px;
+  top: 14px;
+  left: 14px;
+  width: 32px;
+  height: 32px;
   border: 1.5px solid var(--neon-cyan);
   transform: rotate(45deg);
   opacity: 0.4;
@@ -272,18 +275,18 @@ function go(route: string) {
 
 .dcard__shape--03 {
   top: 50%;
-  right: 20px;
+  right: 18px;
   transform: translateY(-50%);
   width: 3px;
-  height: 50px;
+  height: 44px;
   background: var(--amber);
   opacity: 0.6;
 }
 
 .dcard__shape--04 {
-  bottom: 16px;
-  left: 16px;
-  width: 50px;
+  bottom: 14px;
+  left: 14px;
+  width: 46px;
   height: 1.5px;
   background: var(--amber);
 }
@@ -293,7 +296,7 @@ function go(route: string) {
   position: absolute;
   left: 0;
   top: 6px;
-  width: 30px;
+  width: 28px;
   height: 1.5px;
   background: var(--amber);
   opacity: 0.5;
@@ -302,11 +305,11 @@ function go(route: string) {
 /* ---- 响应式 ---- */
 @media (max-width: 767px) {
   .dest {
-    padding: 16px 16px 24px;
+    padding: 8px 16px 28px;
   }
 
   .dest__header {
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
 
   .dest__title {
@@ -315,12 +318,12 @@ function go(route: string) {
 
   .dest__grid {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 10px;
   }
 
   .dcard {
-    min-height: 110px;
-    padding: 18px 20px;
+    min-height: 104px;
+    padding: 16px 18px;
   }
 
   .dcard--01,
@@ -348,7 +351,7 @@ function go(route: string) {
   }
 
   .dcard__num {
-    font-size: 28px;
+    font-size: 26px;
   }
 
   .dcard__cn {

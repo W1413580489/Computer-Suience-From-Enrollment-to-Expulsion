@@ -3,7 +3,7 @@
     <!-- 海报式文字层 -->
     <div class="hero__masthead">
       <span class="hero__kicker">JNU INFORMATION</span>
-      <h1 class="hero__title glitch-title" data-text="XKZ · GUIDE">XKZ · GUIDE</h1>
+      <h1 class="hero__title glitch-title" data-text="信科院指南">信科院指南</h1>
       <p class="hero__tagline">梦回人远许多愁，只在梨花风雨处</p>
       <span class="hero__year">2026</span>
     </div>
@@ -93,10 +93,10 @@ function onActivate() {
 .hero__title {
   position: relative;
   font-family: var(--font-display);
-  font-size: clamp(48px, 9vw, 96px);
+  font-size: clamp(38px, 6.5vw, 72px);
   font-weight: 900;
-  line-height: 0.95;
-  letter-spacing: 0.06em;
+  line-height: 1.1;
+  letter-spacing: 0.08em;
   color: var(--text-primary);
   text-transform: uppercase;
 }
@@ -111,10 +111,10 @@ function onActivate() {
   width: 100%;
   height: 100%;
   font-family: var(--font-display);
-  font-size: clamp(48px, 9vw, 96px);
+  font-size: clamp(38px, 6.5vw, 72px);
   font-weight: 900;
-  line-height: 0.95;
-  letter-spacing: 0.06em;
+  line-height: 1.1;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   pointer-events: none;
 }
@@ -275,7 +275,7 @@ function onActivate() {
   .hero__title,
   .glitch-title::before,
   .glitch-title::after {
-    font-size: 44px;
+    font-size: 36px;
   }
 
   .hero__kicker {

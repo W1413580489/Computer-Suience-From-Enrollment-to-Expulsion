@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>信科院指南 · ZZZ 风格方向 Mockup</title>
+<style>
+  :root {
+    --bg: #12101A;
+    --bg-panel: #1A1724;
+    --bg-raise: #221E2E;
+    --ink: #050305;
+    --acid: #C8FF4D;
+    --pink: #FF4D8D;
+    --electric: #4D8DFF;
+    --amber: #FFC82E;
+    --paper: #F2EDE4;
+    --paper-dim: #9A93A8;
+    --paper-mute: #6E6880;
+    --display: 'Arial Black', 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    --body: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; width: 100%; overflow: hidden; }
+  body {
+    font-family: var(--body);
+    background: var(--bg);
+    color: var(--paper);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* ====================================================
+     噪点纹理背景 — ZZZ 标志性的做旧质感
+     ==================================================== */
+  .noise {
+    position: fixed; inset: 0; pointer-events: none; z-index: 999; opacity: 0.6;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.12'/></svg>");
+  }
+
+  /* 扫描线 */
+  .scanlines {
+    position: fixed; inset: 0; pointer-events: none; z-index: 998;
+    background: repeating-linear-gradient(0deg, transparent 0, transparent 3px, rgba(0,0,0,0.12) 3px, rgba(0,0,0,0.12) 4px);
+    opacity: 0.4;
+  }
+
+  /* ====================================================
+     整体骨架
+     ==================================================== */
+  .hud { position: relative; z-index: 1; height: 100vh; width: 100vw; display: flex; flex-direction: column; }
+
+  /* ====================================================
+     顶栏 — 保留 INFO SYSTEM
+     ==================================================== */
+  .topbar {
+    height: 60px; flex-shrink: 0;
+    display: flex; align-items: center; gap: 18px;
+    padding: 0 22px;
+    border-bottom: 3px solid var(--ink);
+    background: var(--bg);
+    position: relative;
+  }
+  .topbar__logo { display: flex; align-items: baseline; gap: 10px; }
+  .topbar__logo-cn { font-family: var(--display); font-size: 17px; font-weight: 900; letter-spacing: 2px; }
+  .topbar__logo-cn b { color: var(--acid); }
+  .topbar__logo-en { font-family: var(--display); font-size: 10px; letter-spacing: 3px; color: var(--paper-mute); }
+  .topbar__divider { width: 1px; height: 24px; background: var(--paper-mute); }
+  .topbar__chip {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 12px; font-size: 10px; letter-spacing: 1.5px; font-family: var(--display);
+    border: 2px solid var(--ink); border-radius: 2px;
+    background: var(--bg-raise); color: var(--paper-dim);
+    text-transform: uppercase;
+  }
+  .topbar__chip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--acid); box-shadow: 0 0 8px var(--acid); }
+  .topbar__chip--lv { border-color: var(--pink); color: var(--pink); }
+  .topbar__spacer { flex: 1; }
+  .topbar__icon {
+    width: 34px; height: 34px; display: grid; place-items: center;
+    border: 2px solid var(--ink); border-radius: 2px;
+    background: var(--bg-raise); cursor: pointer; font-size: 14px;
+    transition: all .15s;
+  }
+  .topbar__icon:hover { border-color: var(--acid); }
+  .topbar__avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 2px solid var(--electric); display: grid; place-items: center;
+    font-size: 15px; background: var(--bg-raise);
+  }
+
+  /* ====================================================
+     主体 — 左导航 + 中央角色 + 右入口
+     ==================================================== */
+  .main { flex: 1; display: flex; overflow: hidden; position: relative; }
+
+  /* ===== 左导航（侧栏） ===== */
+  .sidenav {
+    width: 180px; flex-shrink: 0;
+    padding: 24px 14px; display: flex; flex-direction: column; gap: 10px;
+    border-right: 3px solid var(--ink);
+    background: var(--bg);
+  }
+  .sidenav__label {
+    font-family: var(--display); font-size: 9px; letter-spacing: 2px;
+    color: var(--paper-mute); padding: 0 14px 8px; text-transform: uppercase;
+  }
+  .sidenav__item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; font-size: 14px; font-weight: 700;
+    color: var(--paper-dim); cursor: pointer;
+    border: 2px solid transparent; transition: all .15s; position: relative;
+  }
+  .sidenav__item .num {
+    font-family: var(--display); font-size: 9px; letter-spacing: 1px;
+    color: var(--paper-mute);
+  }
+  .sidenav__item:hover { background: var(--bg-raise); color: var(--paper); }
+  .sidenav__item--active {
+    color: var(--ink) !important; background: var(--acid);
+    border: 2px solid var(--ink);
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 100%, 0 100%);
+    font-family: var(--display);
+    transform: translateX(4px);
+  }
+  .sidenav__item--active .num { color: var(--ink); }
+
+  /* ====================================================
+     中央角色区 — 场景化融合
+     ==================================================== */
+  .center {
+    flex: 1; position: relative; overflow: hidden;
+    display: flex; align-items: stretch; justify-content: center;
+  }
+  /* 斜切装饰色块（ZZZ 标志性的平行四边形底） */
+  .scene__block {
+    position: absolute; z-index: 0;
+    border: 3px solid var(--ink);
+  }
+  .scene__block--1 {
+    width: 38%; height: 78%; right: 6%; top: 11%;
+    background: var(--pink);
+    clip-path: polygon(14% 0, 100% 0, 100% 86%, 0 100%);
+    transform: rotate(-3deg);
+  }
+  .scene__block--2 {
+    width: 24%; height: 38%; left: 4%; bottom: 8%;
+    background: var(--electric);
+    clip-path: polygon(0 18%, 100% 0, 88% 100%, 0 100%);
+    transform: rotate(4deg);
+  }
+  .scene__block--3 {
+    width: 16%; height: 24%; left: 28%; top: 8%;
+    background: var(--amber);
+    clip-path: polygon(0 0, 80% 0, 100% 100%, 10% 100%);
+    transform: rotate(-8deg);
+  }
+  /* 角落 sticker */
+  .sticker {
+    position: absolute; z-index: 4;
+    padding: 6px 12px;
+    font-family: var(--display); font-size: 11px; letter-spacing: 1px;
+    color: var(--ink); background: var(--acid);
+    border: 2px solid var(--ink); border-radius: 2px;
+    transform: rotate(-6deg);
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .sticker--tl { top: 22px; left: 22px; }
+  .sticker--br { bottom: 100px; right: 4%; background: var(--paper); transform: rotate(4deg); }
+
+  /* 角色 — 站立在场景中（不再是漂浮贴纸） */
+  .stage {
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 0; max-width: 460px; align-self: center;
+  }
+  .stage__name {
+    font-family: var(--display); font-size: 12px;
+    letter-spacing: 4px; color: var(--acid);
+    margin-bottom: 12px;
+    padding: 4px 12px;
+    border: 2px solid var(--acid);
+    clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+  }
+  /* 漫画分镜框 — 角色站在框里 */
+  .stage__frame {
+    width: 360px; height: 460px;
+    border: 4px solid var(--ink);
+    background: var(--bg-panel);
+    position: relative;
+    box-shadow: 12px 12px 0 var(--ink), 12px 12px 0 2px var(--pink);
+    overflow: hidden;
+  }
+  .stage__img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    object-position: bottom;
+    transition: all .35s ease;
+  }
+  /* 脚下地面剪影 — 让人物"站住" */
+  .stage__ground {
+    position: absolute; left: 50%; bottom: 0;
+    transform: translateX(-50%);
+    width: 220px; height: 18px;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.7) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: 3;
+  }
+  /* hover 角色前倾 */
+  .stage:hover .stage__img { transform: translateY(-6px) scale(1.03); filter: drop-shadow(0 0 12px var(--pink)); }
+  .stage:hover .stage__frame { border-color: var(--pink); }
+
+  /* 标题与 CTA — 清晰层次，CTA 是唯一焦点 */
+  .stage__below {
+    margin-top: 20px; text-align: center; max-width: 460px;
+  }
+  .stage__title {
+    font-family: var(--display); font-size: 36px;
+    color: var(--paper); letter-spacing: 1px; line-height: 1.1;
+    margin-bottom: 18px;
+  }
+  .stage__title b {
+    color: var(--acid); background: var(--ink);
+    padding: 2px 8px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+  .stage__cta {
+    display: inline-flex; align-items: center; gap: 12px;
+    padding: 16px 32px;
+    font-family: var(--display); font-size: 16px; letter-spacing: 3px;
+    color: var(--ink); background: var(--acid);
+    border: 3px solid var(--ink);
+    box-shadow: 6px 6px 0 var(--pink);
+    cursor: pointer;
+    transition: all .15s;
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  }
+  .stage__cta:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 var(--pink);
+    background: var(--paper);
+  }
+  .stage__cta:active { transform: translate(3px, 3px); box-shadow: 3px 3px 0 var(--pink); }
+  .stage__cta .arrow { font-size: 20px; }
+
+  /* ====================================================
+     右入口卡片 — 斜切 + 粗描边 + 贴纸感
+     ==================================================== */
+  .quick {
+    width: 280px; flex-shrink: 0;
+    padding: 22px 20px;
+    border-left: 3px solid var(--ink);
+    background: var(--bg);
+    display: flex; flex-direction: column; gap: 14px;
+    overflow-y: auto;
+  }
+  .quick__label {
+    font-family: var(--display); font-size: 10px; letter-spacing: 3px;
+    color: var(--paper-mute);
+    display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .quick__label::before {
+    content: ''; width: 16px; height: 2px; background: var(--acid);
+  }
+  .qcard {
+    position: relative;
+    background: var(--bg-raise);
+    border: 2.5px solid var(--ink);
+    padding: 14px 16px 14px 18px;
+    cursor: pointer;
+    transition: all .15s;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .qcard__corner {
+    position: absolute;
+    width: 12px; height: 12px;
+  }
+  .qcard__corner--tl { top: -2px; left: -2px; border-left: 4px solid var(--acid); border-top: 4px solid var(--acid); }
+  .qcard__corner--br { bottom: -2px; right: -2px; border-right: 4px solid var(--pink); border-bottom: 4px solid var(--pink); }
+
+  .qcard__icon {
+    width: 28px; height: 28px;
+    display: grid; place-items: center;
+    background: var(--acid); border: 2px solid var(--ink);
+    font-size: 14px; color: var(--ink);
+    font-family: var(--display);
+  }
+  .qcard--2 .qcard__icon { background: var(--pink); color: var(--paper); }
+  .qcard--3 .qcard__icon { background: var(--electric); color: var(--paper); }
+  .qcard--4 .qcard__icon { background: var(--amber); color: var(--ink); }
+
+  .qcard__title {
+    font-family: var(--display); font-size: 16px; letter-spacing: 0.5px;
+    color: var(--paper);
+  }
+  .qcard__desc {
+    font-size: 11px; color: var(--paper-dim); line-height: 1.5;
+  }
+  .qcard:hover {
+    background: var(--bg-panel);
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .qcard:hover .qcard__icon { transform: rotate(-8deg) scale(1.1); }
+  .qcard__icon { transition: all .2s ease; }
+
+  /* NEW 角标 */
+  .qcard__new {
+    position: absolute; top: -8px; right: -8px;
+    padding: 3px 7px;
+    font-family: var(--display); font-size: 9px; letter-spacing: 1px;
+    background: var(--pink); color: var(--paper);
+    border: 2px solid var(--ink);
+    transform: rotate(8deg);
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+
+  /* ====================================================
+     底部状态条 — SYSTEM ONLINE 移到更轻的位置
+     ==================================================== */
+  .statusbar {
+    position: absolute; left: 50%; bottom: 18px;
+    transform: translateX(-50%);
+    z-index: 5;
+    display: flex; align-items: center; gap: 12px;
+    padding: 6px 16px;
+    background: var(--bg-panel);
+    border: 2px solid var(--ink);
+    font-family: var(--display); font-size: 10px; letter-spacing: 2px;
+    color: var(--paper-mute);
+    text-transform: uppercase;
+  }
+  .statusbar .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--acid); box-shadow: 0 0 8px var(--acid);
+    animation: blink 1.4s ease-in-out infinite;
+  }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* ====================================================
+     视图切换提示（mockup 专属）
+     ==================================================== */
+  .toggle {
+    position: absolute; top: 70px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: flex; gap: 0;
+    border: 2px solid var(--ink);
+    background: var(--bg);
+  }
+  .toggle__btn {
+    padding: 8px 18px;
+    font-family: var(--display); font-size: 11px; letter-spacing: 2px;
+    color: var(--paper-mute); cursor: pointer; background: var(--bg-raise);
+    border: none;
+    border-right: 2px solid var(--ink);
+  }
+  .toggle__btn:last-child { border-right: none; }
+  .toggle__btn--active { background: var(--acid); color: var(--ink); }
+</style>
+</head>
+<body>
+
+<!-- 纹理叠加 -->
+<div class="noise"></div>
+<div class="scanlines"></div>
+
+<div class="hud">
+
+  <!-- ====== 顶栏 ====== -->
+  <header class="topbar">
+    <div class="topbar__logo">
+      <span class="topbar__logo-cn">信科院<b>指南</b></span>
+      <span class="topbar__logo-en">XKZ · FIELD MANUAL</span>
+    </div>
+    <div class="topbar__divider"></div>
+    <div class="topbar__chip"><span class="dot"></span> INFO SYSTEM</div>
+    <div class="topbar__chip topbar__chip--lv">LV.1 · 新人</div>
+    <div class="topbar__spacer"></div>
+    <div class="topbar__icon" title="搜索">🔍</div>
+    <div class="topbar__icon" title="更新">🔔</div>
+    <div class="topbar__avatar">🧑</div>
+  </header>
+
+  <!-- ====== 视图切换（仅 mockup） ====== -->
+  <div class="toggle">
+    <button class="toggle__btn toggle__btn--active">A · 当前版</button>
+    <button class="toggle__btn">B · ZZZ 方向</button>
+  </div>
+
+  <!-- ====== 主体 ====== -->
+  <main class="main">
+
+    <!-- 左导航 -->
+    <aside class="sidenav">
+      <div class="sidenav__label">快速访问</div>
+      <div class="sidenav__item sidenav__item--active">
+        <span class="num">01</span>
+        <span>新玩家账号登录</span>
+      </div>
+      <div class="sidenav__item">
+        <span class="num">02</span>
+        <span>资源中心</span>
+      </div>
+      <div class="sidenav__item">
+        <span class="num">03</span>
+        <span>AI 问答</span>
+      </div>
+      <div class="sidenav__item">
+        <span class="num">04</span>
+        <span>生涯工具</span>
+      </div>
+      <div style="flex: 1"></div>
+      <div class="sidenav__label">其他</div>
+      <div class="sidenav__item">
+        <span class="num">★</span>
+        <span>反馈建议</span>
+      </div>
+    </aside>
+
+    <!-- 中央场景 -->
+    <section class="center">
+      <div class="scene__block scene__block--1"></div>
+      <div class="scene__block scene__block--2"></div>
+      <div class="scene__block scene__block--3"></div>
+
+      <div class="sticker sticker--tl">SEASON 08 · 开学季</div>
+      <div class="sticker sticker--br">兔小跳 · 唯一向导</div>
+
+      <!-- 角色站立在场景中 -->
+      <div class="stage">
+        <div class="stage__name">NPC · 兔小跳</div>
+
+        <div class="stage__frame">
+          <img class="stage__img" src="character.webp" alt="角色">
+          <div class="stage__ground"></div>
+        </div>
+
+        <div class="stage__below">
+          <h1 class="stage__title">从入学到<b>被开除</b></h1>
+
+          <button class="stage__cta">
+            <span>点击与我对话</span>
+            <span class="arrow">→</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="statusbar">
+        <span class="dot"></span>
+        <span>SYSTEM ONLINE</span>
+        <span>·</span>
+        <span>Build 2026.08.13</span>
+      </div>
+    </section>
+
+    <!-- 右入口卡片 -->
+    <aside class="quick">
+      <div class="quick__label">快捷入口</div>
+
+      <div class="qcard qcard--1">
+        <div class="qcard__corner qcard__corner--tl"></div>
+        <div class="qcard__corner qcard__corner--br"></div>
+        <div class="qcard__new">NEW</div>
+        <div class="qcard__icon">🎮</div>
+        <div class="qcard__title">新手任务</div>
+        <div class="qcard__desc">入学指南 · 装备清单 · 关卡解锁</div>
+      </div>
+
+      <div class="qcard qcard--2">
+        <div class="qcard__corner qcard__corner--tl"></div>
+        <div class="qcard__corner qcard__corner--br"></div>
+        <div class="qcard__icon">💬</div>
+        <div class="qcard__title">AI 问答</div>
+        <div class="qcard__desc">基于 410 篇攻略的问答机器人</div>
+      </div>
+
+      <div class="qcard qcard--3">
+        <div class="qcard__corner qcard__corner--tl"></div>
+        <div class="qcard__corner qcard__corner--br"></div>
+        <div class="qcard__icon">🔗</div>
+        <div class="qcard__title">资源中心</div>
+        <div class="qcard__desc">常用网站 · 学习路线 · 考研资料</div>
+      </div>
+
+      <div class="qcard qcard--4">
+        <div class="qcard__corner qcard__corner--tl"></div>
+        <div class="qcard__corner qcard__corner--br"></div>
+        <div class="qcard__icon">📚</div>
+        <div class="qcard__title">攻略手册</div>
+        <div class="qcard__desc">20 篇完整攻略 · 持续更新</div>
+      </div>
+    </aside>
+
+  </main>
+</div>
+
+<!-- 切换交互 -->
+<script>
+  const btns = document.querySelectorAll('.toggle__btn');
+  btns[0].addEventListener('click', () => {
+    btns[0].classList.add('toggle__btn--active');
+    btns[1].classList.remove('toggle__btn--active');
+  });
+  btns[1].addEventListener('click', () => {
+    btns[1].classList.add('toggle__btn--active');
+    btns[0].classList.remove('toggle__btn--active');
+  });
+</script>
+
+</body>
+</html>
