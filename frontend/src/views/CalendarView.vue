@@ -40,11 +40,13 @@
                 :class="{ 'cal-mark-exam': r.mark === 'exam', 'cal-mark-labor': r.mark === 'labor' }"
               >
                 <td class="cal-week">
-                  <span v-if="r.w">{{ r.w }}<em v-if="r.mark === 'exam'">▲</em><em v-else-if="r.mark === 'labor'">●</em></span>
+                  <span v-if="r.w" class="cal-week-num">{{ r.w }}</span>
+                  <span v-if="r.mark === 'exam'" class="cal-week-mark cal-week-mark--exam">▲</span>
+                  <span v-else-if="r.mark === 'labor'" class="cal-week-mark cal-week-mark--labor">●</span>
                 </td>
                 <td class="cal-month">{{ r.m }}</td>
                 <td v-for="(d, j) in r.days" :key="j" :class="cellClass(d)">
-                  <span v-if="cellDay(d) != null">{{ cellDay(d) }}</span>
+                  <span v-if="cellDay(d) != null" class="cal-day">{{ cellDay(d) }}</span>
                   <span v-if="d && d.s" class="cal-marker">◇</span>
                 </td>
               </tr>
@@ -78,11 +80,13 @@
                 :class="{ 'cal-mark-exam': r.mark === 'exam', 'cal-mark-labor': r.mark === 'labor' }"
               >
                 <td class="cal-week">
-                  <span v-if="r.w">{{ r.w }}<em v-if="r.mark === 'exam'">▲</em><em v-else-if="r.mark === 'labor'">●</em></span>
+                  <span v-if="r.w" class="cal-week-num">{{ r.w }}</span>
+                  <span v-if="r.mark === 'exam'" class="cal-week-mark cal-week-mark--exam">▲</span>
+                  <span v-else-if="r.mark === 'labor'" class="cal-week-mark cal-week-mark--labor">●</span>
                 </td>
                 <td class="cal-month">{{ r.m }}</td>
                 <td v-for="(d, j) in r.days" :key="j" :class="cellClass(d)">
-                  <span v-if="cellDay(d) != null">{{ cellDay(d) }}</span>
+                  <span v-if="cellDay(d) != null" class="cal-day">{{ cellDay(d) }}</span>
                   <span v-if="d && d.s" class="cal-marker">◇</span>
                 </td>
               </tr>
@@ -115,7 +119,7 @@ type DayType = 'staff' | 'class' | 'holiday' | 'grad' | 'spring';
 interface Day {
   d: number;
   t?: DayType;
-  s?: boolean;
+  s?: boolean; // 春节标记
 }
 type Cell = number | Day | null;
 
@@ -139,18 +143,19 @@ function cellClass(d: Cell): string {
   if (d == null) return '';
   if (typeof d === 'number') return '';
   switch (d.t) {
-    case 'staff': return 'cal-cell-staff';
-    case 'class': return 'cal-cell-class';
-    case 'holiday': return 'cal-cell-holiday';
-    case 'grad': return 'cal-cell-grad';
-    case 'spring': return 'cal-cell-spring';
+    case 'staff': return 'cal-cell cal-cell--staff';
+    case 'class': return 'cal-cell cal-cell--class';
+    case 'holiday': return 'cal-cell cal-cell--holiday';
+    case 'grad': return 'cal-cell cal-cell--grad';
+    case 'spring': return 'cal-cell cal-cell--spring';
     default: return '';
   }
 }
 
+// ===== 第一学期（八、九月 ~ 二月）26 行 =====
 const sem1: Row[] = [
   { w: 1, m: '八、九月', days: [null, 30, 31, 1, n(2, 'staff'), n(3, 'class'), 4, 5] },
-  { w: 1, m: '九月', days: [6, n(7, 'class'), n(8, 'class'), n(9, 'class'), n(10, 'class'), n(11, 'class'), 12] },
+  { w: 1, m: '九月', days: [6, n(7, 'class'), 8, 9, 10, 11, 12] },
   { w: 2, m: '九月', days: [13, 14, 15, 16, 17, 18, 19] },
   { w: 3, m: '九月', days: [20, 21, 22, 23, 24, 25, 26] },
   { w: 4, m: '九、十月', days: [27, 28, 29, 30, 1, 2, 3] },
@@ -166,19 +171,20 @@ const sem1: Row[] = [
   { w: 14, m: '十二月', days: [6, 7, 8, 9, 10, 11, 12] },
   { w: 15, m: '十二月', days: [13, 14, 15, 16, 17, 18, 19] },
   { w: 16, m: '十二月', days: [20, 21, 22, 23, 24, 25, 26] },
-  { w: 17, m: '十二月、2027年一月', days: [27, 28, 29, 30, 31, 1, 2] },
+  { w: 17, m: '十二月、2027年一月', mark: 'exam', days: [27, 28, 29, 30, 31, 1, 2] },
   { w: 18, m: '一月', mark: 'exam', days: [3, 4, 5, 6, 7, 8, 9] },
   { w: 19, m: '一月', mark: 'exam', days: [10, 11, 12, 13, 14, 15, 16] },
   { w: 20, m: '一月', mark: 'exam', days: [17, 18, 19, 20, 21, 22, 23] },
   { w: 21, m: '一、二月', days: [24, n(25, 'holiday'), 26, 27, 28, 29, 30] },
-  { w: 22, m: '二月', days: [31, 1, 2, 3, 4, { d: 5, t: 'spring', s: true }, null] },
+  { w: 22, m: '二月', days: [31, 1, 2, 3, 4, n(5, 'spring', true), null] },
   { w: 23, m: '放寒假', days: [7, 8, 9, 10, 11, 12, 13] },
   { w: 24, m: '二月', days: [14, 15, 16, 17, 18, 19, 20] },
   { w: 25, m: '二月', days: [21, 22, 23, 24, n(25, 'staff'), 26, 27] },
 ];
 
+// ===== 第二学期（二月 ~ 八月）27 行 =====
 const sem2: Row[] = [
-  { w: 1, m: '二月', days: [null, 21, n(22, 'class'), n(23, 'class'), n(24, 'class'), n(25, 'staff'), 26, 27] },
+  { w: 1, m: '二月', days: [null, 21, n(22, 'class'), 23, 24, n(25, 'staff'), 26, 27] },
   { w: 1, m: '二、三月', days: [28, n(1, 'class'), 2, 3, 4, 5, 6] },
   { w: 2, m: '三月', days: [7, 8, 9, 10, 11, 12, 13] },
   { w: 3, m: '三月', days: [14, 15, 16, 17, 18, 19, 20] },
@@ -209,7 +215,7 @@ const sem2: Row[] = [
 </script>
 
 <style scoped>
-/* 纯黑底白字：取消所有切角、霓虹、彩色 */
+/* ===== 纯黑底白字 ===== */
 .cal-root {
   height: 100vh;
   height: 100dvh;
@@ -346,27 +352,42 @@ const sem2: Row[] = [
 }
 
 .cal-th-week {
-  width: 64px;
+  width: 76px;
 }
 
 .cal-th-month {
   width: 140px;
 }
 
+/* ---- 周次列：周号 + ▲● 符号 ---- */
 .cal-week {
-  font-weight: 900;
-  color: #ffffff;
   background: #111111;
-  font-size: clamp(15px, 1.7vw, 19px);
+  color: #ffffff;
 }
 
-.cal-week em {
+.cal-week-num {
   display: inline-block;
-  margin-left: 3px;
-  font-style: normal;
-  font-weight: 700;
+  font-weight: 900;
+  font-size: clamp(15px, 1.7vw, 19px);
+  margin-right: 2px;
 }
 
+.cal-week-mark {
+  display: inline-block;
+  font-style: normal;
+  font-weight: 800;
+  font-size: clamp(13px, 1.5vw, 16px);
+}
+
+.cal-week-mark--exam {
+  color: #FFD93D;
+}
+
+.cal-week-mark--labor {
+  color: #00F0FF;
+}
+
+/* ---- 月份列 ---- */
 .cal-month {
   font-size: clamp(13px, 1.5vw, 16px);
   color: #cccccc;
@@ -374,28 +395,62 @@ const sem2: Row[] = [
   letter-spacing: 1px;
 }
 
+/* ---- 考试/实践周：整行弱背景 ---- */
 .cal-mark-exam {
-  background: #1a1a1a;
+  background: rgba(255, 217, 61, 0.05);
 }
 
 .cal-mark-labor {
-  background: #0d0d0d;
+  background: rgba(0, 240, 255, 0.05);
 }
 
-.cal-mark-exam .cal-week em { color: #ffffff; }
-.cal-mark-labor .cal-week em { color: #ffffff; }
+/* ---- 特殊日：低饱和度背景色覆盖格子 ---- */
+.cal-cell {
+  position: relative;
+  background-color: transparent;
+}
 
-/* 特殊日：保留色彩标记（黄绿蓝红），但用文字色而非背景色突出 */
-.cal-cell-staff { color: #FFD93D; font-weight: 800; }
-.cal-cell-class { color: #4ECCA3; font-weight: 700; }
-.cal-cell-holiday { color: #4D8DFF; font-weight: 700; }
-.cal-cell-grad { color: #FF2D95; font-weight: 800; }
-.cal-cell-spring { color: #4D8DFF; font-weight: 700; }
+.cal-cell .cal-day {
+  position: relative;
+  z-index: 1;
+}
+
+.cal-cell--staff {
+  background-color: rgba(255, 217, 61, 0.32);
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.cal-cell--class {
+  background-color: rgba(78, 204, 163, 0.32);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.cal-cell--holiday {
+  background-color: rgba(77, 141, 255, 0.32);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.cal-cell--grad {
+  background-color: rgba(255, 45, 149, 0.32);
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.cal-cell--spring {
+  background-color: rgba(77, 141, 255, 0.32);
+  color: #ffffff;
+  font-weight: 700;
+}
 
 .cal-marker {
   display: inline-block;
-  margin-left: 2px;
-  font-size: 0.7em;
+  margin-left: 3px;
+  font-size: 0.75em;
+  color: #ffffff;
+  font-weight: 700;
 }
 
 /* ---- 图例 ---- */
@@ -426,35 +481,38 @@ const sem2: Row[] = [
 
 .cal-tag {
   display: inline-block;
-  width: 24px;
+  width: 28px;
   height: 24px;
   flex-shrink: 0;
   text-align: center;
   line-height: 24px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #000000;
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffffff;
   border: 1px solid #444444;
 }
 
-.cal-tag--staff { background: #FFD93D; }
-.cal-tag--class { background: #4ECCA3; }
-.cal-tag--holiday { background: #4D8DFF; color: #ffffff; }
-.cal-tag--grad { background: #FF2D95; color: #ffffff; }
-.cal-tag--spring { background: #4D8DFF; color: #ffffff; }
+.cal-tag--staff { background: rgba(255, 217, 61, 0.5); }
+.cal-tag--class { background: rgba(78, 204, 163, 0.5); }
+.cal-tag--holiday { background: rgba(77, 141, 255, 0.5); }
+.cal-tag--grad { background: rgba(255, 45, 149, 0.5); }
+.cal-tag--spring { background: rgba(77, 141, 255, 0.5); }
 
 .cal-mark {
   display: inline-block;
-  width: 24px;
+  width: 28px;
   height: 24px;
   flex-shrink: 0;
   text-align: center;
   line-height: 24px;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 800;
   color: #ffffff;
   border: 1px solid #444444;
 }
+
+.cal-mark--exam { background: rgba(255, 217, 61, 0.18); color: #FFD93D; }
+.cal-mark--labor { background: rgba(0, 240, 255, 0.18); color: #00F0FF; }
 
 .cal-legend__note {
   font-size: 14px;

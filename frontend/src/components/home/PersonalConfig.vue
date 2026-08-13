@@ -135,12 +135,16 @@
               <span class="pc__toggle-thumb" />
               <span class="pc__toggle-text">{{ flags.settings ? 'ON' : 'OFF' }}</span>
             </button>
-            <div v-if="showSettingsAlert" class="pc__alert" :style="alertStyle">
-              <button class="pc__alert-close" aria-label="关闭" @click="closeAlert">×</button>
-              <p>你想设置什么？</p>
-              <p>你想设置什么！</p>
-              <p>想要就找我发源代码</p>
-            </div>
+            <Teleport to="body">
+              <div v-if="showSettingsAlert" class="pc__alert-mask" @click.self="closeAlert">
+                <div class="pc__alert" role="dialog" aria-modal="true">
+                  <button class="pc__alert-close" aria-label="关闭" @click="closeAlert">×</button>
+                  <p>你想设置什么？</p>
+                  <p>你想设置什么！</p>
+                  <p>想要就找我发源代码</p>
+                </div>
+              </div>
+            </Teleport>
           </div>
           <div class="pc__switch">
             <span class="pc__switch-label">区域探索</span>
@@ -160,7 +164,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, reactive, ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import SectionHeader from './SectionHeader.vue';
 
@@ -178,8 +182,6 @@ const flags = reactive({
 });
 
 const showSettingsAlert = ref(false);
-const settingsBtn = ref<HTMLButtonElement | null>(null);
-const alertStyle = ref<Record<string, string>>({});
 
 function goCalendar() {
   router.push('/calendar');
@@ -201,17 +203,6 @@ function onLaunch(key: 'rail' | 'repo' | 'area', url: string) {
 function toggle(key: 'mod' | 'rag' | 'settings') {
   flags[key] = !flags[key];
   if (key === 'settings' && flags.settings) {
-    nextTick(() => {
-      // 弹窗就近定位在开关按钮的右侧外
-      if (settingsBtn.value) {
-        const rect = settingsBtn.value.getBoundingClientRect();
-        alertStyle.value = {
-          position: 'fixed',
-          top: `${rect.top + window.scrollY}px`,
-          left: `${rect.right + 12}px`,
-        };
-      }
-    });
     showSettingsAlert.value = true;
   }
 }
@@ -535,20 +526,32 @@ function closeAlert() {
 }
 
 /* ---- 弹窗 ---- */
-.pc__alert {
+.pc__alert-mask {
   position: fixed;
-  z-index: 1000;
-  width: 280px;
-  padding: 24px 28px;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.pc__alert {
+  position: relative;
+  width: 320px;
+  padding: 28px 32px;
   background: var(--bg-panel-2);
   border: 2px solid var(--amber);
   clip-path: polygon(var(--cut-md) 0, 100% 0, 100% calc(100% - var(--cut-md)), calc(100% - var(--cut-md)) 100%, 0 100%, 0 var(--cut-md));
-  font-size: 14px;
+  font-size: 15px;
   color: var(--text-primary);
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
 .pc__alert p {
