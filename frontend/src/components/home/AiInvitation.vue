@@ -163,7 +163,7 @@ const credits = [
 
 .ticket__label {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 3px;
   color: var(--neon-cyan);
@@ -177,7 +177,7 @@ const credits = [
 }
 
 .ticket__greet {
-  font-size: 18px;
+  font-size: 21px;
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 6px;
@@ -187,7 +187,7 @@ const credits = [
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  font-size: 13px;
+  font-size: 14.5px;
   color: var(--text-secondary);
 }
 
@@ -198,7 +198,7 @@ const credits = [
 .ticket__cta {
   align-self: flex-end;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 900;
   letter-spacing: 2px;
   color: var(--amber);
@@ -222,7 +222,7 @@ const credits = [
 
 .ticket__stub-label {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-muted);
   letter-spacing: 3px;
   writing-mode: vertical-rl;
@@ -256,7 +256,7 @@ const credits = [
 
 .stat__value {
   font-family: var(--font-display);
-  font-size: 34px;
+  font-size: 38px;
   font-weight: 900;
   line-height: 1;
   color: var(--amber);
@@ -264,13 +264,13 @@ const credits = [
 
 .stat__value--date {
   font-family: var(--font-mono);
-  font-size: 20px;
+  font-size: 22px;
   letter-spacing: 1px;
 }
 
 .stat__label {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 2px;
   color: var(--text-secondary);
@@ -278,7 +278,7 @@ const credits = [
 }
 
 .stat__sub {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-muted);
 }
 
@@ -323,8 +323,8 @@ const credits = [
 }
 
 .credits__list li {
-  font-size: 12px;
-  line-height: 28px;
+  font-size: 13.5px;
+  line-height: 30px;
   color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;

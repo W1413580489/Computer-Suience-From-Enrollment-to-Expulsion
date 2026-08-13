@@ -93,7 +93,7 @@ function go(route: string) {
 
 .dest__num {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 2px;
   color: var(--amber);
@@ -101,7 +101,7 @@ function go(route: string) {
 
 .dest__title {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 500;
   letter-spacing: 3px;
   color: var(--text-primary);
@@ -145,7 +145,7 @@ function go(route: string) {
 
 .dcard__num {
   font-family: var(--font-display);
-  font-size: 32px;
+  font-size: 36px;
   font-weight: 900;
   line-height: 1;
   color: var(--amber);
@@ -162,7 +162,7 @@ function go(route: string) {
 
 .dcard__en {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 2px;
   color: var(--text-muted);
@@ -170,14 +170,14 @@ function go(route: string) {
 }
 
 .dcard__cn {
-  font-size: 20px;
+  font-size: 23px;
   font-weight: 700;
   letter-spacing: 1px;
   color: var(--text-primary);
 }
 
 .dcard__desc {
-  font-size: 12px;
+  font-size: 13.5px;
   color: var(--text-secondary);
   letter-spacing: 0.5px;
   margin-top: 2px;
@@ -186,7 +186,7 @@ function go(route: string) {
 .dcard__cta {
   margin-top: auto;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 2px;
   color: var(--amber);

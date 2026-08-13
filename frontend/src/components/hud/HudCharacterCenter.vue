@@ -80,7 +80,7 @@ function onActivate() {
 
 .hero__kicker {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 4px;
   color: var(--amber);
@@ -90,7 +90,7 @@ function onActivate() {
 .hero__title {
   position: relative;
   font-family: var(--font-display);
-  font-size: clamp(38px, 6.5vw, 72px);
+  font-size: clamp(44px, 7vw, 84px);
   font-weight: 900;
   line-height: 1.1;
   letter-spacing: 0.08em;
@@ -108,7 +108,7 @@ function onActivate() {
   width: 100%;
   height: 100%;
   font-family: var(--font-display);
-  font-size: clamp(38px, 6.5vw, 72px);
+  font-size: clamp(44px, 7vw, 84px);
   font-weight: 900;
   line-height: 1.1;
   letter-spacing: 0.08em;
@@ -131,7 +131,7 @@ function onActivate() {
 }
 
 .hero__tagline {
-  font-size: 14px;
+  font-size: 16px;
   color: var(--text-secondary);
   letter-spacing: 3px;
   margin-top: 2px;
@@ -139,7 +139,7 @@ function onActivate() {
 
 .hero__year {
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: 15px;
   letter-spacing: 6px;
   color: var(--text-muted);
   margin-top: 4px;
@@ -220,10 +220,10 @@ function onActivate() {
 .hero__image {
   position: relative;
   z-index: 2;
-  width: 360px;
-  max-width: 72vw;
+  width: 420px;
+  max-width: 78vw;
   height: auto;
-  max-height: 48vh;
+  max-height: 54vh;
   object-fit: contain;
   filter: drop-shadow(0 8px 32px var(--shadow-deep));
   transition: filter 300ms;
@@ -243,7 +243,7 @@ function onActivate() {
   left: 50%;
   transform: translateX(-50%);
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 4px;
   color: var(--text-muted);

@@ -132,7 +132,7 @@ function goNav(item: NavItem) {
 
 .topbar__brand-en {
   font-family: var(--font-display);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 500;
   letter-spacing: 2px;
   color: var(--amber);
@@ -140,7 +140,7 @@ function goNav(item: NavItem) {
 }
 
 .topbar__brand-cn {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-muted);
 }
 
@@ -154,7 +154,7 @@ function goNav(item: NavItem) {
 .topbar__nav-item {
   position: relative;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 2px;
   color: var(--text-secondary);
