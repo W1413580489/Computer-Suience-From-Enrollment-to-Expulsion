@@ -1,9 +1,6 @@
 <template>
-  <section class="dest">
-    <header class="dest__header">
-      <span class="dest__num">// DESTINATIONS</span>
-      <h2 class="dest__title">目的地</h2>
-    </header>
+  <section class="dest" id="destinations">
+    <SectionHeader num="01" title="目的地" en="DESTINATIONS" />
 
     <div class="dest__grid">
       <!-- 01 新手任务 — 左上 -->
@@ -30,7 +27,7 @@
         <span class="dcard__shape dcard__shape--02" />
       </button>
 
-      <!-- 03 资源中心 — 左下（01 下方） -->
+      <!-- 03 资源中心 — 左下 -->
       <button class="dcard dcard--03" @click="go(quests[2].route)">
         <span class="dcard__num">03</span>
         <div class="dcard__body">
@@ -42,7 +39,7 @@
         <span class="dcard__shape dcard__shape--03" />
       </button>
 
-      <!-- 04 附录 — 右下（02 下方） -->
+      <!-- 04 附录 — 右下 -->
       <button class="dcard dcard--04" @click="go(quests[3].route)">
         <span class="dcard__num">04</span>
         <div class="dcard__body">
@@ -59,6 +56,7 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import SectionHeader from './SectionHeader.vue';
 
 const router = useRouter();
 
@@ -76,46 +74,20 @@ function go(route: string) {
 
 <style scoped>
 .dest {
-  padding: 32px 32px 40px;
+  padding: 80px 32px;
   max-width: 1120px;
   margin: 0 auto;
   width: 100%;
 }
 
-.dest__header {
-  display: flex;
-  align-items: baseline;
-  gap: 14px;
-  margin-bottom: 22px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.dest__num {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: var(--amber);
-}
-
-.dest__title {
-  font-family: var(--font-display);
-  font-size: 24px;
-  font-weight: 500;
-  letter-spacing: 3px;
-  color: var(--text-primary);
-  text-transform: uppercase;
-}
-
-/* ---- 桌面端：田字格 2×2 ---- */
+/* ---- 田字格 2×2 ---- */
 .dest__grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
 }
 
-/* ---- 通用卡片：半透明玻璃面板，不遮死背景光晕 ---- */
+/* ---- 卡片：半透明玻璃面板 ---- */
 .dcard {
   position: relative;
   display: flex;
@@ -201,7 +173,7 @@ function go(route: string) {
   transform: translateX(4px);
 }
 
-/* ---- 拼图式斜切角：四卡组成规整 2×2，角部斜切留出 X 形缝隙 ---- */
+/* 拼图式斜切角：四卡角部斜切留 X 形缝隙 */
 .dcard--01 {
   clip-path: polygon(var(--cut-md) 0, 100% 0, 100% 100%, 0 100%, 0 var(--cut-md));
 }
@@ -218,7 +190,7 @@ function go(route: string) {
   clip-path: polygon(0 0, 100% 0, calc(100% - var(--cut-md)) 100%, 0 100%);
 }
 
-/* ---- 装饰几何图形 — 平面设计感 ---- */
+/* ---- 装饰几何图形 ---- */
 .dcard__shape {
   position: absolute;
   pointer-events: none;
@@ -262,29 +234,10 @@ function go(route: string) {
   background: var(--amber);
 }
 
-.dcard--04 .dcard__shape--04::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 6px;
-  width: 28px;
-  height: 1.5px;
-  background: var(--amber);
-  opacity: 0.5;
-}
-
-/* ---- 响应式：小屏/移动端单列，不强制田字格 ---- */
+/* ---- 响应式 ---- */
 @media (max-width: 767px) {
   .dest {
-    padding: 24px 16px 28px;
-  }
-
-  .dest__header {
-    margin-bottom: 14px;
-  }
-
-  .dest__title {
-    font-size: 18px;
+    padding: 48px 16px;
   }
 
   .dest__grid {
@@ -305,11 +258,11 @@ function go(route: string) {
   }
 
   .dcard__num {
-    font-size: 26px;
+    font-size: 28px;
   }
 
   .dcard__cn {
-    font-size: 18px;
+    font-size: 19px;
   }
 }
 </style>

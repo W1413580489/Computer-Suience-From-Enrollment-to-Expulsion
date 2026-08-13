@@ -10,17 +10,21 @@
     />
 
     <main v-if="nav.loaded" class="home-main hud-fade-in">
-      <!-- 第一视觉：Hero 角色主视觉 -->
+      <!-- Hero：标题 + 角色主视觉 -->
       <HudCharacterCenter
         :character-image="characterImg"
-        @on-activate="goChat"
+        @on-go-dest="scrollToDest"
+        @on-open-api="settingsOpen = true"
       />
 
-      <!-- 第二视觉：四大核心目的地 -->
+      <!-- 目的地 -->
       <DestinationGrid />
 
-      <!-- 第三视觉：AI 助手邀请 -->
+      <!-- 智能助手 -->
       <AiInvitation />
+
+      <!-- 数据面板 -->
+      <DataPanel />
     </main>
 
     <main v-else class="home-main home-main--loading">
@@ -59,6 +63,7 @@ import HudCharacterCenter from '@/components/hud/HudCharacterCenter.vue';
 import HudFooterTools from '@/components/hud/HudFooterTools.vue';
 import DestinationGrid from '@/components/home/DestinationGrid.vue';
 import AiInvitation from '@/components/home/AiInvitation.vue';
+import DataPanel from '@/components/home/DataPanel.vue';
 import MobileBottomTabs from '@/components/nav/MobileBottomTabs.vue';
 import NavDrawer from '@/components/nav/NavDrawer.vue';
 import SettingsDrawer from '@/components/settings/SettingsDrawer.vue';
@@ -94,8 +99,8 @@ function go(path: string) {
   router.push(path);
 }
 
-function goChat() {
-  router.push(nav.chatRoute);
+function scrollToDest() {
+  document.getElementById('destinations')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function onDrawerNav(path: string) {
