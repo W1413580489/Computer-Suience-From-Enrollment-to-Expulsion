@@ -3,122 +3,174 @@
     <SectionHeader num="04" title="个人配置" en="PERSONAL CONFIG" />
 
     <!-- 按钮行 -->
-    <div class="pc__row pc__row--btns">
-      <button class="pc__btn" @click="goCalendar">校历</button>
-      <button class="pc__btn" @click="goProject">项目</button>
-      <button class="pc__btn" @click="openDevtools">设置</button>
+    <div class="pc__row">
+      <div class="pc__row-head">
+        <span class="pc__row-title">// BUTTONS / 按钮系统</span>
+        <span class="pc__row-line" />
+      </div>
+      <div class="pc__btns">
+        <button class="pc__btn pc__btn--primary" @click="goCalendar">校历 <em>CALENDAR</em></button>
+        <button class="pc__btn pc__btn--secondary" @click="goProject">项目 <em>PROJECT</em></button>
+        <button class="pc__btn pc__btn--neon" @click="openDevtools">设置 <em>SETTINGS</em></button>
+      </div>
     </div>
 
-    <!-- 标签行（情绪状态） -->
-    <div class="pc__row pc__row--tags">
-      <span class="pc__tag">憔悴 <em>EXHAUSTED</em></span>
-      <span class="pc__tag">迷茫 <em>LOST</em></span>
-      <span class="pc__tag">不想学了 <em>WANT TO QUIT</em></span>
-      <span class="pc__tag">求及格 <em>PASS PLEASE</em></span>
+    <!-- 标签行 -->
+    <div class="pc__row">
+      <div class="pc__row-head">
+        <span class="pc__row-title">// BADGES / 情绪标签</span>
+        <span class="pc__row-line" />
+      </div>
+      <div class="pc__badges">
+        <span class="pc__badge pc__badge--fire">憔悴 <em>EXHAUSTED</em></span>
+        <span class="pc__badge pc__badge--ice">迷茫 <em>LOST</em></span>
+        <span class="pc__badge pc__badge--ether">不想学了 <em>WANT TO QUIT</em></span>
+        <span class="pc__badge pc__badge--normal">求及格 <em>PASS PLEASE</em></span>
+      </div>
     </div>
 
     <!-- 主面板：左开关 / 中进度条 / 右开关 -->
     <div class="pc__panel">
-      <!-- 左开关 3 项 -->
-      <div class="pc__col">
-        <div class="pc__row-item">
-          <span class="pc__label">登录</span>
-          <button class="pc__toggle pc__toggle--on pc__toggle--locked" disabled aria-label="登录（始终开启）">
-            <span class="pc__toggle-thumb" />
-          </button>
-        </div>
-        <div class="pc__row-item">
-          <span class="pc__label">轨道模式</span>
-          <button class="pc__toggle" :class="{ 'pc__toggle--on': flags.rail }" @click="goStarRail">
-            <span class="pc__toggle-thumb" />
-          </button>
-        </div>
-        <div class="pc__row-item">
-          <span class="pc__label">项目仓库</span>
-          <button class="pc__toggle" :class="{ 'pc__toggle--on': flags.repo }" @click="goGithub">
-            <span class="pc__toggle-thumb" />
-          </button>
-        </div>
+      <div class="pc__panel-head">
+        <span class="pc__row-title">// TOGGLE &amp; PROGRESS / 开关与进度条</span>
+        <span class="pc__row-line" />
       </div>
-
-      <!-- 中进度条 3 项 -->
-      <div class="pc__col pc__col--bars">
-        <div class="pc__bar">
-          <div class="pc__bar-head">
-            <span class="pc__bar-label">Patience</span>
-            <span class="pc__bar-val">25%</span>
+      <div class="pc__grid">
+        <!-- 左开关 3 项 -->
+        <div class="pc__col">
+          <div class="pc__switch">
+            <span class="pc__switch-label">登录</span>
+            <button class="pc__toggle pc__toggle--on pc__toggle--locked" disabled aria-label="登录（始终开启）">
+              <span class="pc__toggle-thumb" />
+              <span class="pc__toggle-text">ON</span>
+            </button>
           </div>
-          <div class="pc__bar-track"><div class="pc__bar-fill" style="width: 25%" /></div>
-        </div>
-        <div class="pc__bar">
-          <div class="pc__bar-head">
-            <span class="pc__bar-label">Accuracy</span>
-            <span class="pc__bar-val">2%</span>
+          <div class="pc__switch">
+            <span class="pc__switch-label">轨道模式</span>
+            <button
+              class="pc__toggle"
+              :class="{ 'pc__toggle--on': flags.rail }"
+              @click="onLaunch('rail', 'https://sr.mihoyo.com/')"
+            >
+              <span class="pc__toggle-thumb" />
+              <span class="pc__toggle-text">{{ flags.rail ? 'ON' : 'OFF' }}</span>
+            </button>
           </div>
-          <div class="pc__bar-track"><div class="pc__bar-fill pc__bar-fill--red" style="width: 2%" /></div>
-        </div>
-        <div class="pc__bar">
-          <div class="pc__bar-head">
-            <span class="pc__bar-label">Authenticity</span>
-            <span class="pc__bar-val">92%</span>
+          <div class="pc__switch">
+            <span class="pc__switch-label">项目仓库</span>
+            <button
+              class="pc__toggle"
+              :class="{ 'pc__toggle--on': flags.repo }"
+              @click="onLaunch('repo', 'https://github.com/')"
+            >
+              <span class="pc__toggle-thumb" />
+              <span class="pc__toggle-text">{{ flags.repo ? 'ON' : 'OFF' }}</span>
+            </button>
           </div>
-          <div class="pc__bar-track"><div class="pc__bar-fill pc__bar-fill--green" style="width: 92%" /></div>
         </div>
-      </div>
 
-      <!-- 右开关 4 项 -->
-      <div class="pc__col">
-        <div class="pc__row-item">
-          <span class="pc__label">调制模式</span>
-          <button class="pc__toggle" :class="{ 'pc__toggle--on': flags.mod }" @click="toggle('mod')">
-            <span class="pc__toggle-thumb" />
-          </button>
+        <!-- 中进度条 3 项 -->
+        <div class="pc__col pc__col--bars">
+          <div class="pc__bar">
+            <div class="pc__bar-head">
+              <span class="pc__bar-label">Patience</span>
+              <span class="pc__bar-val">25%</span>
+            </div>
+            <div class="pc__bar-track">
+              <div class="pc__bar-fill" :style="{ '--w': '25%' }" />
+            </div>
+          </div>
+          <div class="pc__bar">
+            <div class="pc__bar-head">
+              <span class="pc__bar-label">Accuracy</span>
+              <span class="pc__bar-val pc__bar-val--red">2%</span>
+            </div>
+            <div class="pc__bar-track">
+              <div class="pc__bar-fill pc__bar-fill--red" :style="{ '--w': '2%' }" />
+            </div>
+          </div>
+          <div class="pc__bar">
+            <div class="pc__bar-head">
+              <span class="pc__bar-label">Authenticity</span>
+              <span class="pc__bar-val pc__bar-val--green">92%</span>
+            </div>
+            <div class="pc__bar-track">
+              <div class="pc__bar-fill pc__bar-fill--green" :style="{ '--w': '92%' }" />
+            </div>
+          </div>
         </div>
-        <div class="pc__row-item">
-          <span class="pc__label">知识检索RAG</span>
-          <button class="pc__toggle" :class="{ 'pc__toggle--on': flags.rag }" @click="toggle('rag')">
-            <span class="pc__toggle-thumb" />
-          </button>
-        </div>
-        <div class="pc__row-item">
-          <span class="pc__label">网站设置</span>
-          <button class="pc__toggle" :class="{ 'pc__toggle--on': flags.settings }" @click="toggle('settings')">
-            <span class="pc__toggle-thumb" />
-          </button>
-        </div>
-        <div class="pc__row-item">
-          <span class="pc__label">区域探索</span>
-          <button class="pc__toggle pc__toggle--locked-off" disabled aria-label="区域探索（始终关闭）">
-            <span class="pc__toggle-thumb" />
-          </button>
-        </div>
-      </div>
-    </div>
 
-    <!-- 网站设置弹窗 -->
-    <div v-if="showSettingsAlert" class="pc__alert-mask" @click.self="closeAlert">
-      <div class="pc__alert">
-        <button class="pc__alert-close" aria-label="关闭" @click="closeAlert">×</button>
-        <p>你想设置什么？</p>
-        <p>你想设置什么！</p>
-        <p>想要就找我发源代码</p>
+        <!-- 右开关 4 项 -->
+        <div class="pc__col">
+          <div class="pc__switch">
+            <span class="pc__switch-label">调制模式</span>
+            <button
+              class="pc__toggle"
+              :class="{ 'pc__toggle--on': flags.mod }"
+              @click="toggle('mod')"
+            >
+              <span class="pc__toggle-thumb" />
+              <span class="pc__toggle-text">{{ flags.mod ? 'ON' : 'OFF' }}</span>
+            </button>
+          </div>
+          <div class="pc__switch">
+            <span class="pc__switch-label">知识检索RAG</span>
+            <button
+              class="pc__toggle"
+              :class="{ 'pc__toggle--on': flags.rag }"
+              @click="toggle('rag')"
+            >
+              <span class="pc__toggle-thumb" />
+              <span class="pc__toggle-text">{{ flags.rag ? 'ON' : 'OFF' }}</span>
+            </button>
+          </div>
+          <div class="pc__switch">
+            <span class="pc__switch-label">网站设置</span>
+            <button
+              ref="settingsBtn"
+              class="pc__toggle"
+              :class="{ 'pc__toggle--on': flags.settings }"
+              @click="onSettingsClick"
+            >
+              <span class="pc__toggle-thumb" />
+              <span class="pc__toggle-text">{{ flags.settings ? 'ON' : 'OFF' }}</span>
+            </button>
+            <div v-if="showSettingsAlert" class="pc__alert" :style="alertStyle">
+              <button class="pc__alert-close" aria-label="关闭" @click="closeAlert">×</button>
+              <p>你想设置什么？</p>
+              <p>你想设置什么！</p>
+              <p>想要就找我发源代码</p>
+            </div>
+          </div>
+          <div class="pc__switch">
+            <span class="pc__switch-label">区域探索</span>
+            <button
+              class="pc__toggle pc__toggle--locked"
+              :class="{ 'pc__toggle--on': flags.area }"
+              @click="onLaunch('area', 'https://ys.mihoyo.com/')"
+            >
+              <span class="pc__toggle-thumb" />
+              <span class="pc__toggle-text">{{ flags.area ? 'ON' : 'OFF' }}</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- 打开 F12 提示弹窗（设置按钮） -->
-    <div v-if="showDevtools" class="pc__alert-mask" @click.self="showDevtools = false">
-      <div class="pc__alert pc__alert--code">
+    <div v-if="showDevtools" class="pc__modal-mask" @click.self="showDevtools = false">
+      <div class="pc__modal">
         <button class="pc__alert-close" aria-label="关闭" @click="showDevtools = false">×</button>
         <p class="pc__alert-title">// DEVTOOLS</p>
         <p>按 <kbd>F12</kbd> 或 <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd> 打开浏览器开发者工具</p>
-        <p class="pc__alert-sub">本站点无法通过 JS 直接唤起 DevTools（浏览器安全策略）</p>
+        <p class="pc__alert-sub">本站无法通过 JS 直接唤起 DevTools（浏览器安全策略）</p>
       </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { nextTick, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import SectionHeader from './SectionHeader.vue';
 
@@ -130,37 +182,49 @@ const flags = reactive({
   mod: false,
   rag: false,
   settings: false,
+  area: false,
 });
 
 const showSettingsAlert = ref(false);
 const showDevtools = ref(false);
+const settingsBtn = ref<HTMLButtonElement | null>(null);
+const alertStyle = ref<Record<string, string>>({});
 
 function goCalendar() {
   router.push('/calendar');
 }
 
 function goProject() {
-  // 「邪修学习指南」飞书篇章
   window.open('https://tralis2671.feishu.cn/wiki/FCATwwKbziiC7zkAL64cl3EXnCf', '_blank', 'noopener');
-}
-
-function goStarRail() {
-  flags.rail = !flags.rail;
-  window.open('https://sr.mihoyo.com/', '_blank', 'noopener');
-}
-
-function goGithub() {
-  flags.repo = !flags.repo;
-  window.open('https://github.com/', '_blank', 'noopener');
 }
 
 function openDevtools() {
   showDevtools.value = true;
 }
 
+// 跳转类开关：跳完后 ~600ms 自动回弹关闭
+function onLaunch(key: 'rail' | 'repo' | 'area', url: string) {
+  flags[key] = true;
+  window.open(url, '_blank', 'noopener');
+  setTimeout(() => {
+    flags[key] = false;
+  }, 800);
+}
+
 function toggle(key: 'mod' | 'rag' | 'settings') {
   flags[key] = !flags[key];
   if (key === 'settings' && flags.settings) {
+    nextTick(() => {
+      // 弹窗就近定位在开关按钮的右侧外
+      if (settingsBtn.value) {
+        const rect = settingsBtn.value.getBoundingClientRect();
+        alertStyle.value = {
+          position: 'fixed',
+          top: `${rect.top + window.scrollY}px`,
+          left: `${rect.right + 12}px`,
+        };
+      }
+    });
     showSettingsAlert.value = true;
   }
 }
@@ -179,122 +243,226 @@ function closeAlert() {
   width: 100%;
 }
 
-/* ---- 按钮行 ---- */
-.pc__row {
+/* ---- 共用小标题头（// 标题 + 横线）---- */
+.pc__row-head,
+.pc__panel-head {
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
   margin-bottom: 14px;
+}
+
+.pc__row-title {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--amber);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.pc__row-line {
+  flex: 1;
+  height: 1px;
+  background: var(--amber);
+  opacity: 0.7;
+}
+
+.pc__row {
+  margin-bottom: 28px;
+}
+
+/* ---- 按钮 ---- */
+.pc__btns {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
 .pc__btn {
   flex: 1;
-  min-width: 120px;
-  padding: 14px 24px;
+  min-width: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 20px;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 1px;
+  cursor: pointer;
+  transition: transform 160ms, box-shadow 160ms;
   background: transparent;
   color: var(--text-primary);
-  border: 2px solid var(--border-subtle);
-  clip-path: polygon(var(--cut-md) 0, 100% 0, 100% calc(100% - var(--cut-md)), calc(100% - var(--cut-md)) 100%, 0 100%, 0 var(--cut-md));
-  cursor: pointer;
-  transition: border-color 160ms, color 160ms, background 160ms;
 }
 
-.pc__btn:hover {
+.pc__btn em {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-style: normal;
+  opacity: 0.85;
+}
+
+/* 主按钮：黄底黑字，斜切左下角 */
+.pc__btn--primary {
+  background: var(--amber);
+  color: var(--ink);
+  clip-path: polygon(0 0, 100% 0, 100% 0, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+}
+
+.pc__btn--primary em { color: var(--ink); }
+
+.pc__btn--primary:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--neon-cyan);
+}
+
+/* 次按钮：黑底白字，灰色描边 */
+.pc__btn--secondary {
+  background: var(--bg-panel);
+  color: var(--text-primary);
+  border: 2px solid var(--border-subtle);
+  clip-path: polygon(0 0, 100% 0, 100% 0, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+}
+
+.pc__btn--secondary:hover {
   border-color: var(--amber);
   color: var(--amber);
-  background: var(--amber-soft);
 }
 
-/* ---- 标签行（情绪） ---- */
-.pc__row--tags {
-  margin-bottom: 22px;
+/* 霓虹按钮：黑底青色描边 */
+.pc__btn--neon {
+  background: var(--bg-panel);
+  color: var(--neon-cyan);
+  border: 2px solid var(--neon-cyan);
+  clip-path: polygon(0 0, 100% 0, 100% 0, 100% 100%, 18px 100%, 0 calc(100% - 18px));
 }
 
-.pc__tag {
+.pc__btn--neon em { color: var(--neon-cyan); }
+
+.pc__btn--neon:hover {
+  background: var(--neon-cyan);
+  color: var(--ink);
+  box-shadow: 0 0 18px var(--neon-cyan-glow);
+}
+
+.pc__btn--neon:hover em { color: var(--ink); }
+
+/* ---- 标签（badge，斜切角）---- */
+.pc__badges {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pc__badge {
   display: inline-flex;
   align-items: baseline;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 7px 14px;
   font-size: 14px;
   font-weight: 700;
-  color: var(--text-primary);
-  background: var(--bg-panel-2);
-  border: 1px solid var(--border-subtle);
-  clip-path: polygon(var(--cut-sm) 0, 100% 0, 100% calc(100% - var(--cut-sm)), calc(100% - var(--cut-sm)) 100%, 0 100%, 0 var(--cut-sm));
+  clip-path: polygon(0 0, 100% 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  color: var(--ink);
 }
 
-.pc__tag em {
+.pc__badge em {
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 2px;
-  color: var(--amber);
   font-style: normal;
 }
 
-/* ---- 主面板 ---- */
+.pc__badge--fire { background: var(--amber); }
+.pc__badge--ice { background: var(--neon-cyan); }
+.pc__badge--ether { background: var(--neon-magenta); color: var(--text-primary); }
+.pc__badge--ether em { color: var(--text-primary); }
+.pc__badge--normal { background: var(--bg-panel-3); color: var(--text-secondary); }
+.pc__badge--normal em { color: var(--text-muted); }
+
+/* ---- 面板 ---- */
 .pc__panel {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr 1fr;
-  gap: 18px;
   background: var(--bg-panel-2);
   border: 1px solid var(--border-subtle);
   clip-path: polygon(var(--cut-md) 0, 100% 0, 100% calc(100% - var(--cut-md)), calc(100% - var(--cut-md)) 100%, 0 100%, 0 var(--cut-md));
   padding: 24px;
 }
 
-.pc__col {
-  display: flex;
-  flex-direction: column;
+.pc__panel-head {
+  margin-bottom: 22px;
+}
+
+.pc__grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
   gap: 18px;
 }
 
-.pc__row-item {
+/* ---- 开关（电池感斜切角）---- */
+.pc__col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pc__switch {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px dashed var(--border-subtle);
+  padding: 10px 14px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  clip-path: polygon(0 0, 100% 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% - 12px));
 }
 
-.pc__col > .pc__row-item:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.pc__label {
+.pc__switch-label {
   font-size: 14px;
   color: var(--text-primary);
   font-weight: 600;
 }
 
-/* ---- 开关（参考 zzz-toggle） ---- */
 .pc__toggle {
   position: relative;
-  width: 52px;
-  height: 26px;
-  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 64px;
+  height: 28px;
+  padding: 0 6px;
   background: var(--bg-panel-3);
-  border: 2px solid var(--ink);
+  border: 2px solid var(--amber);
   cursor: pointer;
-  padding: 0;
-  clip-path: polygon(var(--cut-sm) 0, 100% 0, 100% calc(100% - var(--cut-sm)), calc(100% - var(--cut-sm)) 100%, 0 100%, 0 var(--cut-sm));
-  transition: background 180ms;
+  flex-shrink: 0;
+  clip-path: polygon(0 0, 100% 0, 100% 0, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  transition: background 200ms;
 }
 
 .pc__toggle-thumb {
   position: absolute;
   top: 50%;
-  left: 3px;
+  left: 4px;
   width: 16px;
   height: 16px;
+  background: var(--amber);
   transform: translateY(-50%);
-  background: var(--text-secondary);
-  transition: left 180ms, background 180ms;
+  transition: left 220ms, background 220ms;
+  clip-path: polygon(0 0, 100% 0, 100% 0, 100% 100%, 4px 100%, 0 calc(100% - 4px));
+}
+
+.pc__toggle-text {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-left: auto;
 }
 
 .pc__toggle--on {
@@ -302,26 +470,29 @@ function closeAlert() {
 }
 
 .pc__toggle--on .pc__toggle-thumb {
-  left: calc(100% - 19px);
+  left: calc(100% - 20px);
   background: var(--ink);
 }
 
-.pc__toggle--locked,
-.pc__toggle--locked-off {
+.pc__toggle--on .pc__toggle-text {
+  color: var(--ink);
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.pc__toggle--locked {
   cursor: not-allowed;
-  opacity: 0.75;
+  opacity: 0.9;
 }
 
-.pc__toggle--locked-off .pc__toggle-thumb {
-  left: 3px;
-}
-
-/* ---- 进度条（中列） ---- */
+/* ---- 进度条（中列）---- */
 .pc__col--bars {
   background: var(--bg-panel);
   padding: 20px;
   border: 1px solid var(--border-subtle);
   clip-path: polygon(var(--cut-sm) 0, 100% 0, 100% calc(100% - var(--cut-sm)), calc(100% - var(--cut-sm)) 100%, 0 100%, 0 var(--cut-sm));
+  gap: 18px;
+  justify-content: center;
 }
 
 .pc__bar {
@@ -350,67 +521,75 @@ function closeAlert() {
   color: var(--amber);
 }
 
+.pc__bar-val--red { color: var(--neon-magenta); }
+.pc__bar-val--green { color: var(--success); }
+
 .pc__bar-track {
-  height: 8px;
+  height: 10px;
   background: var(--bg-panel-3);
   clip-path: polygon(var(--cut-sm) 0, 100% 0, 100% calc(100% - var(--cut-sm)), calc(100% - var(--cut-sm)) 100%, 0 100%, 0 var(--cut-sm));
+  position: relative;
   overflow: hidden;
 }
 
 .pc__bar-fill {
+  width: var(--w, 0%);
   height: 100%;
-  background: linear-gradient(90deg, var(--amber), var(--neon-cyan));
+  background: repeating-linear-gradient(
+    90deg,
+    var(--amber) 0 6px,
+    var(--neon-cyan) 6px 12px
+  );
+  transition: width 300ms;
 }
 
 .pc__bar-fill--red {
-  background: var(--neon-magenta);
+  background: repeating-linear-gradient(
+    90deg,
+    var(--neon-cyan) 0 6px,
+    var(--neon-magenta) 6px 12px
+  );
 }
 
 .pc__bar-fill--green {
-  background: var(--success, #4ECCA3);
+  background: repeating-linear-gradient(
+    90deg,
+    var(--amber) 0 6px,
+    var(--success) 6px 12px
+  );
 }
 
-/* ---- 弹窗（遮罩 + 内容） ---- */
-.pc__alert-mask {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
+/* ---- 弹窗 ---- */
 .pc__alert {
-  position: relative;
-  max-width: 420px;
-  padding: 32px 36px;
+  position: fixed;
+  z-index: 1000;
+  width: 280px;
+  padding: 24px 28px;
   background: var(--bg-panel-2);
   border: 2px solid var(--amber);
   clip-path: polygon(var(--cut-md) 0, 100% 0, 100% calc(100% - var(--cut-md)), calc(100% - var(--cut-md)) 100%, 0 100%, 0 var(--cut-md));
-  font-size: 15px;
+  font-size: 14px;
   color: var(--text-primary);
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .pc__alert p {
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
 .pc__alert-close {
   position: absolute;
-  top: 10px;
-  right: 14px;
+  top: 8px;
+  right: 12px;
   font-size: 22px;
   line-height: 1;
   color: var(--text-muted);
   cursor: pointer;
   padding: 4px 8px;
+  background: transparent;
   transition: color 160ms;
 }
 
@@ -420,7 +599,7 @@ function closeAlert() {
 
 .pc__alert-title {
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--amber);
   letter-spacing: 2px;
@@ -429,6 +608,7 @@ function closeAlert() {
 .pc__alert-sub {
   font-size: 12px;
   color: var(--text-muted);
+  margin-top: 6px;
 }
 
 .pc__alert kbd {
@@ -443,9 +623,36 @@ function closeAlert() {
   margin: 0 2px;
 }
 
+.pc__modal-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.pc__modal {
+  position: relative;
+  width: 360px;
+  padding: 32px 36px;
+  background: var(--bg-panel-2);
+  border: 2px solid var(--amber);
+  clip-path: polygon(var(--cut-md) 0, 100% 0, 100% calc(100% - var(--cut-md)), calc(100% - var(--cut-md)) 100%, 0 100%, 0 var(--cut-md));
+  font-size: 14px;
+  color: var(--text-primary);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 /* ---- 响应式 ---- */
 @media (max-width: 900px) {
-  .pc__panel {
+  .pc__grid {
     grid-template-columns: 1fr;
   }
 }
@@ -462,15 +669,15 @@ function closeAlert() {
   .pc__btn {
     min-width: 0;
     font-size: 14px;
-    padding: 12px 18px;
+    padding: 12px 14px;
   }
 
-  .pc__tag {
+  .pc__badge {
     font-size: 12px;
-    padding: 6px 12px;
+    padding: 6px 10px;
   }
 
-  .pc__tag em {
+  .pc__badge em {
     font-size: 9px;
   }
 }

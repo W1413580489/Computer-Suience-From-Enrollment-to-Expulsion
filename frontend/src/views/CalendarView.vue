@@ -94,13 +94,13 @@
       <!-- 附记 / 图例 -->
       <section class="cal-legend">
         <p class="cal-legend__title">附记：</p>
-        <p class="cal-legend__row"><span class="cal-swatch cal-staff"></span> 教职工开学日</p>
-        <p class="cal-legend__row"><span class="cal-swatch cal-class"></span> 学生上课日</p>
-        <p class="cal-legend__row"><span class="cal-swatch cal-holiday"></span> 放假日</p>
-        <p class="cal-legend__row"><span class="cal-swatch cal-grad"></span> 毕业典礼</p>
-        <p class="cal-legend__row"><span class="cal-swatch cal-mark-exam-sw"></span> ▲ 复习考试周</p>
-        <p class="cal-legend__row"><span class="cal-swatch cal-mark-labor-sw"></span> ● 劳动实践周</p>
-        <p class="cal-legend__row"><span class="cal-swatch cal-spring"></span> ◇ 春节</p>
+        <p class="cal-legend__row"><span class="cal-tag cal-tag--staff">黄</span> 教职工开学日</p>
+        <p class="cal-legend__row"><span class="cal-tag cal-tag--class">绿</span> 学生上课日</p>
+        <p class="cal-legend__row"><span class="cal-tag cal-tag--holiday">蓝</span> 放假日</p>
+        <p class="cal-legend__row"><span class="cal-tag cal-tag--grad">红</span> 毕业典礼</p>
+        <p class="cal-legend__row"><span class="cal-mark cal-mark--exam">▲</span> 复习考试周</p>
+        <p class="cal-legend__row"><span class="cal-mark cal-mark--labor">●</span> 劳动实践周</p>
+        <p class="cal-legend__row"><span class="cal-tag cal-tag--spring">◇</span> 春节</p>
         <p class="cal-legend__note">（二）节假日放假以国家和学校规定为准</p>
         <p class="cal-legend__note">（三）如有调整，以学校文件为准</p>
       </section>
@@ -115,7 +115,7 @@ type DayType = 'staff' | 'class' | 'holiday' | 'grad' | 'spring';
 interface Day {
   d: number;
   t?: DayType;
-  s?: boolean; // 春节标记（◇）
+  s?: boolean;
 }
 type Cell = number | Day | null;
 
@@ -148,7 +148,6 @@ function cellClass(d: Cell): string {
   }
 }
 
-// 第一学期（八、九月 ~ 二月）
 const sem1: Row[] = [
   { w: 1, m: '八、九月', days: [null, 30, 31, 1, n(2, 'staff'), n(3, 'class'), 4, 5] },
   { w: 1, m: '九月', days: [6, n(7, 'class'), n(8, 'class'), n(9, 'class'), n(10, 'class'), n(11, 'class'), 12] },
@@ -178,7 +177,6 @@ const sem1: Row[] = [
   { w: 25, m: '二月', days: [21, 22, 23, 24, n(25, 'staff'), 26, 27] },
 ];
 
-// 第二学期（二月 ~ 八月）
 const sem2: Row[] = [
   { w: 1, m: '二月', days: [null, 21, n(22, 'class'), n(23, 'class'), n(24, 'class'), n(25, 'staff'), 26, 27] },
   { w: 1, m: '二、三月', days: [28, n(1, 'class'), 2, 3, 4, 5, 6] },
@@ -211,10 +209,11 @@ const sem2: Row[] = [
 </script>
 
 <style scoped>
+/* 纯黑底白字：取消所有切角、霓虹、彩色 */
 .cal-root {
   min-height: 100vh;
-  min-height: 100dvh;
-  background: var(--bg-primary);
+  background: #000000;
+  color: #ffffff;
   display: flex;
   flex-direction: column;
 }
@@ -225,8 +224,8 @@ const sem2: Row[] = [
   gap: 14px;
   padding: 0 clamp(12px, 2vw, 16px);
   height: var(--topbar-h);
-  border-bottom: 1px solid var(--border-subtle);
-  background: var(--bg-panel);
+  border-bottom: 1px solid #555555;
+  background: #000000;
   flex-shrink: 0;
 }
 
@@ -237,36 +236,36 @@ const sem2: Row[] = [
   padding: 8px 14px;
   font-size: 14px;
   font-weight: 700;
-  color: var(--amber);
-  border: 1px solid var(--amber);
-  background: var(--amber-soft);
+  color: #ffffff;
+  background: #000000;
+  border: 1px solid #ffffff;
   cursor: pointer;
   transition: background 160ms;
-  clip-path: var(--clip-sm);
 }
 
 .cal-back:hover {
-  background: var(--amber-mid);
+  background: #ffffff;
+  color: #000000;
 }
 
 .cal-topbar__title {
   flex: 1;
   font-family: var(--font-mono);
-  font-size: clamp(13px, 2vw, 15px);
+  font-size: clamp(13px, 2vw, 16px);
   font-weight: 700;
   letter-spacing: 2px;
-  color: var(--text-primary);
+  color: #ffffff;
 }
 
 .cal-body {
   flex: 1;
-  max-width: 1100px;
   width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: clamp(24px, 4vw, 40px) clamp(12px, 3vw, 24px) 48px;
+  padding: clamp(24px, 4vw, 40px) clamp(12px, 3vw, 24px) 60px;
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 32px;
 }
 
 /* ---- Intro ---- */
@@ -277,220 +276,190 @@ const sem2: Row[] = [
 
 .cal-intro__num {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 3px;
-  color: var(--amber);
+  color: #aaaaaa;
 }
 
 .cal-intro__title {
-  font-family: var(--font-display);
-  font-size: clamp(28px, 5vw, 40px);
+  font-size: clamp(32px, 6vw, 56px);
   font-weight: 900;
-  letter-spacing: 0.05em;
-  color: var(--text-primary);
-  margin: 6px 0;
+  letter-spacing: 4px;
+  color: #ffffff;
+  margin: 8px 0;
 }
 
 .cal-intro__sub {
   font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 4px;
-  color: var(--text-secondary);
+  font-size: 13px;
+  letter-spacing: 5px;
+  color: #888888;
 }
 
 /* ---- Semester ---- */
 .cal-semester__title {
-  font-family: var(--font-display);
-  font-size: clamp(18px, 2.5vw, 22px);
-  letter-spacing: 2px;
-  color: var(--amber);
-  margin-bottom: 12px;
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: #ffffff;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #555555;
 }
 
 .cal-table-wrap {
   overflow-x: auto;
-  border: 1px solid var(--border-subtle);
-  clip-path: polygon(var(--cut-md) 0, 100% 0, 100% calc(100% - var(--cut-md)), calc(100% - var(--cut-md)) 100%, 0 100%, 0 var(--cut-md));
+  border: 1px solid #444444;
+  background: #000000;
 }
 
 .cal-table {
   width: 100%;
-  min-width: 720px;
+  min-width: 880px;
   border-collapse: collapse;
-  background: var(--bg-panel);
-  font-size: clamp(11px, 1.4vw, 13px);
+  background: #000000;
+  font-size: clamp(15px, 1.8vw, 20px);
 }
 
 .cal-table th,
 .cal-table td {
-  border: 1px solid var(--border-subtle);
-  padding: 7px 4px;
+  border: 1px solid #444444;
+  padding: 12px 6px;
   text-align: center;
   vertical-align: middle;
-  color: var(--text-primary);
+  color: #ffffff;
   font-variant-numeric: tabular-nums;
 }
 
 .cal-table thead th {
-  background: var(--bg-panel-2);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
+  background: #111111;
+  font-size: clamp(14px, 1.6vw, 18px);
+  font-weight: 800;
   letter-spacing: 2px;
-  color: var(--amber);
-  padding: 10px 4px;
+  color: #ffffff;
+  padding: 14px 6px;
 }
 
 .cal-th-week {
-  width: 56px;
+  width: 64px;
 }
 
 .cal-th-month {
-  width: 110px;
+  width: 140px;
 }
 
 .cal-week {
-  font-family: var(--font-display);
-  font-size: 13px;
   font-weight: 900;
-  color: var(--amber);
-  background: var(--bg-panel-2);
+  color: #ffffff;
+  background: #111111;
+  font-size: clamp(15px, 1.7vw, 19px);
 }
 
 .cal-week em {
   display: inline-block;
   margin-left: 3px;
   font-style: normal;
-  font-family: var(--font-body);
-  font-size: 11px;
-  color: var(--text-primary);
+  font-weight: 700;
 }
 
 .cal-month {
-  font-size: 12px;
-  color: var(--text-secondary);
-  background: var(--bg-panel-2);
+  font-size: clamp(13px, 1.5vw, 16px);
+  color: #cccccc;
+  background: #111111;
   letter-spacing: 1px;
 }
 
 .cal-mark-exam {
-  background: rgba(255, 217, 61, 0.06);
+  background: #1a1a1a;
 }
 
 .cal-mark-labor {
-  background: rgba(0, 240, 255, 0.05);
+  background: #0d0d0d;
 }
 
-.cal-mark-exam .cal-week em { color: var(--amber); }
-.cal-mark-labor .cal-week em { color: var(--neon-cyan); }
+.cal-mark-exam .cal-week em { color: #ffffff; }
+.cal-mark-labor .cal-week em { color: #ffffff; }
 
-/* ---- 特殊日配色 ---- */
-.cal-cell-staff {
-  background: #FFD93D !important;
-  color: #0A0A0A !important;
-  font-weight: 800;
-}
-
-.cal-cell-class {
-  background: #4ECCA3 !important;
-  color: #0A0A0A !important;
-  font-weight: 700;
-}
-
-.cal-cell-holiday {
-  background: #4D8DFF !important;
-  color: #F5F5F5 !important;
-  font-weight: 700;
-}
-
-.cal-cell-grad {
-  background: #FF2D95 !important;
-  color: #F5F5F5 !important;
-  font-weight: 800;
-}
-
-.cal-cell-spring {
-  background: #4D8DFF !important;
-  color: #F5F5F5 !important;
-  font-weight: 700;
-}
+/* 特殊日：保留色彩标记（黄绿蓝红），但用文字色而非背景色突出 */
+.cal-cell-staff { color: #FFD93D; font-weight: 800; }
+.cal-cell-class { color: #4ECCA3; font-weight: 700; }
+.cal-cell-holiday { color: #4D8DFF; font-weight: 700; }
+.cal-cell-grad { color: #FF2D95; font-weight: 800; }
+.cal-cell-spring { color: #4D8DFF; font-weight: 700; }
 
 .cal-marker {
   display: inline-block;
   margin-left: 2px;
-  font-size: 10px;
+  font-size: 0.7em;
 }
 
 /* ---- 图例 ---- */
 .cal-legend {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 20px;
-  background: var(--bg-panel);
-  border: 1px solid var(--border-subtle);
-  clip-path: polygon(var(--cut-md) 0, 100% 0, 100% calc(100% - var(--cut-md)), calc(100% - var(--cut-md)) 100%, 0 100%, 0 var(--cut-md));
+  gap: 8px;
+  padding: 24px;
+  background: #000000;
+  border: 1px solid #444444;
 }
 
 .cal-legend__title {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 800;
   letter-spacing: 2px;
-  color: var(--amber);
-  margin-bottom: 4px;
+  color: #ffffff;
+  margin-bottom: 6px;
 }
 
 .cal-legend__row {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 13px;
-  color: var(--text-primary);
+  font-size: 15px;
+  color: #ffffff;
 }
 
-.cal-swatch {
+.cal-tag {
   display: inline-block;
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   flex-shrink: 0;
-  border: 1px solid var(--ink);
+  text-align: center;
+  line-height: 24px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #000000;
+  border: 1px solid #444444;
 }
 
-.cal-staff { background: #FFD93D; }
-.cal-class { background: #4ECCA3; }
-.cal-holiday, .cal-spring { background: #4D8DFF; }
-.cal-grad { background: #FF2D95; }
+.cal-tag--staff { background: #FFD93D; }
+.cal-tag--class { background: #4ECCA3; }
+.cal-tag--holiday { background: #4D8DFF; color: #ffffff; }
+.cal-tag--grad { background: #FF2D95; color: #ffffff; }
+.cal-tag--spring { background: #4D8DFF; color: #ffffff; }
 
-.cal-mark-exam-sw::before {
-  content: '▲';
+.cal-mark {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  text-align: center;
+  line-height: 24px;
   font-size: 16px;
-  color: var(--amber);
-}
-.cal-mark-labor-sw::before {
-  content: '●';
-  font-size: 16px;
-  color: var(--neon-cyan);
+  font-weight: 700;
+  color: #ffffff;
+  border: 1px solid #444444;
 }
 
 .cal-legend__note {
-  font-size: 12px;
-  color: var(--text-muted);
+  font-size: 14px;
+  color: #888888;
   margin-top: 4px;
 }
 
-/* ---- 响应式 ---- */
 @media (max-width: 640px) {
-  .cal-back-label {
+  .cal-back span {
     display: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    transition-duration: 0.01ms !important;
   }
 }
 </style>
