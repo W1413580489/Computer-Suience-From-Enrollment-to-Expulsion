@@ -140,8 +140,8 @@ function goCalendar() {
 }
 
 function goProject() {
-  // 「邪修学习指南」飞书篇章占位 URL：先打开知识库首页
-  window.open('https://tralis2671.feishu.cn/wiki/VvKVwsHo2iIIC4ko0PmcKs4lnKd', '_blank', 'noopener');
+  // 「邪修学习指南」飞书篇章
+  window.open('https://tralis2671.feishu.cn/wiki/FCATwwKbziiC7zkAL64cl3EXnCf', '_blank', 'noopener');
 }
 
 function goStarRail() {
