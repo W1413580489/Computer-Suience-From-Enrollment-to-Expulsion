@@ -76,8 +76,8 @@ function go(route: string) {
 
 <style scoped>
 .dest {
-  padding: 8px 24px 40px;
-  max-width: 860px;
+  padding: 32px 32px 40px;
+  max-width: 1120px;
   margin: 0 auto;
   width: 100%;
 }
@@ -276,7 +276,7 @@ function go(route: string) {
 /* ---- 响应式：小屏/移动端单列，不强制田字格 ---- */
 @media (max-width: 767px) {
   .dest {
-    padding: 8px 16px 28px;
+    padding: 24px 16px 28px;
   }
 
   .dest__header {

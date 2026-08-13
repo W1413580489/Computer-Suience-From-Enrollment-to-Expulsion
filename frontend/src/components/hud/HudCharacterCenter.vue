@@ -22,9 +22,6 @@
       />
       <span class="hero__figure-label">CAMPUS GUIDE</span>
     </div>
-
-    <!-- 邀请语 -->
-    <p class="hero__invite">今天想去哪里？</p>
   </section>
 </template>
 
@@ -66,8 +63,8 @@ function onActivate() {
   flex-direction: column;
   align-items: center;
   gap: 18px;
-  padding: 32px 24px 24px;
-  min-height: 60vh;
+  padding: 28px 24px 0;
+  min-height: 46vh;
 }
 
 /* ---- 报头文字层 ---- */
@@ -148,14 +145,16 @@ function onActivate() {
   margin-top: 4px;
 }
 
-/* ---- 角色主视觉 ---- */
+/* ---- 角色主视觉：层级最高，压在所有按钮前面 ---- */
 .hero__figure {
   position: relative;
+  z-index: 5;
   display: flex;
   flex-direction: column;
   align-items: center;
   cursor: pointer;
   transition: transform 300ms ease;
+  margin-bottom: -48px;
 }
 
 .hero__figure:hover {
@@ -224,12 +223,12 @@ function onActivate() {
   width: 360px;
   max-width: 72vw;
   height: auto;
-  max-height: 50vh;
+  max-height: 48vh;
   object-fit: contain;
   filter: drop-shadow(0 8px 32px var(--shadow-deep));
   transition: filter 300ms;
-  mask-image: linear-gradient(to bottom, black 88%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black 88%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 90%, transparent 100%);
   animation: figure-float 5s infinite ease-in-out;
 }
 
@@ -253,22 +252,11 @@ function onActivate() {
   white-space: nowrap;
 }
 
-/* ---- 邀请语 ---- */
-.hero__invite {
-  font-family: var(--font-display);
-  font-size: clamp(20px, 3vw, 28px);
-  font-weight: 500;
-  letter-spacing: 4px;
-  color: var(--amber);
-  text-align: center;
-  margin-top: 4px;
-}
-
 /* ---- 响应式 ---- */
 @media (max-width: 767px) {
   .hero {
-    padding: 20px 16px 16px;
-    min-height: 50vh;
+    padding: 16px 16px 0;
+    min-height: 40vh;
     gap: 12px;
   }
 
@@ -288,19 +276,18 @@ function onActivate() {
     letter-spacing: 2px;
   }
 
+  .hero__figure {
+    margin-bottom: -28px;
+  }
+
   .hero__image {
     width: 220px;
-    max-height: 36vh;
+    max-height: 34vh;
   }
 
   .hero__cross--tl { left: -4px; }
   .hero__cross--br { right: -4px; bottom: 24px; }
   .hero__vline { display: none; }
-
-  .hero__invite {
-    font-size: 18px;
-    letter-spacing: 3px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
