@@ -43,7 +43,7 @@ EMBEDDING_MODEL = os.getenv("XKZ_EMBEDDING_MODEL", "BAAI/bge-small-zh-v1.5")  # 
 RERANKER_MODEL = os.getenv("XKZ_RERANKER_MODEL", "BAAI/bge-reranker-base")     # ~278MB
 EMBEDDING_CACHE = DATA_DIR / "embedding_cache.npy"   # 预计算的 chunk 向量缓存
 RERANK_CANDIDATE_K = int(os.getenv("XKZ_RERANK_K", "20"))  # Reranker 精排候选数（召回 top-20 → 精排 top-k）
-RERANK_ENABLED = os.getenv("XKZ_RERANK_ENABLED", "1") == "1"  # 是否启用 Reranker，0=关闭
+RERANK_ENABLED = os.getenv("XKZ_RERANK_ENABLED", "0") == "1"  # 默认关闭，低配服务器省600MB内存；设1启用
 
 # ---- 平台兜底模型（FR-BY-MODEL）----
 PLATFORM_API_KEY = os.getenv("XKZ_PLATFORM_API_KEY", "")   # 平台兜底 DeepSeek Key（不填则免费模式不可用）

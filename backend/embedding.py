@@ -34,6 +34,8 @@ class EmbeddingService:
         self._available = False
         try:
             import torch
+            # v3: CPU 优化 —— 限制线程数，降低内存峰值
+            torch.set_num_threads(2)
             from transformers import AutoModel, AutoTokenizer
 
             self.tokenizer = AutoTokenizer.from_pretrained(config.EMBEDDING_MODEL)
@@ -110,6 +112,10 @@ class RerankerService:
         self.model = None
         self.tokenizer = None
         self._available = False
+        # v3: 低配服务器可设 XKZ_RERANK_ENABLED=0 跳过模型加载，省 ~600MB 内存
+        if not config.RERANK_ENABLED:
+            print("[Reranker] 已通过 XKZ_RERANK_ENABLED=0 关闭，跳过模型加载（省约600MB内存）")
+            return
         try:
             import torch
             from transformers import AutoModelForSequenceClassification, AutoTokenizer

@@ -6,6 +6,7 @@ pydantic>=2.6.0
 jieba>=0.42.1
 rank-bm25>=0.2.2
 numpy>=1.24.0
-# v3: Embedding + Reranker（模型不可用时自动降级，这些包非必须）
+# v3: Embedding 向量召回（约350MB内存，bge-small-zh-v1.5）
+# 模型不可用时自动降级为四路BM25召回，这些包非必须
 torch>=2.0.0
 transformers>=4.36.0
