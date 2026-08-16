@@ -39,8 +39,8 @@ class EmbeddingService:
             from transformers import AutoModel, AutoTokenizer
 
             self.tokenizer = AutoTokenizer.from_pretrained(config.EMBEDDING_MODEL)
-            # v3: FP16 加载，模型内存 130MB → 65MB，低配服务器省内存，效果无损
-            self.model = AutoModel.from_pretrained(config.EMBEDDING_MODEL, torch_dtype=torch.float16)
+            # CPU 上用默认 FP32：FP16 在 CPU 无原生支持，转换开销大反而拖慢推理
+            self.model = AutoModel.from_pretrained(config.EMBEDDING_MODEL)
             self.model.eval()
             # 获取维度（取配置或实际推理）
             self.dimension = self.model.config.hidden_size
