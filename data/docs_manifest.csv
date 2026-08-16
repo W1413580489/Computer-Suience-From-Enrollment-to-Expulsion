@@ -1,22 +1,23 @@
-﻿# 文档清单：id, 标题, 类别, URL
+# 文档清单：id, 标题, 类别, URL, 子类别
 # 类别: home=主文档 guide=攻略章节 appendix=附录
-home,信科院-从入学到被开除(主页),home,https://tralis2671.feishu.cn/wiki/VvKVwsHo2iIIC4ko0PmcKs4lnKd
-guide01,新生指南补缺,guide,https://tralis2671.feishu.cn/wiki/DYhvw9owZivrJskU5LicGl06nAg
-guide02,常用链接,guide,https://bcnjr89bg80t.feishu.cn/wiki/ZFQ4wlelJiOUkAk3L7tcn94xnKe
-guide03,大学政策简解,guide,https://bcnjr89bg80t.feishu.cn/wiki/HgtnwqvJUiKv58k7j3jcN0s4npg
-guide04,学生组织介绍,guide,https://bcnjr89bg80t.feishu.cn/wiki/DZUOwmJKLi6kRfkwT5Schjg3n3f
-guide05,学术发展规划,guide,https://bcnjr89bg80t.feishu.cn/wiki/GF54wCHgUiOSmdkYSTIcVSWwncb
-guide06,就业发展规划,guide,https://bcnjr89bg80t.feishu.cn/wiki/D17ewTvi8iImXbkBxS0cVt0un0O
-guide07,竞赛指导,guide,https://bcnjr89bg80t.feishu.cn/wiki/NCo9wYAxJilSEVki0e8cBWBInfb
-guide08,情感与生活指南,guide,https://bcnjr89bg80t.feishu.cn/wiki/RyTMwuuXri2JSckbc6ycZOdknYf
-guide09,效率工具推荐,guide,https://tralis2671.feishu.cn/wiki/ZATTw8ddKiJwD7k4OLicQGswnad
-guide10,美食娱乐排行,guide,https://tralis2671.feishu.cn/wiki/W1sRwXaB7iXYxrk5XKxcgivrnxg
-guide11,Git使用指南,guide,https://tralis2671.feishu.cn/wiki/PZfdwamzGirDqOkrIIwcFIzbnlh
-appendix01,林家络的恋爱教学笔记,appendix,https://tralis2671.feishu.cn/wiki/QVxYwRDzxiESxMkDEPCc1zrlnaf
-appendix02,不知来源的焚诀,appendix,https://tralis2671.feishu.cn/wiki/ZnF4wWRGRi4Rk0kqTo4c6zz4n0b
-appendix03,学习指南(权限观看),appendix,https://tralis2671.feishu.cn/wiki/FCATwwKbziiC7zkAL64cl3EXnCf
-appendix04,复习资料(权限观看),appendix,https://tralis2671.feishu.cn/wiki/ZkVTwvg7kio8vhkyuKZcthHvnWd
-appendix05,无限战队,appendix,https://tralis2671.feishu.cn/wiki/SVZ5wPoooiKqgMkvBhScDAvPnFd
-appendix06,SSR战队,appendix,https://tralis2671.feishu.cn/wiki/Vi6xw6sOgi6ZtAk2PHBcKVkXn2b
-appendix07,追求策略的多元视角实证研究,appendix,https://tralis2671.feishu.cn/wiki/B4WBwQcwXiY1F1kgPJ5c4cDZnVe
-appendix08,健身指北,appendix,https://tralis2671.feishu.cn/wiki/VpjFw9xQkiHxu6k7BnTcad2Dnmh
+# 子类别: nav=导航 policy=政策 experience=经验 tool=工具 org=组织 life=生活
+home,信科院-从入学到被开除(主页),home,https://tralis2671.feishu.cn/wiki/VvKVwsHo2iIIC4ko0PmcKs4lnKd,nav
+guide01,新生指南补缺,guide,https://tralis2671.feishu.cn/wiki/DYhvw9owZivrJskU5LicGl06nAg,experience
+guide02,常用链接,guide,https://bcnjr89bg80t.feishu.cn/wiki/ZFQ4wlelJiOUkAk3L7tcn94xnKe,tool
+guide03,大学政策简解,guide,https://bcnjr89bg80t.feishu.cn/wiki/HgtnwqvJUiKv58k7j3jcN0s4npg,policy
+guide04,学生组织介绍,guide,https://bcnjr89bg80t.feishu.cn/wiki/DZUOwmJKLi6kRfkwT5Schjg3n3f,org
+guide05,学术发展规划,guide,https://bcnjr89bg80t.feishu.cn/wiki/GF54wCHgUiOSmdkYSTIcVSWwncb,policy
+guide06,就业发展规划,guide,https://bcnjr89bg80t.feishu.cn/wiki/D17ewTvi8iImXbkBxS0cVt0un0O,experience
+guide07,竞赛指导,guide,https://bcnjr89bg80t.feishu.cn/wiki/NCo9wYAxJilSEVkiQe8cBWBInfb,experience
+guide08,情感与生活指南,guide,https://bcnjr89bg80t.feishu.cn/wiki/RyTMwuuXri2JSckbc6ycZOdknYf,experience
+guide09,效率工具推荐,guide,https://tralis2671.feishu.cn/wiki/ZATTw8ddKiJwD7k4OLicQGswnad,tool
+guide10,美食娱乐排行,guide,https://bcnjr89bg80t.feishu.cn/wiki/W1sRwXaB7iXYxrk5XKxcgivrnxg,life
+guide11,Git使用指南,guide,https://tralis2671.feishu.cn/wiki/PZfdwamzGirDqOkrIIwcFIzbnlh,tool
+appendix01,林家络的恋爱教学笔记,appendix,https://tralis2671.feishu.cn/wiki/QVxYwRDzxiESxMkDEPCc1zrlnaf,experience
+appendix02,不知来源的焚诀,appendix,https://tralis2671.feishu.cn/wiki/ZnF4wWRGRi4Rk0kqTo4c6zz4n0b,experience
+appendix03,学习指南(权限观看),appendix,https://tralis2671.feishu.cn/wiki/FCATwwKbziiC7zkAL64cl3EXnCf,tool
+appendix04,复习资料(权限观看),appendix,https://tralis2671.feishu.cn/wiki/ZkVTwvg7kio8vhkyuKZcthHvnWd,tool
+appendix05,无限战队,appendix,https://tralis2671.feishu.cn/wiki/SVZ5wPoooiKqMkvBhScDAvPnFd,org
+appendix06,SSR战队,appendix,https://tralis2671.feishu.cn/wiki/Vi6xw6sOgi6ZtAk2PHBcKVkXn2b,org
+appendix07,追求策略的多元视角实证研究,appendix,https://tralis2671.feishu.cn/wiki/B4WBwQcwXiY1F1kgPJ5c4cDZnVe,experience
+appendix08,健身指北,appendix,https://tralis2671.feishu.cn/wiki/VpjFw9xQkiHxu6k7BnTcad2Dnmh,experience

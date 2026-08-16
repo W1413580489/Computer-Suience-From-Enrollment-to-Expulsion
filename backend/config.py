@@ -22,10 +22,28 @@ RATELIMIT_FILE = LOGS_DIR / "ratelimit.json"               # 文件级 IP 限额
 # ---- 检索 ----
 RETRIEVE_TOP_K = int(os.getenv("XKZ_TOP_K", "8"))          # FR-RT-03
 MAX_CHUNKS_PER_DOC = int(os.getenv("XKZ_MAX_PER_DOC", "3"))  # 召回时单文档块数上限（多样性，FR-RT-06）
-RETRIEVE_THRESHOLD = float(os.getenv("XKZ_THRESHOLD", "0.5"))  # FR-RT-04
+RETRIEVE_THRESHOLD = float(os.getenv("XKZ_THRESHOLD", "0.5"))  # FR-RT-04（v3 后仅用于 BM25 单路兜底）
 # FR-RT-04 补充：BM25 原始分对中文常见问题词（怎么/什么）不敏感，
 # 需同时满足「内容词命中」——查询中长度≥2 的非停用词至少命中 1 个，否则视为无相关内容
 MAX_CHUNK_TEXT = 800                                       # FR-RT-03 单块截断
+
+# ---- 多路召回加权融合（v3）----
+# 五路召回：BM25 / 标题精确 / section_path / 关键词重叠 / 向量语义
+# 使用加权 RRF (Reciprocal Rank Fusion) 融合，权重越大该路影响力越高
+RECALL_WEIGHT_BM25 = float(os.getenv("XKZ_W_BM25", "1.0"))      # BM25 基础路
+RECALL_WEIGHT_TITLE = float(os.getenv("XKZ_W_TITLE", "2.0"))    # 标题精确匹配（权重最高，标题命中最相关）
+RECALL_WEIGHT_SECTION = float(os.getenv("XKZ_W_SECTION", "1.5"))  # section_path 层级匹配
+RECALL_WEIGHT_OVERLAP = float(os.getenv("XKZ_W_OVERLAP", "1.0"))  # 关键词重叠度
+RECALL_WEIGHT_VECTOR = float(os.getenv("XKZ_W_VECTOR", "1.5"))  # 向量语义匹配（弥补 BM25 词面局限）
+RRF_K = int(os.getenv("XKZ_RRF_K", "60"))                       # RRF 常数，越大排名差异越平滑
+
+# ---- Embedding + Reranker（v3）----
+# 模型从 HuggingFace 下载，国内服务器设置环境变量 XKZ_HF_ENDPOINT=https://hf-mirror.com
+EMBEDDING_MODEL = os.getenv("XKZ_EMBEDDING_MODEL", "BAAI/bge-small-zh-v1.5")  # ~95MB, 512维
+RERANKER_MODEL = os.getenv("XKZ_RERANKER_MODEL", "BAAI/bge-reranker-base")     # ~278MB
+EMBEDDING_CACHE = DATA_DIR / "embedding_cache.npy"   # 预计算的 chunk 向量缓存
+RERANK_CANDIDATE_K = int(os.getenv("XKZ_RERANK_K", "20"))  # Reranker 精排候选数（召回 top-20 → 精排 top-k）
+RERANK_ENABLED = os.getenv("XKZ_RERANK_ENABLED", "1") == "1"  # 是否启用 Reranker，0=关闭
 
 # ---- 平台兜底模型（FR-BY-MODEL）----
 PLATFORM_API_KEY = os.getenv("XKZ_PLATFORM_API_KEY", "")   # 平台兜底 DeepSeek Key（不填则免费模式不可用）
@@ -68,3 +86,57 @@ SYSTEM_PROMPT = """你是「信科院智能助手」，基于暨南大学信科�
 - 涉及步骤/流程时，用编号列表（①②③）清晰列出
 - 涉及对比时，用表格或分点说明
 - 涉及时间/地点/金额等关键信息时，用加粗强调"""
+
+# ---- v3: 动态 System Prompt（按意图分类追加风格指令）----
+# 基础 prompt 之上，根据 classify_intent 结果追加不同风格
+INTENT_PROMPTS = {
+    "policy": """
+
+【当前问题类型：政策规章】
+回答风格调整：
+- 严格引用政策原文，不补充个人解读或经验性判断
+- 回答末尾必须标注「⚠️ 以上为资料库收录的政策信息，具体执行请以学校最新通知为准」
+- 涉及 GPA/学分/资格门槛等硬性指标时，用加粗强调数值
+- 涉及内招/外招/港澳台侨差异时，分点列明各自适用条件
+- 避免使用「应该」「大概」「可能」等模糊措辞""",
+
+    "experience": """
+
+【当前问题类型：经验心得】
+回答风格调整：
+- 用口语化、亲切的学长学姐口吻回答
+- 可适当加入「学长建议」「过来人经验」等引导语
+- 鼓励性表达，但不把个人经验绝对化（避免「一定要」「必须」）
+- 可适当补充注意事项或常见误区
+- 涉及主观感受时，明确标注「因人而异」""",
+
+    "tool": """
+
+【当前问题类型：工具与链接】
+回答风格调整：
+- 优先列出工具名称 + 链接/网址 + 一句话用途说明
+- 结构化呈现：工具名（加粗）→ 链接 → 用途
+- 涉及操作步骤时，用编号列表清晰列出每一步
+- 涉及命令行操作时，用代码块格式展示命令
+- 链接失效风险提示：如资料较旧，可提醒「链接可能失效，请以官方渠道为准」""",
+
+    "org": """
+
+【当前问题类型：组织介绍】
+回答风格调整：
+- 结构化介绍每个组织：名称（加粗）→ 性质 → 加入方式 → 联系方式
+- 用列表形式清晰呈现多个组织
+- 客观描述组织职能，不加主观评价
+- 涉及招新时间/条件时，提醒「以当年招新通知为准」""",
+
+    "life": """
+
+【当前问题类型：生活娱乐】
+回答风格调整：
+- 推荐式表达，可适当加入主观评价（「这家口碑不错」「性价比高」）
+- 涉及排行/榜单时，保留原资料的排序
+- 涉及价格/位置时，用加粗强调
+- 提醒「口味因人而异，仅供参考」""",
+
+    "auto": "",  # 无法判定意图，不追加额外指令，使用基础 prompt
+}

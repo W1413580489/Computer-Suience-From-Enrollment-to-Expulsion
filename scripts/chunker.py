@@ -17,6 +17,7 @@ MANIFEST = BASE / "data" / "docs_manifest.csv"
 
 CHUNK_MAX = 600  # 目标块最大字符数
 CHUNK_MIN = 30   # 最小块字符数
+CHUNK_OVERLAP = 80  # 块间重叠字符数，避免边界上下文断裂
 
 # HTML 标签 + 导航噪音
 HTML_TAGS = re.compile(
@@ -84,15 +85,37 @@ def load_manifest() -> dict[str, dict]:
             line = line.strip()
             if not line or line.startswith("#"):
                 continue
-            parts = line.split(",", 3)
+            parts = line.split(",", 4)
             if len(parts) >= 4:
-                meta[parts[0]] = {"title": parts[1], "category": parts[2], "url": parts[3]}
+                meta[parts[0]] = {
+                    "title": parts[1],
+                    "category": parts[2],
+                    "url": parts[3],
+                    "subcategory": parts[4] if len(parts) >= 5 else "experience",
+                }
     return meta
+
+
+def _apply_overlap(text: str, prev_tail: str) -> str:
+    """为当前块前部拼接上一块尾部，形成重叠窗口，避免边界上下文断裂。"""
+    if not prev_tail:
+        return text
+    # 找一个干净的断点（空格或标点），避免切在字中间
+    cut = prev_tail
+    for sep in ["。", "；", "，", " ", "\n"]:
+        idx = prev_tail.rfind(sep)
+        if idx >= 0:
+            cut = prev_tail[idx + len(sep):]
+            break
+    if cut:
+        return f"[上文] {cut}\n\n{text}"
+    return text
 
 def chunk_document(
     filepath: Path,
     doc_title: str,
-    source_url: str
+    source_url: str,
+    subcategory: str = "experience"
 ) -> list[dict]:
     raw = filepath.read_text(encoding="utf-8")
     clean = clean_markdown(raw)
@@ -111,9 +134,10 @@ def chunk_document(
     chunks: list[dict] = []
     buf: list[str] = []
     chunk_idx = 0
+    last_tail = ""  # 上一块尾部文本，用于构造重叠窗口
 
     def flush():
-        nonlocal buf, chunk_idx
+        nonlocal buf, chunk_idx, last_tail
         text = "\n".join(buf).strip()
         # 超过上限按段落拆
         if len(text) > CHUNK_MAX:
@@ -125,16 +149,22 @@ def chunk_document(
                     continue
                 if sub_buf and len(sub_buf) + len(p) + 2 > CHUNK_MAX:
                     if len(sub_buf.strip()) >= CHUNK_MIN:
-                        chunks.append(make_chunk(sub_buf.strip(), chunk_idx))
+                        chunk_text = _apply_overlap(sub_buf.strip(), last_tail)
+                        chunks.append(make_chunk(chunk_text, chunk_idx))
                         chunk_idx += 1
+                        last_tail = sub_buf.strip()[-CHUNK_OVERLAP:]
                     sub_buf = ""
                 sub_buf = (sub_buf + "\n\n" + p).strip() if sub_buf else p
             if sub_buf and len(sub_buf.strip()) >= CHUNK_MIN:
-                chunks.append(make_chunk(sub_buf.strip(), chunk_idx))
+                chunk_text = _apply_overlap(sub_buf.strip(), last_tail)
+                chunks.append(make_chunk(chunk_text, chunk_idx))
                 chunk_idx += 1
+                last_tail = sub_buf.strip()[-CHUNK_OVERLAP:]
         elif len(text) >= CHUNK_MIN:
-            chunks.append(make_chunk(text, chunk_idx))
+            chunk_text = _apply_overlap(text, last_tail)
+            chunks.append(make_chunk(chunk_text, chunk_idx))
             chunk_idx += 1
+            last_tail = text[-CHUNK_OVERLAP:]
         buf.clear()
 
     def make_chunk(text: str, idx: int) -> dict:
@@ -145,6 +175,7 @@ def chunk_document(
             "doc": doc_title,
             "section": leaf,
             "section_path": sec,
+            "category": subcategory,  # 子类别：policy/experience/tool/org/life/nav
             "text": text[:CHUNK_MAX * 2],  # 最终截断保护
             "source_url": source_url,
             "updated_at": "2026-08-10",
@@ -167,6 +198,8 @@ def chunk_document(
             level = len(m.group(1))
             h_text = clean_header_text(m.group(2))
             flush()
+            # 切换章节时重置重叠上文，避免跨章节拼接
+            last_tail = ""
             while len(header_stack) > level:
                 header_stack.pop()
             if len(header_stack) < level:
@@ -193,8 +226,10 @@ def chunk_document(
                 para_text = "\n".join(buf[:para_end]).strip()
                 buf = buf[para_end + 1:]
                 if len(para_text) >= CHUNK_MIN:
-                    chunks.append(make_chunk(para_text, chunk_idx))
+                    chunk_text = _apply_overlap(para_text, last_tail)
+                    chunks.append(make_chunk(chunk_text, chunk_idx))
                     chunk_idx += 1
+                    last_tail = para_text[-CHUNK_OVERLAP:]
 
     flush()
     return chunks
@@ -206,11 +241,12 @@ def main():
 
     for f in sorted(RAW_DIR.glob("*.md")):
         doc_id = f.stem
-        info = meta.get(doc_id, {"title": doc_id, "category": "guide", "url": ""})
+        info = meta.get(doc_id, {"title": doc_id, "category": "guide", "url": "", "subcategory": "experience"})
         doc_title = info["title"]
         source_url = info["url"]
+        subcategory = info.get("subcategory", "experience")
 
-        chunks = chunk_document(f, doc_title, source_url)
+        chunks = chunk_document(f, doc_title, source_url, subcategory)
         all_chunks.extend(chunks)
         sections = sorted({c["section_path"] for c in chunks})
         avg_size = sum(c["chunk_size"] for c in chunks) // max(len(chunks), 1)

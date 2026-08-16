@@ -215,6 +215,9 @@ async def ask(req: AskRequest, request: Request):
     # ---- 检索（FR-RT / FR-QA-03）----
     retriever = Retriever.get()
     results = retriever.search(question)
+    # v3: 动态 System Prompt —— 根据意图分类追加风格指令
+    intent = retriever.classify_intent(question)
+    system_prompt = config.SYSTEM_PROMPT + config.INTENT_PROMPTS.get(intent, "")
     if not retriever.is_relevant(question, results):
         async def no_content():
             yield _sse({"type": "start"})
@@ -231,11 +234,13 @@ async def ask(req: AskRequest, request: Request):
     ]
 
     ref_block = "\n".join(
-        f"[来源{i + 1}]（{r.get('section_path', r['section'])}）: {r['text']}" for i, r in enumerate(results)
+        f"[来源{i + 1}]（{r.get('section_path', r['section'])}）: {r['text']}"
+        + (f"\n[来源{i + 1}上下文] {r['parent_context']}" if r.get("parent_context") else "")
+        for i, r in enumerate(results)
     )
 
     # ---- 组装消息（§7.2，多轮最多 6 轮 FR-QA-05）----
-    messages = [{"role": "system", "content": config.SYSTEM_PROMPT}]
+    messages = [{"role": "system", "content": system_prompt}]
     history = (req.history or [])[-config.MAX_HISTORY_ROUNDS * 2:]
     for h in history:
         if h.get("role") in ("user", "assistant") and h.get("content"):
