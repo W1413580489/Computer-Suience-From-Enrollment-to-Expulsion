@@ -43,6 +43,12 @@
   ],
   "guides": [
     {
+      "label": "黑话辞典",
+      "desc": "校园术语百科 · 绩点/综测/保研/选课黑话",
+      "url": "/glossary",
+      "icon": "book"
+    },
+    {
       "label": "新生指南补缺",
       "desc": "入学前准备与新生常见问题",
       "url": "https://tralis2671.feishu.cn/wiki/DYhvw9owZivrJskU5LicGl06nAg",
@@ -112,57 +118,71 @@
   "appendix": [
     {
       "label": "林家络的恋爱教学笔记",
-      "desc": "",
+      "desc": "林家络表示：恋爱？易如反掌啊",
       "url": "https://tralis2671.feishu.cn/wiki/QVxYwRDzxiESxMkDEPCc1zrlnaf",
       "icon": "doc",
       "restricted": false
     },
     {
-      "label": "不知来源的焚诀",
-      "desc": "",
+      "label": "🔥不知来源的焚决",
+      "desc": "选课/毕设/社团/考研经验与笔记卷子",
       "url": "https://tralis2671.feishu.cn/wiki/ZnF4wWRGRi4Rk0kqTo4c6zz4n0b",
       "icon": "doc",
       "restricted": false
     },
     {
-      "label": "学习指南(权限观看)",
-      "desc": "",
+      "label": "©️邪修学习指南（谨慎观看）",
+      "desc": "论文邪修方法教学",
       "url": "https://tralis2671.feishu.cn/wiki/FCATwwKbziiC7zkAL64cl3EXnCf",
       "icon": "doc",
       "restricted": true
     },
     {
-      "label": "复习资料(权限观看)",
-      "desc": "",
+      "label": "©️复习资料（权限观看）",
+      "desc": "复习资料，限权限观看",
       "url": "https://tralis2671.feishu.cn/wiki/ZkVTwvg7kio8vhkyuKZcthHvnWd",
       "icon": "doc",
       "restricted": true
     },
     {
-      "label": "无限战队",
-      "desc": "",
+      "label": "♾️无限战队",
+      "desc": "学院A类学术竞赛与创新创业竞赛队伍",
       "url": "https://tralis2671.feishu.cn/wiki/SVZ5wPoooiKqgMkvBhScDAvPnFd",
       "icon": "doc",
       "restricted": false
     },
     {
-      "label": "SSR战队",
-      "desc": "",
+      "label": "🤖SSR战队",
+      "desc": "战队介绍（待补充）",
       "url": "https://tralis2671.feishu.cn/wiki/Vi6xw6sOgi6ZtAk2PHBcKVkXn2b",
       "icon": "doc",
       "restricted": false
     },
     {
-      "label": "追求策略的多元视角实证研究",
-      "desc": "",
+      "label": "🔬《追求策略的多元视角实证研究》",
+      "desc": "我们最讲科学了",
       "url": "https://tralis2671.feishu.cn/wiki/B4WBwQcwXiY1F1kgPJ5c4cDZnVe",
       "icon": "doc",
       "restricted": false
     },
     {
-      "label": "健身指北",
-      "desc": "",
+      "label": "用脚打的水猴子也能看懂的健身指北",
+      "desc": "详细健身教程",
       "url": "https://tralis2671.feishu.cn/wiki/VpjFw9xQkiHxu6k7BnTcad2Dnmh",
+      "icon": "doc",
+      "restricted": false
+    },
+    {
+      "label": "笔记本电脑推荐——面向所有大学生的推荐向",
+      "desc": "23网安梵某学长编撰的电脑选购指南",
+      "url": "https://tralis2671.feishu.cn/wiki/Y9OIw8JXKiGsdtkP5RCcDxc3nge",
+      "icon": "doc",
+      "restricted": false
+    },
+    {
+      "label": "AntX6快速上手",
+      "desc": "流程图软件教学",
+      "url": "https://tralis2671.feishu.cn/wiki/Q0dGw8AnQiNU3GkrMd2cfA2zn6b",
       "icon": "doc",
       "restricted": false
     }

@@ -1,7 +1,12 @@
 <template>
   <header class="topbar">
     <div class="topbar__left">
-      <button v-if="showHome" class="topbar__back" aria-label="返回主页" @click="goHome">
+      <!-- 返回主页：夜间 zzz 用 zenless-ui 按钮 / 日间 ak 原版 -->
+      <z-button v-if="showHome && theme.isZzz" size="small" class="topbar__zback" @click="goHome">
+        <NeonIcon name="home" :size="18" />
+        <span class="topbar__back-text">返回主页</span>
+      </z-button>
+      <button v-if="showHome && !theme.isZzz" class="topbar__back" aria-label="返回主页" @click="goHome">
         <NeonIcon name="home" :size="20" />
         <span class="topbar__back-text">返回主页</span>
       </button>
@@ -29,11 +34,60 @@
     </nav>
 
     <div class="topbar__right">
-      <span v-if="!isMobile && !isHome" class="topbar__tag">{{ routeLabel }}</span>
-      <button class="topbar__icon-btn" aria-label="通知" @click="emit('onNotificationClick')">
+      <!-- 夜间 zzz：zenless-ui 标签 / 日间 ak：原版标签 -->
+      <z-tag v-if="!isMobile && !isHome && theme.isZzz" size="mini" class="topbar__ztag">{{ routeLabel }}</z-tag>
+      <span v-else-if="!isMobile && !isHome" class="topbar__tag">{{ routeLabel }}</span>
+      <!-- 日夜间模式切换（绝区零 ↔ 明日方舟），紧邻「更新日志」铃铛 -->
+      <button
+        class="theme-toggle"
+        :aria-label="theme.isAk ? '切换到夜间模式' : '切换到日间模式'"
+        :title="theme.isAk ? '切换到夜间模式 · 绝区零' : '切换到日间模式 · 明日方舟'"
+        @click="theme.toggle()"
+      >
+        <span class="theme-toggle__track">
+          <span class="theme-toggle__knob" :class="{ 'theme-toggle__knob--ak': theme.isAk }"></span>
+        </span>
+        <span class="theme-toggle__label">{{ theme.isAk ? '日' : '夜' }}</span>
+      </button>
+      <!-- 更新日志：夜间 zzz 用 zenless-ui 徽标+气泡 / 日间 ak 原版 -->
+      <z-tooltip v-if="theme.isZzz" content="更新日志" placement="bottom">
+        <z-badge is-dot type="fire" class="topbar__zbadge">
+          <button class="topbar__icon-btn" aria-label="更新日志" @click="emit('onNotificationClick')">
+            <NeonIcon name="notification" :size="22" />
+          </button>
+        </z-badge>
+      </z-tooltip>
+      <button v-else class="topbar__icon-btn" aria-label="更新日志" @click="emit('onNotificationClick')">
         <NeonIcon name="notification" :size="22" />
       </button>
-      <button class="topbar__avatar" aria-label="用户" @click="emit('onAvatarClick')">
+
+      <!-- 用户信息（登录后） -->
+      <div v-if="userStore.isLoggedIn" class="topbar__user-wrap" ref="userWrapRef">
+        <button class="topbar__user" @click="toggleUserMenu">
+          <span class="topbar__user-name">{{ userStore.user?.nickname }}</span>
+          <span class="topbar__user-badge">{{ userStore.gradeLabel }} · {{ userStore.majorLabel }}</span>
+        </button>
+        <!-- 下拉菜单 -->
+        <Teleport to="body">
+          <div
+            v-if="showUserMenu"
+            class="topbar__user-menu"
+            :style="menuStyle"
+            @click.stop
+          >
+            <button class="topbar__user-menu-item" @click="switchIdentity">
+              <NeonIcon name="user" :size="14" />
+              切换身份
+            </button>
+            <button class="topbar__user-menu-item topbar__user-menu-item--danger" @click="doLogout">
+              <NeonIcon name="user" :size="14" />
+              退出登录
+            </button>
+          </div>
+        </Teleport>
+      </div>
+
+      <button v-else class="topbar__avatar" aria-label="用户" @click="emit('onAvatarClick')">
         <NeonIcon name="user" :size="18" />
       </button>
     </div>
@@ -41,11 +95,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import JnuLogo from '@/components/common/JnuLogo.vue';
 import NeonIcon from '@/components/common/NeonIcon.vue';
 import { useNavStore } from '@/stores/navStore';
+import { useThemeStore } from '@/stores/themeStore';
+import { useUserStore } from '@/stores/userStore';
+
+const theme = useThemeStore();
+const userStore = useUserStore();
 
 const props = withDefaults(
   defineProps<{
@@ -64,6 +123,45 @@ const emit = defineEmits<{
 
 const router = useRouter();
 const nav = useNavStore();
+
+/* 用户下拉菜单 */
+const showUserMenu = ref(false);
+const userWrapRef = ref<HTMLElement | null>(null);
+const menuStyle = ref({});
+
+function toggleUserMenu() {
+  if (!showUserMenu.value) {
+    const rect = userWrapRef.value?.getBoundingClientRect();
+    if (rect) {
+      menuStyle.value = {
+        top: rect.bottom + 4 + 'px',
+        right: window.innerWidth - rect.right + 'px',
+      };
+    }
+  }
+  showUserMenu.value = !showUserMenu.value;
+}
+
+function closeUserMenu(e: MouseEvent) {
+  if (userWrapRef.value && !userWrapRef.value.contains(e.target as Node)) {
+    showUserMenu.value = false;
+  }
+}
+
+onMounted(() => document.addEventListener('click', closeUserMenu));
+onUnmounted(() => document.removeEventListener('click', closeUserMenu));
+
+function switchIdentity() {
+  showUserMenu.value = false;
+  userStore.logout();
+  router.push('/login');
+}
+
+function doLogout() {
+  showUserMenu.value = false;
+  userStore.logout();
+  router.push('/login');
+}
 
 const isHome = computed(() => props.currentRoute === '/');
 
@@ -109,7 +207,7 @@ function goNav(item: NavItem) {
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-  background: rgba(10, 10, 10, 0.92);
+  background: var(--surface-blur);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-subtle);
   position: relative;
@@ -187,6 +285,57 @@ function goNav(item: NavItem) {
   gap: 12px;
 }
 
+/* 日夜间模式切换 — 绝区零(夜) ↔ 明日方舟(日) */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 10px 0 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-panel);
+  color: var(--text-secondary);
+  clip-path: var(--clip-sm);
+  cursor: pointer;
+  transition: border-color 200ms, color 200ms, box-shadow 200ms;
+}
+.theme-toggle:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+  box-shadow: 0 0 14px var(--amber-glow);
+}
+.theme-toggle__track {
+  position: relative;
+  width: 34px;
+  height: 18px;
+  background: var(--bg-panel-3);
+  border: 1px solid var(--border-subtle);
+  clip-path: var(--clip-sm);
+  transition: background 400ms, border-color 400ms;
+}
+.theme-toggle__knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  background: var(--amber);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  transition: transform 400ms cubic-bezier(0.4, 0, 0.2, 1), background 400ms;
+}
+.theme-toggle__knob--ak {
+  transform: translateX(16px);
+}
+.theme-toggle__label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--amber);
+  min-width: 12px;
+  text-align: center;
+}
+
 .topbar__tag {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -195,6 +344,17 @@ function goNav(item: NavItem) {
   border: 1px solid var(--border-subtle);
   padding: 4px 10px;
   clip-path: var(--clip-sm);
+}
+
+/* zenless-ui 徽标 / 标签对齐 */
+.topbar__zbadge {
+  display: inline-flex;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.topbar__ztag {
+  flex-shrink: 0;
 }
 
 .topbar__back {
@@ -215,6 +375,16 @@ function goNav(item: NavItem) {
 .topbar__back:hover {
   background: var(--amber-mid);
   box-shadow: 0 0 14px var(--amber-glow);
+}
+
+/* zenless-ui 返回主页按钮 */
+.topbar__zback {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px !important;
+  flex-shrink: 0;
 }
 
 .topbar__icon-btn {
@@ -249,6 +419,88 @@ function goNav(item: NavItem) {
 .topbar__avatar:hover {
   color: var(--amber);
   border-color: var(--amber);
+}
+
+/* 用户信息标签 */
+.topbar__user-wrap {
+  position: relative;
+}
+
+.topbar__user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-panel);
+  clip-path: var(--clip-sm);
+  cursor: pointer;
+  transition: border-color 200ms, background 200ms;
+}
+
+.topbar__user:hover {
+  border-color: var(--amber);
+  background: var(--bg-panel-2);
+}
+
+.topbar__user-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+}
+
+.topbar__user-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--amber);
+  padding: 2px 6px;
+  background: var(--amber-soft);
+  clip-path: var(--clip-sm);
+}
+
+/* 用户下拉菜单 */
+.topbar__user-menu {
+  position: fixed;
+  z-index: 9999;
+  min-width: 160px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  clip-path: polygon(var(--cut-sm) 0, 100% 0, 100% calc(100% - var(--cut-sm)), calc(100% - var(--cut-sm)) 100%, 0 100%, 0 var(--cut-sm));
+  padding: 6px;
+  box-shadow: 0 8px 24px var(--shadow-deep);
+}
+
+.topbar__user-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background 160ms, color 160ms;
+  text-align: left;
+}
+
+.topbar__user-menu-item:hover {
+  background: var(--bg-panel-2);
+  color: var(--amber);
+}
+
+.topbar__user-menu-item--danger {
+  color: var(--danger);
+}
+
+.topbar__user-menu-item--danger:hover {
+  background: var(--bg-panel-2);
+  color: var(--danger);
 }
 
 @media (max-width: 767px) {

@@ -11,7 +11,7 @@
         <span class="guides-list__label">{{ item.label }}</span>
         <span v-if="item.desc" class="guides-list__desc">{{ item.desc }}</span>
       </span>
-      <NeonIcon name="external" :size="15" class="guides-list__arrow" />
+      <NeonIcon :name="item.url.startsWith('/') ? 'arrow-right' : 'external'" :size="15" class="guides-list__arrow" />
     </button>
   </div>
 </template>

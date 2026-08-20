@@ -1,0 +1,412 @@
+{
+  "categories": [
+    {
+      "key": "academic",
+      "label": "学业相关",
+      "icon": "book"
+    },
+    {
+      "key": "course",
+      "label": "选课相关",
+      "icon": "doc"
+    },
+    {
+      "key": "exam",
+      "label": "考试相关",
+      "icon": "guide"
+    },
+    {
+      "key": "scholarship",
+      "label": "奖助学金",
+      "icon": "star"
+    },
+    {
+      "key": "graduation",
+      "label": "毕业升学",
+      "icon": "home"
+    },
+    {
+      "key": "life",
+      "label": "校园生活",
+      "icon": "user"
+    },
+    {
+      "key": "slang",
+      "label": "校园黑话",
+      "icon": "chat"
+    }
+  ],
+  "terms": [
+    {
+      "term": "绩点",
+      "pinyin": "ji dian",
+      "category": "academic",
+      "definition": "GPA（Grade Point Average），衡量学生学业成绩的指标。暨大采用 4 分制，A=4.0, B=3.0, C=2.0, D=1.0。每门课绩点乘以学分，加权平均后得出。保研、评奖评优都看这个。",
+      "related": ["综测", "保研"]
+    },
+    {
+      "term": "综测",
+      "pinyin": "zong ce",
+      "category": "academic",
+      "definition": "综合素质测评，除了成绩外还考核品德、能力、实践等维度。直接关系到奖学金评定，每学期填一次表申报加分项。",
+      "related": ["奖学金", "加分项"]
+    },
+    {
+      "term": "学分",
+      "pinyin": "xue fen",
+      "category": "academic",
+      "definition": "每门课程的权重，一般专业课 3-4 学分，通识课 2 学分，体育课 1 学分。毕业总学分要求约 160，每学期建议修 20-25 学分。",
+      "related": ["绩点", "毕业要求"]
+    },
+    {
+      "term": "加分项",
+      "pinyin": "jia fen xiang",
+      "category": "academic",
+      "definition": "综测加分的项目，如参加竞赛获奖、学生干部、志愿服务、论文发表等。每项有对应加分，是综测排名的关键。",
+      "related": ["综测", "A类竞赛"]
+    },
+    {
+      "term": "补退选",
+      "pinyin": "bu tui xuan",
+      "category": "course",
+      "definition": "开学初的两轮选课调整。补选=抢没选上的课，退选=把不想上的课退掉。一般开课第一周退选，第二周补选结束。错过就没机会改了。",
+      "related": ["选课", "教务系统"]
+    },
+    {
+      "term": "选课",
+      "pinyin": "xuan ke",
+      "category": "course",
+      "definition": "每学期初在教务系统抢课程的操作。分预选、正选、补退选三轮。热门课秒没，需提前看好备选。建议先选专业课后选通识。",
+      "related": ["补退选", "通识课", "专选"]
+    },
+    {
+      "term": "通识课",
+      "pinyin": "tong shi ke",
+      "category": "course",
+      "definition": "全校通选的课，分文史哲、社科、自然科技、艺术等模块。毕业要求修满若干学分，建议挑给分好的老师，是 GPA 拉分项。",
+      "related": ["专选", "公选", "水课"]
+    },
+    {
+      "term": "专选",
+      "pinyin": "zhuan xuan",
+      "category": "course",
+      "definition": "专业选修课，限本专业学生选。和通识课的区别是难度更高、和专业知识相关。一般大三开始大量接触。",
+      "related": ["通识课", "公选"]
+    },
+    {
+      "term": "公选",
+      "pinyin": "gong xuan",
+      "category": "course",
+      "definition": "公共选修课的简称，和通识课类似但更宽泛。部分学院把通识课和公选课混用，具体看本专业培养方案。",
+      "related": ["通识课", "专选"]
+    },
+    {
+      "term": "水课",
+      "pinyin": "shui ke",
+      "category": "course",
+      "definition": "给分高、作业少、考试松的课程。常见于通识课，是 GPA 拉分的首选。但别全选水课，专业课还得硬啃。",
+      "related": ["通识课", "刷分"]
+    },
+    {
+      "term": "刷分",
+      "pinyin": "shua fen",
+      "category": "course",
+      "definition": "重修已及格的课以提高绩点。每门课最多刷两次，最新成绩覆盖旧成绩。保研党大二大三会大量刷分。",
+      "related": ["重修", "绩点", "保研"]
+    },
+    {
+      "term": "重修",
+      "pinyin": "chong xiu",
+      "category": "course",
+      "definition": "挂科后重新修读该课程。分跟班重修（跟下一届上课）和单独开班重修。重修要交费，且成绩单会标注。",
+      "related": ["挂科", "补考"]
+    },
+    {
+      "term": "挂科",
+      "pinyin": "gua ke",
+      "category": "exam",
+      "definition": "课程不及格（<60 分）。需补考或重修，影响绩点和保研资格。专业课挂科影响较大，通识课挂了重修即可。",
+      "related": ["补考", "重修"]
+    },
+    {
+      "term": "补考",
+      "pinyin": "bu kao",
+      "category": "exam",
+      "definition": "挂科后开学初的第二次考试机会。补考成绩一般按 60 分记入绩点，建议能过就别挂，补考更难。",
+      "related": ["挂科", "重修"]
+    },
+    {
+      "term": "期末考",
+      "pinyin": "qi mo kao",
+      "category": "exam",
+      "definition": "学期末的正式考试，占总评成绩 50-70%。一般安排在最后两周，考完即放寒暑假。考前两周是复习黄金期。",
+      "related": ["平时分", "总评"]
+    },
+    {
+      "term": "平时分",
+      "pinyin": "ping shi fen",
+      "category": "exam",
+      "definition": "出勤、作业、小测、课堂表现等组成的成绩，占总评 30-50%。平时分稳则期末压力小，建议每节课都到。",
+      "related": ["期末考", "总评"]
+    },
+    {
+      "term": "总评",
+      "pinyin": "zong ping",
+      "category": "exam",
+      "definition": "课程最终成绩 = 平时分 × 权重 + 期末考 × 权重。60 分及格，<60 挂科。绩点按总评换算。",
+      "related": ["平时分", "期末考", "绩点"]
+    },
+    {
+      "term": "奖学金",
+      "pinyin": "jiang xue jin",
+      "category": "scholarship",
+      "definition": "国家奖学金（8000）、国家励志奖学金（5000）、校一等奖学金（3000）、校二等奖学金（2000）等。评定看综测排名，每年 9-10 月评审。",
+      "related": ["综测", "加分项"]
+    },
+    {
+      "term": "助学金",
+      "pinyin": "zhu xue jin",
+      "category": "scholarship",
+      "definition": "面向家庭经济困难学生的资助，分国家助学金和校内助学金。需提前申请贫困生认定，每学期按月发放。",
+      "related": ["贫困生认定"]
+    },
+    {
+      "term": "贫困生认定",
+      "pinyin": "pin kun sheng ren ding",
+      "category": "scholarship",
+      "definition": "每学年初提交家庭经济情况证明，经学院审核后认定。是申请助学金、励志奖学金、勤工助学的前提。",
+      "related": ["助学金", "勤工助学"]
+    },
+    {
+      "term": "勤工助学",
+      "pinyin": "qin gong zhu xue",
+      "category": "scholarship",
+      "definition": "学校提供的校内兼职岗位，如图书馆管理员、办公室助理。时薪一般 15-20 元，每月上限 40 小时。需先认定贫困生。",
+      "related": ["贫困生认定", "助学金"]
+    },
+    {
+      "term": "保研",
+      "pinyin": "bao yan",
+      "category": "graduation",
+      "definition": "推荐免试攻读硕士研究生，看前三年绩点+综测+竞赛论文。一般专业前 10-15% 有机会。大三下学期开始准备材料。",
+      "related": ["绩点", "综测", "推免"]
+    },
+    {
+      "term": "推免",
+      "pinyin": "tui mian",
+      "category": "graduation",
+      "definition": "推荐免试的正式名称，保研的官方叫法。分学术学位推免和专业学位推免，名额按学院分配。",
+      "related": ["保研"]
+    },
+    {
+      "term": "考研",
+      "pinyin": "kao yan",
+      "category": "graduation",
+      "definition": "全国硕士研究生统一招生考试，每年 12 月底。政治+英语+数学+专业课，备考周期 6-12 个月。",
+      "related": ["保研", "初试", "复试"]
+    },
+    {
+      "term": "初试",
+      "pinyin": "chu shi",
+      "category": "graduation",
+      "definition": "考研的笔试环节，12 月底全国统考。过国家线和院线才能进复试。满分 500，一般工科线 280-300。",
+      "related": ["考研", "复试", "国家线"]
+    },
+    {
+      "term": "复试",
+      "pinyin": "fu shi",
+      "category": "graduation",
+      "definition": "考研初试过线后的面试环节，3-4 月举行。含专业笔试+面试+英语口语。复试比重逐年增加，不能掉以轻心。",
+      "related": ["考研", "初试"]
+    },
+    {
+      "term": "双学位",
+      "pinyin": "shuang xue wei",
+      "category": "graduation",
+      "definition": "主修一个专业的同时辅修另一个专业并达到学位要求，毕业拿两个学位证。一般大二申请，需绩点达标。",
+      "related": ["辅修", "绩点"]
+    },
+    {
+      "term": "辅修",
+      "pinyin": "fu xiu",
+      "category": "graduation",
+      "definition": "修读另一专业的课程但学分要求较低，一般只发辅修证明不发学位证。比双学位轻松，但含金量也低。",
+      "related": ["双学位"]
+    },
+    {
+      "term": "毕设",
+      "pinyin": "bi she",
+      "category": "graduation",
+      "definition": "毕业设计/论文，大四必修的最终大作业。要找导师、定题目、写论文、答辩。建议大三下就联系导师占坑。",
+      "related": ["答辩", "导师"]
+    },
+    {
+      "term": "答辩",
+      "pinyin": "da bian",
+      "category": "graduation",
+      "definition": "毕设最终的口头汇报环节，面对 3-5 位老师提问。答不上来很正常，关键是态度好、虚心接受批评。一般都能过。",
+      "related": ["毕设", "导师"]
+    },
+    {
+      "term": "导师",
+      "pinyin": "dao shi",
+      "category": "graduation",
+      "definition": "毕设指导老师，方向要匹配自己的题目。好导师会帮你改论文、放养不卡人；严导师会开组会、加实验。提前打听口碑。",
+      "related": ["毕设", "组会"]
+    },
+    {
+      "term": "组会",
+      "pinyin": "zu hui",
+      "category": "graduation",
+      "definition": "课题组定期开会汇报进度，一般每周或每两周一次。跟导师做科研或毕设的必修课，建议提前准备 PPT。",
+      "related": ["导师", "进组"]
+    },
+    {
+      "term": "进组",
+      "pinyin": "jin zu",
+      "category": "graduation",
+      "definition": "加入导师的科研课题组，做项目发论文。对保研和申请海外硕博有帮助，建议大二大三主动联系。",
+      "related": ["导师", "组会", "保研"]
+    },
+    {
+      "term": "A类竞赛",
+      "pinyin": "A lei jing sai",
+      "category": "academic",
+      "definition": "学校认定的高级别学科竞赛，如挑战杯、互联网+、数模、ACM。获奖可加综测分和保研分，是加分硬通货。",
+      "related": ["综测", "加分项", "保研"]
+    },
+    {
+      "term": "大创",
+      "pinyin": "da chuang",
+      "category": "academic",
+      "definition": "大学生创新创业训练计划，立项后可获经费资助。分国家级、省级、校级，结题后可加综测分。一般大二申请。",
+      "related": ["加分项", "综测"]
+    },
+    {
+      "term": "教务系统",
+      "pinyin": "jiao wu xi tong",
+      "category": "life",
+      "definition": "jw.jnu.edu.cn，选课、查课表、查成绩、报名考试的统一入口。抢课时必崩，建议错峰或用手机流量。",
+      "related": ["选课", "补退选"]
+    },
+    {
+      "term": "校园网",
+      "pinyin": "xiao yuan wang",
+      "category": "life",
+      "definition": "学校提供的网络，宿舍和教学楼覆盖。账号是学号，初始密码身份证后六位。流量每月有限，超了要充值。",
+      "related": ["VPN"]
+    },
+    {
+      "term": "VPN",
+      "pinyin": "VPN",
+      "category": "life",
+      "definition": "webvpn.jnu.edu.cn，校外访问校内资源的通道。密码和校园网相同。用学校网络别干违法的事，学校能查到记录。",
+      "related": ["校园网"]
+    },
+    {
+      "term": "学子邮",
+      "pinyin": "xue zi you",
+      "category": "life",
+      "definition": "@stu20XX.jnu.edu.cn 的学生邮箱，20XX 是入学年份。需主动申请，可用来注册 GitHub 学生包、JetBrains 等教育优惠。",
+      "related": ["GitHub学生包"]
+    },
+    {
+      "term": "GitHub学生包",
+      "pinyin": "GitHub xue sheng bao",
+      "category": "life",
+      "definition": "用学子邮申请 GitHub Education Pack，含 Copilot、JetBrains 全家桶、域名、DigitalOcean 额度等。审核 1-3 天。",
+      "related": ["学子邮"]
+    },
+    {
+      "term": "综测排名",
+      "pinyin": "zong ce pai ming",
+      "category": "academic",
+      "definition": "按综测总分从高到低排的名次，直接决定奖学金评定和保研资格。前 10% 一等奖，前 30% 二等奖（具体看学院）。",
+      "related": ["综测", "奖学金", "保研"]
+    },
+    {
+      "term": "培养方案",
+      "pinyin": "pei yang fang an",
+      "category": "academic",
+      "definition": "本专业四年课程的完整规划，含必修/选修/学分要求。开学初务必读一遍，规划好每学期选什么课。",
+      "related": ["学分", "选课"]
+    },
+    {
+      "term": "院线",
+      "pinyin": "yuan xian",
+      "category": "graduation",
+      "definition": "学院自己划的考研复试分数线，一般 ≥ 国家线。过院线才能进本学院复试，没过可调剂其他院。",
+      "related": ["国家线", "复试", "调剂"]
+    },
+    {
+      "term": "国家线",
+      "pinyin": "guo jia xian",
+      "category": "graduation",
+      "definition": "教育部划的考研最低复试线，分 A 区 B 区。A 区（含广东）一般比 B 区高 10 分。过国家线才有书读。",
+      "related": ["院线", "复试"]
+    },
+    {
+      "term": "调剂",
+      "pinyin": "tiao ji",
+      "category": "graduation",
+      "definition": "考研第一志愿没过线，申请调到其他学校或专业。一般只能调相近专业，且目标院校需有缺额。3 月开调剂系统。",
+      "related": ["考研", "院线"]
+    },
+    {
+      "term": "二辩",
+      "pinyin": "er bian",
+      "category": "graduation",
+      "definition": "毕设第一次答辩没过，一个月后的第二次答辩机会。二辩再不过就延毕，建议第一次就认真准备别留这个坑。",
+      "related": ["答辩", "毕设"]
+    },
+    {
+      "term": "延毕",
+      "pinyin": "yan bi",
+      "category": "graduation",
+      "definition": "延期毕业，毕设没过、学分不够或主动申请。一般延一年，期间仍需交学费。找工作会有影响，能不延就不延。",
+      "related": ["毕设", "二辩"]
+    },
+    {
+      "term": "搬砖",
+      "pinyin": "ban zhuan",
+      "category": "slang",
+      "definition": "学生圈对写代码、做作业、干杂活的戏称。'又去搬砖啊'='又去写代码啊'。自嘲用语，别当真。",
+      "related": []
+    },
+    {
+      "term": "卷",
+      "pinyin": "juan",
+      "category": "slang",
+      "definition": "过度竞争的简称。'这个班太卷了'=这个班学霸太多竞争激烈。信科院是卷王集中地，建议找到自己的节奏别盲从。",
+      "related": ["绩点", "保研"]
+    },
+    {
+      "term": "摆烂",
+      "pinyin": "bai lan",
+      "category": "slang",
+      "definition": "放弃挣扎、不再努力的态度。'我摆烂了'=我不想卷了。短期摆烂能缓解压力，长期摆烂会延毕。建议劳逸结合。",
+      "related": ["延毕"]
+    },
+    {
+      "term": "扩列",
+      "pinyin": "kuo lie",
+      "category": "slang",
+      "definition": "扩充好友列表的简称， QQ 空间时代流行下来。'求扩列'=加个好友吧。社团招新时常用来互相加联系方式。",
+      "related": []
+    },
+    {
+      "term": "捞",
+      "pinyin": "lao",
+      "category": "slang",
+      "definition": "老师给差一点的学生加分让其及格的行为。'这老师捞人'=这老师会给 58-59 分的学生凑到 60。考前打听清楚。",
+      "related": ["挂科", "补考"]
+    },
+    {
+      "term": "T0/T1/T2",
+      "pinyin": "T0 T1 T2",
+      "category": "slang",
+      "definition": "选课攻略里给课程分档：T0=神课（事少分高）、T1=好课（正常给分）、T2=慎选（事多分低）。选课参考用。",
+      "related": ["选课", "水课"]
+    }
+  ]
+}

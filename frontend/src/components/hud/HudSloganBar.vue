@@ -19,7 +19,7 @@ defineProps<{ main: string; sub: string }>();
   justify-content: center;
   gap: 4px;
   min-height: var(--slogan-h);
-  background: rgba(10, 10, 10, 0.92);
+  background: var(--surface-blur);
   border-top: 2px solid var(--amber);
   position: relative;
   z-index: 1;

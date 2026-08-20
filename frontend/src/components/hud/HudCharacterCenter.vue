@@ -10,18 +10,27 @@
         <span class="hero__kicker">JNU INFORMATION</span>
         <h1 class="hero__title glitch-title" data-text="信科院指南">信科院指南</h1>
         <div class="hero__intro">
+          <p v-if="gradeSubtitle" class="hero__intro--grade">{{ gradeSubtitle }}</p>
           <p>主要面向对象：信科院/学习编程的学生</p>
           <p class="hero__intro--mid">其他专业可参考就业发展规划以外的内容</p>
           <p>本文档11章节11子文档，共8.1万余字</p>
         </div>
         <div class="hero__actions">
-          <button class="hero__btn hero__btn--primary" @click="emit('onGoDest')">
-            <span>目的地</span>
-            <span class="hero__btn-arrow">→</span>
-          </button>
-          <button class="hero__btn hero__btn--secondary" @click="emit('onOpenApi')">
-            配置 API
-          </button>
+          <!-- 夜间 zzz：zenless-ui 按钮 -->
+          <template v-if="theme.isZzz">
+            <z-button type="primary" size="large" @click="emit('onGoDest')">目的地</z-button>
+            <z-button size="large" @click="emit('onOpenApi')">配置 API</z-button>
+          </template>
+          <!-- 日间 ak：原版按钮 -->
+          <template v-else>
+            <button class="hero__btn hero__btn--primary" @click="emit('onGoDest')">
+              <span>目的地</span>
+              <span class="hero__btn-arrow">→</span>
+            </button>
+            <button class="hero__btn hero__btn--secondary" @click="emit('onOpenApi')">
+              配置 API
+            </button>
+          </template>
         </div>
       </div>
 
@@ -44,9 +53,14 @@
 </template>
 
 <script setup lang="ts">
+import { useThemeStore } from '@/stores/themeStore';
+
 defineProps<{
   characterImage: string;
+  gradeSubtitle?: string;
 }>();
+
+const theme = useThemeStore();
 
 const emit = defineEmits<{
   onGoDest: [];
@@ -131,6 +145,15 @@ const emit = defineEmits<{
   font-size: 14px;
   line-height: 1.6;
   color: var(--text-secondary);
+}
+
+.hero__intro--grade {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--amber);
+  letter-spacing: 1px;
+  margin-bottom: 4px;
 }
 
 .hero__intro--mid {

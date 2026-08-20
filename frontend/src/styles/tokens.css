@@ -1,10 +1,10 @@
 /* 设计 Token — 绝区零（ZZZ）风格设计系统 */
 :root {
-  /* 背景层级 — 纯黑/深灰 */
-  --bg-primary: #0A0A0A;
-  --bg-panel: #121212;
-  --bg-panel-2: #1A1A1A;
-  --bg-panel-3: #2A2A2A;
+  /* 背景层级 — 炭灰（对齐 zenless-ui 官网亮度，非纯黑） */
+  --bg-primary: #101114;
+  --bg-panel: #16171B;
+  --bg-panel-2: #1D1F24;
+  --bg-panel-3: #2A2D33;
 
   /* 边框 */
   --border-subtle: #4C4C4C;
@@ -93,6 +93,17 @@
   /* 背景 — ZZZ 黑底+扫描线 */
   --bg-image: linear-gradient(135deg, #0A0A0A 0%, #121212 60%, #0A0A0A 100%);
 
+  /* 半透明毛玻璃表面（顶栏/输入坞/底栏等） — ZZZ 深色 */
+  --surface-blur: rgba(10, 10, 10, 0.92);
+  /* 卡片半透明玻璃面板 — ZZZ 深色 */
+  --card-surface: rgba(18, 18, 18, 0.72);
+  --card-surface-hover: rgba(26, 26, 26, 0.85);
+  --card-border: rgba(255, 217, 61, 0.14);
+  /* body 扫描线/光晕参数 */
+  --scanline-op: 0.015;
+  --bg-glow-1: rgba(255, 217, 61, 0.04);
+  --bg-glow-2: rgba(0, 240, 255, 0.03);
+
   /* 布局尺寸 */
   --topbar-h: 64px;
   --slogan-h: 88px;
@@ -100,6 +111,132 @@
   --sidenav-w: 208px;
   --rightpanel-w: 300px;
   --bottomtabs-h: 72px;
+}
+
+/* zenless-ui 对话框垂直置中（库默认 top:20% 偏上；抽屉/全屏模式不受影响） */
+[data-theme='zzz'] .z-modal:not(.is-drawer):not(.is-fullscreen) .z-modal__wrap {
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ============================================
+   日间模式 [data-theme="ak"] — 明日方舟风格
+   参考双魂设计 Demo：陶土红强调 + 暖灰底 + 衬线标题 + 发丝细线
+   ============================================ */
+[data-theme='ak'] {
+  /* 背景层级 — 暖灰/米白 */
+  --bg-primary: #EAEDF0;
+  --bg-panel: #E0E4E8;
+  --bg-panel-2: #F5F7FA;
+  --bg-panel-3: #FFFFFF;
+
+  /* 边框 — 发丝细线 */
+  --border-subtle: #C8D0DC;
+  --border-glow: #C8323F;
+
+  /* 主色：明日方舟标志陶土红 */
+  --accent-primary: #C8323F;
+  --accent-bright: #C8323F;
+  --accent-glow: rgba(200, 50, 63, 0.15);
+
+  /* amber 槽位统一切换为 AK 红 */
+  --amber: #C8323F;
+  --amber-deep: #A02530;
+  --amber-glow: rgba(200, 50, 63, 0.15);
+  /* 红色按钮上的文字用白 */
+  --on-amber: #FFFFFF;
+
+  /* 辅色：克制蓝 / 青绿（明日方舟操作员终端辅助色） */
+  --neon-cyan: #2A78D8;
+  --neon-cyan-glow: rgba(42, 120, 216, 0.12);
+  --neon-magenta: #00A896;
+  --neon-magenta-glow: rgba(0, 168, 150, 0.12);
+
+  /* 文本层级 — 炭黑/灰 */
+  --text-primary: #1A1D24;
+  --text-secondary: #4A5060;
+  --text-muted: #8890A0;
+  --text-link: #2A78D8;
+
+  /* 系统状态色 */
+  --success: #2E8B6F;
+  --danger: #C8323F;
+  --warning: #C8923C;
+
+  /* 半透明状态色变体 — 浅底对应浅色蒙层 */
+  --mask-light: rgba(234, 237, 240, 0.6);
+  --mask-overlay: rgba(234, 237, 240, 0.7);
+  --mask-strong: rgba(234, 237, 240, 0.85);
+  --accent-soft: rgba(200, 50, 63, 0.06);
+  --accent-mid: rgba(200, 50, 63, 0.1);
+  --accent-faint: rgba(200, 50, 63, 0.2);
+  --accent-strong: rgba(200, 50, 63, 0.3);
+  --success-soft: rgba(46, 139, 111, 0.08);
+  --success-border: rgba(46, 139, 111, 0.3);
+  --success-strong: rgba(46, 139, 111, 0.4);
+  --danger-soft: rgba(200, 50, 63, 0.06);
+  --danger-border: rgba(200, 50, 63, 0.3);
+  --amber-soft: rgba(200, 50, 63, 0.06);
+  --amber-mid: rgba(200, 50, 63, 0.12);
+  --amber-strong: rgba(200, 50, 63, 0.2);
+  --amber-halo: rgba(200, 50, 63, 0.28);
+  --amber-deep-soft: rgba(160, 37, 48, 0.05);
+  --amber-deep-mid: rgba(160, 37, 48, 0.08);
+  --amber-deep-strong: rgba(160, 37, 48, 0.14);
+  --warning-soft: rgba(200, 146, 60, 0.08);
+  --surface-glass: rgba(255, 255, 255, 0.7);
+  --shadow-deep: rgba(60, 80, 120, 0.08);
+  --on-amber-muted: rgba(255, 255, 255, 0.78);
+  --on-amber-faint: rgba(255, 255, 255, 0.68);
+
+  /* 字体 — AK 衬线标题 + 干净无衬线正文 */
+  --font-display: 'Noto Serif SC', 'Songti SC', serif;
+  --font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* AK 风格无切角，切角参数归零（clip-path polygon 自动退化为矩形） */
+  --cut-sm: 0px;
+  --cut-md: 0px;
+  --cut-lg: 0px;
+
+  /* 阴影 — 柔和、无辉光 */
+  --shadow-glow: none;
+  --shadow-card: 0 2px 12px rgba(60, 80, 120, 0.06);
+  --shadow-glow-cyan: none;
+  --shadow-glow-magenta: none;
+
+  /* 背景 — AK 暖灰底（无扫描线） */
+  --bg-image: linear-gradient(135deg, #EAEDF0 0%, #E0E4E8 60%, #EAEDF0 100%);
+
+  /* 半透明毛玻璃表面 — AK 浅色 */
+  --surface-blur: rgba(234, 237, 240, 0.9);
+  /* 卡片半透明玻璃面板 — AK 浅色玻璃 + 红描边，保证深色文字可读 */
+  --card-surface: rgba(255, 255, 255, 0.72);
+  --card-surface-hover: rgba(255, 255, 255, 0.92);
+  --card-border: rgba(200, 50, 63, 0.22);
+  /* body 扫描线关闭，光晕改为克制的红/蓝 */
+  --scanline-op: 0;
+  --bg-glow-1: rgba(200, 50, 63, 0.03);
+  --bg-glow-2: rgba(42, 120, 216, 0.02);
+}
+
+/* AK 主题：滚动条改为细线灰 */
+[data-theme='ak'] ::-webkit-scrollbar-track {
+  background: var(--bg-panel);
+}
+[data-theme='ak'] ::-webkit-scrollbar-thumb {
+  background: #B0B8C4;
+  clip-path: none;
+}
+
+/* AK 主题：暗角（vignette）增强氛围 — 置于背景层，不遮挡弹窗 */
+[data-theme='ak'] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(120, 130, 145, 0.16) 100%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 * {
@@ -120,18 +257,19 @@ body {
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
-  /* ZZZ 全局扫描线背景 */
+  /* 全局扫描线/光晕背景（参数随主题切换） */
   background-image:
     repeating-linear-gradient(
       0deg,
       transparent 0,
       transparent 2px,
-      rgba(255, 255, 255, 0.015) 2px,
-      rgba(255, 255, 255, 0.015) 4px
+      rgba(255, 255, 255, var(--scanline-op)) 2px,
+      rgba(255, 255, 255, var(--scanline-op)) 4px
     ),
-    radial-gradient(circle at 20% 0%, rgba(255, 217, 61, 0.04), transparent 50%),
-    radial-gradient(circle at 80% 100%, rgba(0, 240, 255, 0.03), transparent 50%);
+    radial-gradient(circle at 20% 0%, var(--bg-glow-1), transparent 50%),
+    radial-gradient(circle at 80% 100%, var(--bg-glow-2), transparent 50%);
   background-attachment: fixed;
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 a {

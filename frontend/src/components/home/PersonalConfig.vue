@@ -9,9 +9,20 @@
         <span class="pc__row-line" />
       </div>
       <div class="pc__btns">
-        <button class="pc__btn pc__btn--primary" @click="goCalendar">校历 <em>CALENDAR</em></button>
-        <button class="pc__btn pc__btn--secondary" @click="goProject">项目 <em>PROJECT</em></button>
-        <button class="pc__btn pc__btn--neon" @click="emit('onOpenApi')">设置 <em>SETTINGS</em></button>
+        <!-- 夜间 zzz：zenless-ui 按钮 -->
+        <template v-if="theme.isZzz">
+          <z-button type="primary" size="large" class="pc__zbtn" @click="goCalendar">校历</z-button>
+          <z-button size="large" class="pc__zbtn" @click="goProject">项目</z-button>
+          <z-button type="fire" size="large" class="pc__zbtn" @click="emit('onOpenApi')">设置</z-button>
+          <z-button v-if="userStore.isLoggedIn" size="large" class="pc__zbtn" @click="switchIdentity">切换身份</z-button>
+        </template>
+        <!-- 日间 ak：原版按钮 -->
+        <template v-else>
+          <button class="pc__btn pc__btn--primary" @click="goCalendar">校历 <em>CALENDAR</em></button>
+          <button class="pc__btn pc__btn--secondary" @click="goProject">项目 <em>PROJECT</em></button>
+          <button class="pc__btn pc__btn--neon" @click="emit('onOpenApi')">设置 <em>SETTINGS</em></button>
+          <button v-if="userStore.isLoggedIn" class="pc__btn pc__btn--secondary" @click="switchIdentity">切换身份 <em>SWITCH</em></button>
+        </template>
       </div>
     </div>
 
@@ -22,10 +33,19 @@
         <span class="pc__row-line" />
       </div>
       <div class="pc__badges">
-        <span class="pc__badge pc__badge--fire">憔悴 <em>EXHAUSTED</em></span>
-        <span class="pc__badge pc__badge--ice">迷茫 <em>LOST</em></span>
-        <span class="pc__badge pc__badge--ether">不想学了 <em>WANT TO QUIT</em></span>
-        <span class="pc__badge pc__badge--normal">求及格 <em>PASS PLEASE</em></span>
+        <!-- 夜间 zzz：zenless-ui 标签 -->
+        <template v-if="theme.isZzz">
+          <z-tag v-for="(b, i) in activeBadges" :key="i" :type="badgeType(i)">{{ b.text }}</z-tag>
+        </template>
+        <!-- 日间 ak：原版标签 -->
+        <template v-else>
+          <span
+            v-for="(b, i) in activeBadges"
+            :key="i"
+            class="pc__badge"
+            :class="badgeClass(i)"
+          >{{ b.text }} <em>{{ b.en }}</em></span>
+        </template>
       </div>
     </div>
 
@@ -40,14 +60,23 @@
         <div class="pc__col">
           <div class="pc__switch">
             <span class="pc__switch-label">登录</span>
-            <button class="pc__toggle pc__toggle--on pc__toggle--locked" disabled aria-label="登录（始终开启）">
+            <!-- 夜间 zzz：zenless-ui 开关（锁定开启） -->
+            <z-switch v-if="theme.isZzz" :model-value="true" disabled />
+            <!-- 日间 ak：原版开关 -->
+            <button v-else class="pc__toggle pc__toggle--on pc__toggle--locked" disabled aria-label="登录（始终开启）">
               <span class="pc__toggle-thumb" />
               <span class="pc__toggle-text">ON</span>
             </button>
           </div>
           <div class="pc__switch">
             <span class="pc__switch-label">轨道模式</span>
+            <z-switch
+              v-if="theme.isZzz"
+              v-model="flags.rail"
+              @change="onLaunch('rail', 'https://sr.mihoyo.com/')"
+            />
             <button
+              v-else
               class="pc__toggle"
               :class="{ 'pc__toggle--on': flags.rail }"
               @click="onLaunch('rail', 'https://sr.mihoyo.com/')"
@@ -58,7 +87,13 @@
           </div>
           <div class="pc__switch">
             <span class="pc__switch-label">项目仓库</span>
+            <z-switch
+              v-if="theme.isZzz"
+              v-model="flags.repo"
+              @change="onLaunch('repo', 'https://github.com/')"
+            />
             <button
+              v-else
               class="pc__toggle"
               :class="{ 'pc__toggle--on': flags.repo }"
               @click="onLaunch('repo', 'https://github.com/')"
@@ -71,31 +106,23 @@
 
         <!-- 中进度条 3 项 -->
         <div class="pc__col pc__col--bars">
-          <div class="pc__bar">
+          <div v-for="(bar, i) in activeBars" :key="i" class="pc__bar">
             <div class="pc__bar-head">
-              <span class="pc__bar-label">Patience</span>
-              <span class="pc__bar-val">25%</span>
+              <span class="pc__bar-label">{{ bar.label }}</span>
+              <span class="pc__bar-val" :class="barToneClass(bar.tone)">{{ bar.value }}%</span>
             </div>
-            <div class="pc__bar-track">
-              <div class="pc__bar-fill" :style="{ '--w': '25%' }" />
-            </div>
-          </div>
-          <div class="pc__bar">
-            <div class="pc__bar-head">
-              <span class="pc__bar-label">Accuracy</span>
-              <span class="pc__bar-val pc__bar-val--red">2%</span>
-            </div>
-            <div class="pc__bar-track">
-              <div class="pc__bar-fill pc__bar-fill--red" :style="{ '--w': '2%' }" />
-            </div>
-          </div>
-          <div class="pc__bar">
-            <div class="pc__bar-head">
-              <span class="pc__bar-label">Authenticity</span>
-              <span class="pc__bar-val pc__bar-val--green">92%</span>
-            </div>
-            <div class="pc__bar-track">
-              <div class="pc__bar-fill pc__bar-fill--green" :style="{ '--w': '92%' }" />
+            <!-- 夜间 zzz：zenless-ui 进度条 / 日间 ak：原版 -->
+            <z-progress
+              v-if="theme.isZzz"
+              :percent="bar.value"
+              :color="bar.tone === 'red' ? 'danger' : bar.tone === 'green' ? 'success' : undefined"
+            />
+            <div v-else class="pc__bar-track">
+              <div
+                class="pc__bar-fill"
+                :class="{ 'pc__bar-fill--red': bar.tone === 'red', 'pc__bar-fill--green': bar.tone === 'green' }"
+                :style="{ '--w': bar.value + '%' }"
+              />
             </div>
           </div>
         </div>
@@ -104,7 +131,9 @@
         <div class="pc__col">
           <div class="pc__switch">
             <span class="pc__switch-label">调制模式</span>
+            <z-switch v-if="theme.isZzz" v-model="flags.mod" />
             <button
+              v-else
               class="pc__toggle"
               :class="{ 'pc__toggle--on': flags.mod }"
               @click="toggle('mod')"
@@ -115,7 +144,9 @@
           </div>
           <div class="pc__switch">
             <span class="pc__switch-label">知识检索RAG</span>
+            <z-switch v-if="theme.isZzz" v-model="flags.rag" />
             <button
+              v-else
               class="pc__toggle"
               :class="{ 'pc__toggle--on': flags.rag }"
               @click="toggle('rag')"
@@ -126,7 +157,9 @@
           </div>
           <div class="pc__switch">
             <span class="pc__switch-label">网站设置</span>
+            <z-switch v-if="theme.isZzz" v-model="flags.settings" @click="onSettingsClick" />
             <button
+              v-else
               ref="settingsBtn"
               class="pc__toggle"
               :class="{ 'pc__toggle--on': flags.settings }"
@@ -135,20 +168,16 @@
               <span class="pc__toggle-thumb" />
               <span class="pc__toggle-text">{{ flags.settings ? 'ON' : 'OFF' }}</span>
             </button>
-            <Teleport to="body">
-              <div v-if="showSettingsAlert" class="pc__alert-mask" @click.self="closeAlert">
-                <div class="pc__alert" role="dialog" aria-modal="true">
-                  <button class="pc__alert-close" aria-label="关闭" @click="closeAlert">×</button>
-                  <p>你想设置什么？</p>
-                  <p>你想设置什么！</p>
-                  <p>想要就找我发源代码</p>
-                </div>
-              </div>
-            </Teleport>
           </div>
           <div class="pc__switch">
             <span class="pc__switch-label">区域探索</span>
+            <z-switch
+              v-if="theme.isZzz"
+              v-model="flags.area"
+              @change="onLaunch('area', 'https://ys.mihoyo.com/')"
+            />
             <button
+              v-else
               class="pc__toggle pc__toggle--locked"
               :class="{ 'pc__toggle--on': flags.area }"
               @click="onLaunch('area', 'https://ys.mihoyo.com/')"
@@ -160,17 +189,71 @@
         </div>
       </div>
     </div>
+
+    <!-- 网站设置弹窗：Teleport 到 body，避免父级 .hud-fade-in 的 transform 破坏 z-modal 的 position:fixed 上下文 -->
+    <Teleport v-if="theme.isZzz && showSettingsAlert" to="body">
+      <z-modal
+        v-model="showSettingsAlert"
+        title="网站设置 · SETTINGS"
+        :show-footer="false"
+        @close="closeAlert"
+      >
+        <p class="pc__alert-line">你想设置什么？</p>
+        <p class="pc__alert-line">你想设置什么！</p>
+        <p class="pc__alert-line pc__alert-line--dim">想要就找我发源代码</p>
+      </z-modal>
+    </Teleport>
+    <Teleport v-else to="body">
+      <div v-if="showSettingsAlert" class="pc__alert-mask" @click.self="closeAlert">
+        <div class="pc__alert" role="dialog" aria-modal="true">
+          <button class="pc__alert-close" aria-label="关闭" @click="closeAlert">×</button>
+          <p>你想设置什么？</p>
+          <p>你想设置什么！</p>
+          <p>想要就找我发源代码</p>
+        </div>
+      </div>
+    </Teleport>
   </section>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import SectionHeader from './SectionHeader.vue';
+import { useThemeStore } from '@/stores/themeStore';
+import { useUserStore } from '@/stores/userStore';
+import { gradeBadges, gradeBars, type GradeBar } from '@/data/gradeContent';
 
 const router = useRouter();
+const theme = useThemeStore();
+const userStore = useUserStore();
 
 const emit = defineEmits<{ onOpenApi: [] }>();
+
+// ---- 年级驱动的情绪标签 / 进度条 ----
+const DEFAULT_GRADE = 1; // 游客默认展示大一文案
+
+const activeGrade = computed(() => userStore.user?.grade ?? DEFAULT_GRADE);
+
+const activeBadges = computed(() => gradeBadges[activeGrade.value] ?? gradeBadges[DEFAULT_GRADE]);
+
+const activeBars = computed<GradeBar[]>(() => gradeBars[activeGrade.value] ?? gradeBars[DEFAULT_GRADE]);
+
+// zzz 主题标签色循环
+function badgeType(i: number): string | undefined {
+  return ['fire', 'ice', 'ether', undefined][i % 4];
+}
+
+// ak 主题标签 class 循环
+function badgeClass(i: number): string {
+  return ['pc__badge--fire', 'pc__badge--ice', 'pc__badge--ether', 'pc__badge--normal'][i % 4];
+}
+
+function barToneClass(tone?: string): string {
+  if (tone === 'red') return 'pc__bar-val--red';
+  if (tone === 'green') return 'pc__bar-val--green';
+  return '';
+}
 
 const flags = reactive({
   rail: false,
@@ -191,6 +274,11 @@ function goProject() {
   window.open('https://tralis2671.feishu.cn/wiki/FCATwwKbziiC7zkAL64cl3EXnCf', '_blank', 'noopener');
 }
 
+function switchIdentity() {
+  userStore.logout();
+  router.push('/login');
+}
+
 // 跳转类开关：跳完后 ~600ms 自动回弹关闭
 function onLaunch(key: 'rail' | 'repo' | 'area', url: string) {
   flags[key] = true;
@@ -202,7 +290,11 @@ function onLaunch(key: 'rail' | 'repo' | 'area', url: string) {
 
 function toggle(key: 'mod' | 'rag' | 'settings') {
   flags[key] = !flags[key];
-  if (key === 'settings' && flags.settings) {
+}
+
+// z-switch 点击直接弹窗（click 在 checkbox toggle 之前触发，flags.settings 还是旧值）
+function onSettingsClick() {
+  if (!flags.settings) {
     showSettingsAlert.value = true;
   }
 }
@@ -256,6 +348,17 @@ function closeAlert() {
   display: flex;
   gap: 14px;
   flex-wrap: wrap;
+}
+
+/* zenless-ui 按钮在按钮行内平铺 */
+.pc__zbtn {
+  flex: 1;
+  min-width: 160px;
+}
+
+/* zenless-ui 进度条与原版轨道等高 */
+.pc__col--bars :deep(.z-progress__track) {
+  height: 10px;
 }
 
 .pc__btn {
@@ -526,6 +629,19 @@ function closeAlert() {
 }
 
 /* ---- 弹窗 ---- */
+/* z-modal 内容排版 */
+.pc__alert-line {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-primary);
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+.pc__alert-line--dim {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
 .pc__alert-mask {
   position: fixed;
   inset: 0;

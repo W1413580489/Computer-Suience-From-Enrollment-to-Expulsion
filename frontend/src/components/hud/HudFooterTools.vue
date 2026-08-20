@@ -12,6 +12,16 @@
         <span>{{ item.label }}</span>
       </button>
     </div>
+    <div class="ext-system__icp">
+      <a
+        href="https://beian.miit.gov.cn"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="ext-system__icp-link"
+      >
+        闽ICP备2026031193号-1
+      </a>
+    </div>
   </nav>
 </template>
 
@@ -73,6 +83,23 @@ const emit = defineEmits<{ onItemClick: [item: FooterToolItem] }>();
 
 .ext-system__item:hover .ext-system__dot {
   opacity: 1;
+}
+
+.ext-system__icp {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.ext-system__icp-link {
+  font-size: 14.4px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 200ms;
+}
+
+.ext-system__icp-link:hover {
+  color: var(--amber);
 }
 
 @media (max-width: 767px) {

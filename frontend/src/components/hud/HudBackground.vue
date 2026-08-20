@@ -5,6 +5,8 @@
     <div class="hud-background__glow hud-background__glow--br" />
     <!-- 克制的几何线条 — 城市视觉包装 -->
     <div class="hud-background__lines" />
+    <!-- ZZZ 专属：青柠斜向警示条纹底纹（仅夜间显示） -->
+    <div class="hud-background__stripes" />
   </div>
 </template>
 
@@ -43,12 +45,12 @@
   opacity: 0.3;
 }
 
-/* 几何线条 — 城市建筑感，非科技网格 */
+/* 几何线条 — 城市建筑感，非科技网格（颜色随主题切换） */
 .hud-background__lines {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, transparent 0%, transparent 70%, rgba(255, 217, 61, 0.04) 100%),
+    linear-gradient(180deg, transparent 0%, transparent 70%, var(--bg-glow-1) 100%),
     repeating-linear-gradient(
       90deg,
       transparent 0,
@@ -58,5 +60,23 @@
     );
   mask-image: radial-gradient(ellipse at center, black 40%, transparent 85%);
   -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 85%);
+}
+
+/* ZZZ 斜向警示条纹 — zenless-ui 官网同款底纹，日间隐藏 */
+.hud-background__stripes {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent 0,
+    transparent 22px,
+    rgba(201, 255, 11, 0.04) 22px,
+    rgba(201, 255, 11, 0.04) 24px
+  );
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 90%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 90%);
+}
+[data-theme='ak'] .hud-background__stripes {
+  display: none;
 }
 </style>

@@ -83,4 +83,32 @@ const nav = useNavStore();
   text-align: center;
   padding: 32px 0;
 }
+
+@media (max-width: 767px) {
+  .changelog {
+    gap: 10px;
+  }
+  .changelog__entry {
+    padding: 12px 14px;
+  }
+  .changelog__header {
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .changelog__version {
+    font-size: 13px;
+  }
+  .changelog__date {
+    font-size: 11px;
+  }
+  .changelog__item {
+    font-size: 14px;
+    line-height: 1.6;
+    padding-left: 16px;
+  }
+  .changelog__item::before {
+    font-size: 14px;
+  }
+}
 </style>

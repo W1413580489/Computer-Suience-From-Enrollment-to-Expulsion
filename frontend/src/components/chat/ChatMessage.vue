@@ -13,28 +13,81 @@
       </div>
 
       <div v-if="message.citations?.length" class="msg__citations">
-        <ChatCitationCard v-for="c in message.citations" :key="c.id" :citation="c" />
+        <!-- 夜间 zzz：zenless-ui 折叠面板 -->
+        <z-collapse v-if="theme.isZzz" v-model="citationsExpanded" class="msg__zcite">
+          <z-collapse-item :name="'cite'">
+            <template #title>
+              <NeonIcon name="doc" :size="14" />
+              <span class="msg__citations-label">参考来源（{{ message.citations.length }}）</span>
+            </template>
+            <div class="msg__citations-list">
+              <ChatCitationCard v-for="c in message.citations" :key="c.id" :citation="c" />
+            </div>
+          </z-collapse-item>
+        </z-collapse>
+        <!-- 日间 ak：原版折叠 -->
+        <template v-else>
+          <button
+            class="msg__citations-toggle"
+            :aria-expanded="citationsExpanded"
+            @click="citationsExpanded = !citationsExpanded"
+          >
+            <NeonIcon name="doc" :size="14" />
+            <span class="msg__citations-label">参考来源（{{ message.citations.length }}）</span>
+            <NeonIcon
+              name="arrow-right"
+              :size="14"
+              class="msg__citations-arrow"
+              :class="{ 'msg__citations-arrow--open': citationsExpanded }"
+            />
+          </button>
+          <div v-show="citationsExpanded" class="msg__citations-list">
+            <ChatCitationCard v-for="c in message.citations" :key="c.id" :citation="c" />
+          </div>
+        </template>
       </div>
 
       <div v-if="message.role === 'assistant' && !message.streaming && (message.content || message.error)" class="msg__actions">
-        <button
-          class="msg__action"
-          :class="{ 'msg__action--up': message.feedback === 'up' }"
-          aria-label="点赞"
-          :disabled="message.feedback != null"
-          @click="emit('onFeedback', 'up')"
-        >
-          <NeonIcon name="thumb-up" :size="18" />
-        </button>
-        <button
-          class="msg__action"
-          :class="{ 'msg__action--down': message.feedback === 'down' }"
-          aria-label="点踩"
-          :disabled="message.feedback != null"
-          @click="emit('onFeedback', 'down')"
-        >
-          <NeonIcon name="thumb-down" :size="18" />
-        </button>
+        <!-- 夜间 zzz：zenless-ui 按钮 -->
+        <template v-if="theme.isZzz">
+          <z-button
+            size="mini"
+            :type="message.feedback === 'up' ? 'primary' : 'default'"
+            :disabled="message.feedback != null"
+            @click="emit('onFeedback', 'up')"
+          >
+            <NeonIcon name="thumb-up" :size="16" />
+          </z-button>
+          <z-button
+            size="mini"
+            :type="message.feedback === 'down' ? 'fire' : 'default'"
+            :disabled="message.feedback != null"
+            @click="emit('onFeedback', 'down')"
+          >
+            <NeonIcon name="thumb-down" :size="16" />
+          </z-button>
+        </template>
+        <!-- 日间 ak：原版按钮 -->
+        <template v-else>
+          <button
+            class="msg__action"
+            :class="{ 'msg__action--up': message.feedback === 'up' }"
+            aria-label="点赞"
+            :disabled="message.feedback != null"
+            @click="emit('onFeedback', 'up')"
+          >
+            <NeonIcon name="thumb-up" :size="18" />
+          </button>
+          <button
+            class="msg__action"
+            :class="{ 'msg__action--down': message.feedback === 'down' }"
+            aria-label="点踩"
+            :disabled="message.feedback != null"
+            @click="emit('onFeedback', 'down')"
+          >
+            <NeonIcon name="thumb-down" :size="18" />
+          </button>
+        </template>
         <span v-if="message.feedback" class="msg__feedback-done">
           {{ message.feedback === 'up' ? '已点赞' : '已反馈，感谢' }}
         </span>
@@ -44,10 +97,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import NeonIcon from '@/components/common/NeonIcon.vue';
 import ChatCursor from '@/components/chat/ChatCursor.vue';
 import ChatCitationCard from '@/components/chat/ChatCitationCard.vue';
+import { useThemeStore } from '@/stores/themeStore';
 import type { ChatMessage } from '@/types/nav';
 
 const props = defineProps<{ message: ChatMessage }>();
@@ -55,6 +109,11 @@ const emit = defineEmits<{
   onFeedback: [value: 'up' | 'down'];
   onOpenSettings: [];
 }>();
+
+const theme = useThemeStore();
+
+// 参考来源默认折叠，点击展开（避免来源列表占满屏幕）
+const citationsExpanded = ref(false);
 
 // Key 失效类错误提示去设置页（FR-BY-08）
 const showKeyFixHint = computed(
@@ -120,11 +179,47 @@ const showKeyFixHint = computed(
 }
 
 .msg__citations {
+  border-top: 1px dashed var(--border-subtle);
+  padding-top: 8px;
+}
+
+.msg__citations-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 4px 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 200ms;
+}
+
+.msg__citations-toggle:hover {
+  color: var(--accent-primary);
+}
+
+.msg__citations-label {
+  flex: 1;
+  text-align: left;
+}
+
+.msg__citations-arrow {
+  transition: transform 200ms ease;
+  transform: rotate(90deg);
+}
+
+.msg__citations-arrow--open {
+  transform: rotate(-90deg);
+}
+
+.msg__citations-list {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  border-top: 1px dashed var(--border-subtle);
-  padding-top: 8px;
+  margin-top: 6px;
 }
 
 .msg__actions {
@@ -167,6 +262,19 @@ const showKeyFixHint = computed(
 
 .msg__feedback-done {
   font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* zenless-ui 引用折叠面板 */
+.msg__zcite {
+  width: 100%;
+}
+
+.msg__zcite :deep(.z-collapse-item__title) {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
   color: var(--text-muted);
 }
 

@@ -1,5 +1,27 @@
 <template>
-  <Teleport to="body">
+  <!-- 夜间 zzz：zenless-ui 抽屉 + 菜单。Teleport 到 body，避免父级 .hud-fade-in 的 transform 破坏 z-modal 的 position:fixed 上下文 -->
+  <Teleport v-if="theme.isZzz" to="body">
+    <z-modal
+      :model-value="visible"
+      mode="drawer"
+      title="导航菜单"
+      :show-footer="false"
+      @close="emit('onClose')"
+    >
+      <z-menu :model-value="activeKey" @change="onZzzNav">
+        <z-menu-item v-for="item in items" :key="item.key" :name="item.key">
+          <span class="zzz-item">
+            <span class="zzz-item__num">{{ item.number }}</span>
+            <span class="zzz-item__label">{{ item.label }}</span>
+            <span class="zzz-item__sub">{{ item.subLabel }}</span>
+          </span>
+        </z-menu-item>
+      </z-menu>
+    </z-modal>
+  </Teleport>
+
+  <!-- 日间 ak：原版底部抽屉 -->
+  <Teleport v-else to="body">
     <Transition name="drawer">
       <div v-if="visible" class="drawer-mask" @click.self="emit('onClose')">
         <div class="drawer" role="dialog" aria-label="导航菜单">
@@ -26,13 +48,43 @@
 
 <script setup lang="ts">
 import NeonIcon from '@/components/common/NeonIcon.vue';
+import { useThemeStore } from '@/stores/themeStore';
 import type { SideMenuItem } from '@/types/nav';
 
-defineProps<{ visible: boolean; items: SideMenuItem[]; activeKey: string }>();
+const props = defineProps<{ visible: boolean; items: SideMenuItem[]; activeKey: string }>();
 const emit = defineEmits<{ onItemClick: [route: string]; onClose: [] }>();
+const theme = useThemeStore();
+
+/** z-menu change 事件：按 key 找到对应路由并跳转 */
+function onZzzNav(key: string | number) {
+  const item = props.items.find((i) => i.key === key);
+  if (item) emit('onItemClick', item.route);
+}
 </script>
 
 <style scoped>
+/* zzz 菜单项排版 */
+.zzz-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  width: 100%;
+}
+.zzz-item__num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  opacity: 0.55;
+}
+.zzz-item__label {
+  font-size: 15px;
+}
+.zzz-item__sub {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  opacity: 0.45;
+}
 .drawer-mask {
   position: fixed;
   inset: 0;

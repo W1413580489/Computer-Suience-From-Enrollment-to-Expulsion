@@ -1,5 +1,21 @@
 <template>
-  <Teleport to="body">
+  <!-- 夜间 zzz：zenless-ui 对话框。Teleport 到 body，避免父级 .hud-fade-in 的 transform 破坏 z-modal 的 position:fixed 上下文 -->
+  <Teleport v-if="theme.isZzz && visible" to="body">
+    <z-modal
+      :model-value="visible"
+      :title="title"
+      :confirm-text="confirmText || '确认'"
+      cancel-text="取消"
+      @confirm="emit('onConfirm')"
+      @cancel="emit('onCancel')"
+      @close="emit('onCancel')"
+    >
+      <p v-if="message" class="zzz-message">{{ message }}</p>
+    </z-modal>
+  </Teleport>
+
+  <!-- 日间 ak：原版样式 -->
+  <Teleport v-else to="body">
     <Transition name="modal">
       <div v-if="visible" class="modal-mask" @click.self="emit('onCancel')">
         <div class="modal" role="alertdialog" :aria-label="title" @keydown.esc="emit('onCancel')">
@@ -16,6 +32,8 @@
 </template>
 
 <script setup lang="ts">
+import { useThemeStore } from '@/stores/themeStore';
+
 defineProps<{
   visible: boolean;
   title: string;
@@ -23,9 +41,15 @@ defineProps<{
   confirmText?: string;
 }>();
 const emit = defineEmits<{ onConfirm: []; onCancel: [] }>();
+const theme = useThemeStore();
 </script>
 
 <style scoped>
+.zzz-message {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.7;
+}
 .modal-mask {
   position: fixed;
   inset: 0;

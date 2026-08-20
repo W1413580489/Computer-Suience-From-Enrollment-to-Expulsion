@@ -154,6 +154,11 @@ async def hot_questions():
     return {"ok": True, "data": _read_json(config.HOT_QUESTIONS_FILE, [])}
 
 
+@app.get("/api/glossary")
+async def glossary():
+    return _read_json(config.GLOSSARY_FILE, {})
+
+
 @app.post("/api/verify")
 async def verify(req: VerifyRequest):
     provider = (req.provider or "deepseek").lower()

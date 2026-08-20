@@ -1,5 +1,145 @@
 <template>
-  <Teleport to="body">
+  <!-- 夜间 zzz：zenless-ui 抽屉面板。Teleport 到 body，避免父级 .hud-fade-in 的 transform 破坏 z-modal 的 position:fixed 上下文 -->
+  <Teleport v-if="theme.isZzz && visible" to="body">
+    <z-modal
+      :model-value="visible"
+      mode="drawer"
+      title="设置 · BYOK"
+      :show-footer="false"
+      @close="emit('onClose')"
+    >
+    <div class="settings__body">
+      <div
+        class="settings__status-card"
+        :class="settings.hasKey ? 'settings__status-card--ok' : 'settings__status-card--warn'"
+      >
+        <span class="settings__status-dot" />
+        <div>
+          <p class="settings__status-title">
+            {{ settings.hasKey ? `已接入 ${settings.preset.label}` : '未配置 API Key' }}
+          </p>
+          <p class="settings__status-sub">
+            {{ settings.hasKey ? '不限次数提问，Key 仅保存在本浏览器' : '当前使用平台免费额度：30 次/日，5 次/分钟' }}
+          </p>
+        </div>
+      </div>
+
+      <ol v-if="!settings.hasKey" class="settings__steps">
+        <li class="settings__step">
+          <span class="settings__step-num">1</span>
+          <span>点击下方链接，打开 {{ settings.preset.label }} 开放平台</span>
+        </li>
+        <li class="settings__step">
+          <span class="settings__step-num">2</span>
+          <span>注册并创建一个新的 API Key（复制备用）</span>
+        </li>
+        <li class="settings__step">
+          <span class="settings__step-num">3</span>
+          <span>粘贴到下方输入框，点「测试连接」确认可用</span>
+        </li>
+      </ol>
+
+      <p class="settings__hint">Key 仅保存在本浏览器本地存储，不会上传到服务器保存。</p>
+
+      <div class="settings__field">
+        <span class="settings__label">模型服务商</span>
+        <!-- zenless-ui 下拉选择 -->
+        <z-select
+          :model-value="settings.provider"
+          class="settings__zctrl"
+          @change="onProviderChange"
+        >
+          <z-option
+            v-for="p in PROVIDER_PRESETS"
+            :key="p.key"
+            :value="p.key"
+            :label="p.label"
+          />
+        </z-select>
+      </div>
+
+      <div class="settings__field">
+        <span class="settings__label">API Key</span>
+        <!-- zenless-ui 密码输入框（自带明暗切换） -->
+        <z-input
+          v-model="settings.apiKey"
+          class="settings__zctrl"
+          type="password"
+          placeholder="sk-..."
+          autocomplete="off"
+          @input="settings.save()"
+        />
+      </div>
+
+      <div class="settings__field">
+        <span class="settings__label">Base URL{{ settings.provider === 'custom' ? '（必填）' : '' }}</span>
+        <z-input
+          v-model="settings.baseUrl"
+          class="settings__zctrl"
+          type="text"
+          :placeholder="settings.preset.baseUrl || 'https://your-openai-compatible-endpoint/v1'"
+          :disabled="settings.provider !== 'custom'"
+          @input="settings.save()"
+        />
+      </div>
+
+      <div class="settings__field">
+        <span class="settings__label">模型名</span>
+        <z-input
+          v-model="settings.model"
+          class="settings__zctrl"
+          type="text"
+          :placeholder="settings.preset.model || 'model-name'"
+          @input="settings.save()"
+        />
+      </div>
+
+      <div class="settings__actions settings__zactions">
+        <z-button
+          type="primary"
+          class="settings__zbtn"
+          :disabled="!settings.hasKey || verifying"
+          @click="onVerify"
+        >{{ verifying ? '验证中…' : '测试连接' }}</z-button>
+        <z-button
+          class="settings__zbtn"
+          :disabled="!settings.hasKey"
+          @click="onClear"
+        >清除 Key</z-button>
+      </div>
+
+      <p
+        v-if="verifyResult"
+        class="settings__verify"
+        :class="verifyResult.valid ? 'settings__verify--ok' : 'settings__verify--fail'"
+      >
+        {{ verifyResult.message }}
+      </p>
+
+      <div class="settings__help">
+        <a
+          v-if="settings.preset.keyHelpUrl"
+          class="settings__help-cta"
+          :href="settings.preset.keyHelpUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <NeonIcon name="external" :size="16" />
+          打开 {{ settings.preset.label }} 开放平台，免费创建 Key
+        </a>
+        <p class="settings__help-text">未配置 Key 时使用平台免费额度（30 次/日/IP），配置后不受限制。</p>
+      </div>
+
+      <p v-if="health" class="settings__status">
+        服务状态：{{ health.status === 'up' ? '在线' : '异常' }} · 知识块 {{ health.chunks }} ·
+        平台免费额度{{ health.platform_key_configured ? '已开放' : '未开放' }}
+      </p>
+    </div>
+    </z-modal>
+  </Teleport>
+
+  <!-- 日间 ak：原版右侧滑入面板 -->
+  <Teleport v-else to="body">
     <Transition name="settings">
       <div v-if="visible" class="settings-mask" @click.self="emit('onClose')">
         <aside class="settings" role="dialog" aria-label="设置">
@@ -147,12 +287,14 @@
 import { ref, watch } from 'vue';
 import NeonIcon from '@/components/common/NeonIcon.vue';
 import { PROVIDER_PRESETS, useSettingsStore } from '@/stores/settingsStore';
+import { useThemeStore } from '@/stores/themeStore';
 import { fetchHealth, verifyKey } from '@/api/client';
 
 const props = defineProps<{ visible: boolean }>();
 const emit = defineEmits<{ onClose: [] }>();
 
 const settings = useSettingsStore();
+const theme = useThemeStore();
 const verifying = ref(false);
 const verifyResult = ref<{ valid: boolean; message: string } | null>(null);
 const health = ref<{ status: string; chunks: number; platform_key_configured: boolean } | null>(null);
@@ -379,6 +521,19 @@ function onClear() {
 
 select.settings__input {
   font-family: var(--font-body);
+}
+
+/* zenless-ui 表单控件：铺满字段 */
+.settings__zctrl {
+  width: 100%;
+}
+
+.settings__zactions {
+  margin-top: 0;
+}
+
+.settings__zbtn {
+  flex: 1;
 }
 
 .settings__actions {

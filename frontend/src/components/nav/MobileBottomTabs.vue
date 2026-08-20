@@ -39,7 +39,7 @@ function isActive(route: string): boolean {
   bottom: 0;
   height: var(--bottomtabs-h);
   display: flex;
-  background: rgba(10, 10, 10, 0.92);
+  background: var(--surface-blur);
   backdrop-filter: blur(12px);
   border-top: 2px solid var(--amber);
   z-index: 50;

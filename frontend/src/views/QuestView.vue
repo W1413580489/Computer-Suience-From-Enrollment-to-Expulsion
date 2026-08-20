@@ -38,7 +38,14 @@
             <span class="level-card__num">关卡 {{ idx + 1 }}</span>
             <span class="level-card__title">{{ ch.title }}</span>
             <div class="level-card__progress">
-              <div class="level-card__bar">
+              <!-- 夜间 zzz：zenless-ui 进度条 -->
+              <z-progress
+                v-if="theme.isZzz"
+                class="level-card__zprog"
+                :percent="chapterProgress(ch.id)"
+              />
+              <!-- 日间 ak：原版进度条 -->
+              <div v-else class="level-card__bar">
                 <div class="level-card__fill" :style="{ width: chapterProgress(ch.id) + '%' }" />
               </div>
               <span>{{ chapterProgress(ch.id) }}%</span>
@@ -136,10 +143,12 @@ import QuestLogin from '@/components/quest/QuestLogin.vue';
 import { loadProgress, saveProgress } from '@/composables/useQuest';
 import { questChapters } from '@/data/questData';
 import { renderMarkdown } from '@/composables/useMarkdown';
+import { useThemeStore } from '@/stores/themeStore';
 
 type Phase = 'login' | 'levels' | 'reading';
 
 const router = useRouter();
+const theme = useThemeStore();
 const chapters = questChapters;
 const progress = reactive(loadProgress());
 const phase = ref<Phase>(progress.hasSeenIntro ? 'levels' : 'login');
@@ -316,6 +325,8 @@ function scrollToTop() {
   flex: 1; height: 4px; background: var(--bg-panel-3);
   border-radius: 2px; overflow: hidden;
 }
+/* zzz：zenless-ui 进度条占满剩余宽度 */
+.level-card__zprog { flex: 1; }
 .level-card__fill {
   height: 100%; background: var(--amber);
   border-radius: 2px; transition: width .4s ease;

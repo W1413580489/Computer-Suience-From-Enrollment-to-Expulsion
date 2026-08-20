@@ -6,8 +6,21 @@
       <div v-if="hotQuestions.length" class="msg-list__hot">
         <p class="msg-list__hot-title">高频问题</p>
         <div class="msg-list__hot-grid">
+          <!-- 夜间 zzz：zenless-ui 按钮卡片 -->
+          <z-button
+            v-for="item in hotQuestions"
+            v-if="theme.isZzz"
+            :key="item.q"
+            class="msg-list__zhot"
+            @click="emit('onAskHot', item.q)"
+          >
+            <span class="msg-list__hot-label">{{ item.label }}</span>
+            <span class="msg-list__hot-q">{{ item.q }}</span>
+          </z-button>
+          <!-- 日间 ak：原版卡片 -->
           <button
             v-for="item in hotQuestions"
+            v-if="!theme.isZzz"
             :key="item.q"
             class="msg-list__hot-card"
             @click="emit('onAskHot', item.q)"
@@ -27,11 +40,21 @@
       @on-open-settings="emit('onOpenSettings')"
     />
   </div>
+
+  <!-- 夜间 zzz：zenless-ui 回到顶部（消息列表滚动区） -->
+  <z-backtop
+    v-if="theme.isZzz"
+    :target="listEl"
+    :visible-height="300"
+    :right="20"
+    :bottom="150"
+  />
 </template>
 
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue';
 import ChatMessage from '@/components/chat/ChatMessage.vue';
+import { useThemeStore } from '@/stores/themeStore';
 import type { ChatMessage as ChatMessageType } from '@/types/nav';
 
 const props = defineProps<{
@@ -45,6 +68,7 @@ const emit = defineEmits<{
   onOpenSettings: [];
 }>();
 
+const theme = useThemeStore();
 const listEl = ref<HTMLElement | null>(null);
 
 watch(
@@ -131,6 +155,20 @@ watch(
 .msg-list__hot-q {
   font-size: 13px;
   color: var(--text-primary);
+}
+
+/* zenless-ui 高频问题按钮卡片 */
+.msg-list__zhot {
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  height: auto;
+  min-height: 64px;
+  padding: 14px 16px;
+  line-height: 1.4;
+  text-align: left;
+  white-space: normal;
 }
 
 @media (max-width: 767px) {

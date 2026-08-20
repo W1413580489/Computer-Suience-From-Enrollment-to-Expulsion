@@ -1,5 +1,30 @@
 <template>
-  <Teleport to="body">
+  <!-- 夜间 zzz：zenless-ui 对话框。Teleport 到 body，避免父级 .hud-fade-in 的 transform 破坏 z-modal 的 position:fixed 上下文 -->
+  <Teleport v-if="theme.isZzz && visible" to="body">
+    <z-modal
+      :model-value="visible"
+      title="这条回答哪里有问题？"
+      confirm-text="提交反馈"
+      cancel-text="取消"
+      @confirm="submit"
+      @cancel="emit('onCancel')"
+      @close="emit('onCancel')"
+    >
+      <div class="modal__options">
+        <z-radio
+          v-for="r in reasons"
+          :key="r"
+          v-model="selected"
+          shape="button"
+          :value="r"
+          class="modal__zradio"
+        >{{ r }}</z-radio>
+      </div>
+    </z-modal>
+  </Teleport>
+
+  <!-- 日间 ak：原版弹窗 -->
+  <Teleport v-else to="body">
     <Transition name="modal">
       <div v-if="visible" class="modal-mask" @click.self="emit('onCancel')">
         <div class="modal" role="dialog" aria-label="点踩原因">
@@ -27,9 +52,11 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { useThemeStore } from '@/stores/themeStore';
 
 const props = defineProps<{ visible: boolean }>();
 const emit = defineEmits<{ onSubmit: [reason: string]; onCancel: [] }>();
+const theme = useThemeStore();
 
 // FR-FB-02：点踩原因选项
 const reasons = ['答案错误', '未命中问题', '引用缺失', '其他'];
@@ -48,6 +75,39 @@ function submit() {
 </script>
 
 <style scoped>
+.modal__options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 4px 0 8px;
+}
+
+/* zenless-ui 单选按钮铺满格子 */
+.modal__zradio {
+  width: 100%;
+}
+
+.modal__zradio :deep(.z-radio__label) {
+  width: 100%;
+}
+.modal__option {
+  min-height: 44px;
+  padding: 0 12px;
+  clip-path: var(--clip-sm);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 13px;
+  transition: border-color 160ms, color 160ms, background 160ms;
+}
+.modal__option:hover {
+  border-color: var(--accent-primary);
+  color: var(--text-primary);
+}
+.modal__option--selected {
+  border-color: var(--accent-primary);
+  color: var(--accent-bright);
+  background: var(--accent-soft);
+}
 .modal-mask {
   position: fixed;
   inset: 0;
@@ -76,33 +136,6 @@ function submit() {
   font-weight: 600;
 }
 
-.modal__options {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.modal__option {
-  padding: 14px;
-  min-height: 52px;
-  border: 1px solid var(--border-subtle);
-  clip-path: var(--clip-sm);
-  color: var(--text-secondary);
-  font-size: 13px;
-  transition: border-color 200ms, color 200ms, background 200ms;
-}
-
-.modal__option:hover {
-  border-color: var(--accent-primary);
-  color: var(--accent-bright);
-}
-
-.modal__option--selected {
-  border-color: var(--accent-primary);
-  background: var(--bg-panel-3);
-  color: var(--accent-bright);
-}
-
 .modal__actions {
   display: flex;
   gap: 10px;
@@ -110,7 +143,7 @@ function submit() {
 
 .modal__btn {
   flex: 1;
-  min-height: 48px;
+  min-height: 44px;
   clip-path: var(--clip-sm);
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
@@ -125,11 +158,6 @@ function submit() {
 .modal__btn--primary {
   background: var(--accent-primary);
   border-color: var(--accent-primary);
-  color: #fff;
-}
-
-.modal__btn--primary:hover {
-  background: var(--accent-bright);
   color: #fff;
 }
 

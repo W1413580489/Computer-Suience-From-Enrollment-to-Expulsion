@@ -224,5 +224,27 @@ function onFeedbackReason(reason: string) {
   .hud-page {
     padding-bottom: var(--bottomtabs-h);
   }
+  /* 横幅紧凑化，释放内容区空间 */
+  .byok-banner {
+    margin: 8px auto 0;
+    width: calc(100% - 24px);
+    min-height: 48px;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+  .byok-banner__text {
+    font-size: 12px;
+  }
+  .byok-banner__text strong {
+    font-size: 13px;
+  }
+  .byok-banner__close {
+    width: 28px;
+    height: 28px;
+  }
+  .chat-disclaimer {
+    font-size: 10px;
+    padding: 4px 12px 0;
+  }
 }
 </style>

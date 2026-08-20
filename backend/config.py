@@ -15,6 +15,7 @@ CHUNKS_FILE = DATA_DIR / "chunks.jsonl"
 NAV_CONFIG_FILE = DATA_DIR / "nav_config.json"
 CHANGELOG_FILE = DATA_DIR / "changelog.json"
 HOT_QUESTIONS_FILE = DATA_DIR / "hot_questions.json"
+GLOSSARY_FILE = DATA_DIR / "glossary.json"
 
 ANSWERS_LOG = LOGS_DIR / "answers.jsonl"                   # 脱敏问答/反馈日志（FR-FB-03）
 RATELIMIT_FILE = LOGS_DIR / "ratelimit.json"               # 文件级 IP 限额计数（FR-BY-IP-04）

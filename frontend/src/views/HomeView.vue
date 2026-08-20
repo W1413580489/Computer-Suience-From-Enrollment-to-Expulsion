@@ -4,15 +4,22 @@
     <HudTopBar
       :current-route="route.path"
       :is-mobile="isMobile"
-      @on-avatar-click="settingsOpen = true"
+      @on-avatar-click="handleAvatarClick"
       @on-notification-click="go('/changelog')"
       @on-menu-click="drawerOpen = true"
     />
 
-    <main v-if="nav.loaded" class="home-main hud-fade-in">
+    <main v-if="nav.loaded" ref="homeMainEl" class="home-main hud-fade-in">
+      <!-- 硬件/其他类 黄色提示条 -->
+      <div v-if="userStore.isLoggedIn && !userStore.isSoftware" class="home-warning">
+        <span class="home-warning__icon">!</span>
+        <span>你选择的专业（{{ userStore.majorLabel }}）内容正在开发中，敬请期待</span>
+      </div>
+
       <!-- Hero：标题 + 角色主视觉 -->
       <HudCharacterCenter
         :character-image="characterImg"
+        :grade-subtitle="gradeSubtitle"
         @on-go-dest="scrollToDest"
         @on-open-api="settingsOpen = true"
       />
@@ -54,6 +61,15 @@
       @on-close="drawerOpen = false"
     />
     <SettingsDrawer :visible="settingsOpen" @on-close="settingsOpen = false" />
+
+    <!-- 夜间 zzz：zenless-ui 回到顶部（首页主滚动区） -->
+    <z-backtop
+      v-if="theme.isZzz && nav.loaded"
+      :target="homeMainEl"
+      :visible-height="400"
+      :right="24"
+      :bottom="96"
+    />
   </div>
 </template>
 
@@ -72,17 +88,28 @@ import MobileBottomTabs from '@/components/nav/MobileBottomTabs.vue';
 import NavDrawer from '@/components/nav/NavDrawer.vue';
 import SettingsDrawer from '@/components/settings/SettingsDrawer.vue';
 import { useNavStore } from '@/stores/navStore';
+import { useThemeStore } from '@/stores/themeStore';
+import { useUserStore } from '@/stores/userStore';
 import { useViewport, openExternal } from '@/composables/useViewport';
+import { heroSubtitles } from '@/data/gradeContent';
 import type { MobileTab } from '@/types/nav';
 import characterImg from '@/assets/images/character.webp';
 
 const route = useRoute();
 const router = useRouter();
 const nav = useNavStore();
+const theme = useThemeStore();
+const userStore = useUserStore();
 const { isMobile } = useViewport();
+
+const gradeSubtitle = computed(() => {
+  if (!userStore.user) return '';
+  return heroSubtitles[userStore.user.grade] ?? '';
+});
 
 const drawerOpen = ref(false);
 const settingsOpen = ref(false);
+const homeMainEl = ref<HTMLElement | null>(null);
 
 onMounted(() => {
   if (!nav.loaded) nav.load();
@@ -101,6 +128,15 @@ const mobileTabs = computed<MobileTab[]>(() => [
 
 function go(path: string) {
   router.push(path);
+}
+
+// 点击用户头像：未登录跳转登录页，已登录打开设置面板
+function handleAvatarClick() {
+  if (userStore.isLoggedIn) {
+    settingsOpen.value = true;
+  } else {
+    router.push('/login');
+  }
 }
 
 function scrollToDest() {
@@ -141,6 +177,37 @@ function onDrawerNav(path: string) {
   font-size: 14px;
   padding: 0 24px;
   text-align: center;
+}
+
+/* 警告条 */
+.home-warning {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: #f5a623;
+  color: #1a1a1a;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 5;
+}
+
+.home-warning__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  color: #f5a623;
+  font-size: 13px;
+  font-weight: 900;
+  flex-shrink: 0;
 }
 
 @media (max-width: 767px) {
