@@ -199,12 +199,12 @@ defineExpose({ refresh });
   border-bottom: 2px solid var(--amber);
 }
 
-/* AK 日间 */
+/* AK 日间：浅色玻璃卡 + 发丝红描边 + 柔和阴影，对齐其他模块 */
 .ach__ticket--ak {
-  background: rgba(255, 248, 235, 0.96);
-  border: 1px solid rgba(180, 100, 50, 0.4);
+  background: var(--card-surface);
+  border: 1px solid var(--card-border);
   border-bottom: 3px solid var(--amber-deep);
-  box-shadow: 0 4px 16px rgba(100, 60, 30, 0.15);
+  box-shadow: var(--shadow-card);
 }
 
 /* 主区 */
@@ -229,8 +229,8 @@ defineExpose({ refresh });
 }
 
 .ach__ticket--ak .ach__ticket-stub {
-  background: rgba(240, 225, 195, 0.7);
-  border-left: 2px dashed rgba(180, 100, 50, 0.5);
+  background: var(--bg-panel-3);
+  border-left: 2px dashed var(--border-subtle);
 }
 
 .ach__ticket-stub-label {
@@ -264,13 +264,20 @@ defineExpose({ refresh });
 
 .ach__badge--yellow { background: var(--amber); color: var(--on-amber); }
 .ach__badge--cyan { background: var(--neon-cyan); color: #0A0A0A; }
-.ach__badge--magenta { background: var(--neon-magenta); color: var(--text-primary); }
+.ach__badge--magenta { background: var(--neon-magenta); color: #0A0A0A; }
 .ach__badge--dark { background: var(--bg-panel-3); color: var(--text-secondary); border: 1px solid var(--border-subtle); }
 
+/* AK 日间：亮色徽章的青/青绿偏中色调，文字用白保证可读 */
+.ach__ticket--ak .ach__badge--cyan,
+.ach__ticket--ak .ach__badge--magenta {
+  color: #FFFFFF;
+}
+
+/* AK 日间：深色徽章用浅灰底板 + 发丝描边，文字为中灰 */
 .ach__ticket--ak .ach__badge--dark {
-  background: rgba(100, 60, 30, 0.12);
-  color: rgba(100, 60, 30, 0.7);
-  border: 1px solid rgba(180, 100, 50, 0.35);
+  background: var(--bg-panel-3);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
 }
 
 /* 标题 */
@@ -284,7 +291,7 @@ defineExpose({ refresh });
 }
 
 .ach__ticket--ak .ach__ticket-title {
-  color: #3A2415;
+  color: var(--text-primary);
 }
 
 /* 描述 */
@@ -300,7 +307,7 @@ defineExpose({ refresh });
 }
 
 .ach__ticket--ak .ach__ticket-desc {
-  color: rgba(80, 50, 30, 0.85);
+  color: var(--text-secondary);
 }
 
 /* 底部日期 */
@@ -317,7 +324,7 @@ defineExpose({ refresh });
 }
 
 .ach__ticket--ak .ach__ticket-date {
-  color: rgba(100, 60, 30, 0.6);
+  color: var(--text-muted);
 }
 
 /* 空槽位 */
