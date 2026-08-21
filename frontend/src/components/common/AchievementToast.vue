@@ -112,6 +112,35 @@ onUnmounted(() => {
   clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
 }
 
+/* 手机端：全宽居中，减小内边距，加显式关闭区 */
+@media (max-width: 767px) {
+  .ach-toasts {
+    top: 12px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+    width: auto;
+  }
+  .ach-toast {
+    padding: 12px 14px;
+    min-height: 56px; /* 足够大的点击区域 */
+  }
+  .ach-toast__ribbon {
+    font-size: 8px;
+    margin-bottom: 4px;
+  }
+  .ach-toast__badge {
+    padding: 3px 8px;
+    font-size: 10px;
+  }
+  .ach-toast__title {
+    font-size: 14px;
+  }
+  .ach-toast__label {
+    font-size: 9px;
+  }
+}
+
 /* AK 日间：浅色玻璃卡 + 发丝描边，对齐设计体系 */
 .ach-toast--ak {
   background: var(--card-surface);
