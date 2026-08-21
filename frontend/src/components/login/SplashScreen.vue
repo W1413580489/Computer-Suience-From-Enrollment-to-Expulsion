@@ -850,6 +850,119 @@ onUnmounted(() => {
   }
   .splash__content {
     gap: 24px;
+    padding: 24px 16px;
+  }
+  .splash__content--zzz-frame {
+    padding: 24px 16px;
+  }
+  .splash__content--ak-frame {
+    padding: 24px 16px;
+  }
+  .splash__logo--zzz,
+  .splash__logo--ak {
+    font-size: 18px;
+    letter-spacing: 2px;
+  }
+  .splash__logo-sub {
+    font-size: 9px;
+  }
+  .splash__terminal--zzz {
+    padding: 8px 10px;
+  }
+  .splash__terminal--ak {
+    padding: 12px 14px;
+  }
+  .splash__terminal-header {
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+  }
+  .splash__terminal-dot {
+    width: 6px;
+    height: 6px;
+  }
+  .splash__terminal-title {
+    font-size: 9px;
+  }
+  .splash__line {
+    font-size: 11px;
+    line-height: 1.6;
+  }
+  .splash__wave {
+    gap: 4px;
+  }
+  .splash__wave-bar {
+    width: 24px;
+  }
+  .splash__skip {
+    bottom: 16px;
+    right: 16px;
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+  .splash__guest {
+    bottom: 16px;
+    left: 16px;
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+  .splash__theme {
+    top: 16px;
+    right: 16px;
+    padding: 4px 6px;
+    gap: 4px;
+  }
+  .splash__theme-track {
+    width: 28px;
+    height: 14px;
+  }
+  .splash__theme-knob {
+    width: 10px;
+    height: 10px;
+  }
+  .splash__theme-knob--ak {
+    transform: translateX(14px);
+  }
+  .splash__theme-label {
+    font-size: 10px;
+  }
+  .splash__rain-col {
+    width: 10px;
+    font-size: 10px;
+  }
+  .splash__data-rain {
+    opacity: 0.6;
+  }
+  .splash__ak-holo-grid {
+    background-size: 40px 40px;
+  }
+  .splash__ak-file-scroll {
+    width: 140px;
+    font-size: 9px;
+  }
+  .splash__ak-corner,
+  .splash__ak-corner-inner {
+    width: 16px;
+    height: 16px;
+  }
+  .splash__ak-corner-inner--tl { top: 18px; left: 18px; }
+  .splash__ak-corner-inner--tr { top: 18px; right: 18px; }
+  .splash__ak-corner-inner--bl { bottom: 18px; left: 18px; }
+  .splash__ak-corner-inner--br { bottom: 18px; right: 18px; }
+}
+
+@media (max-width: 380px) {
+  .splash__logo--zzz,
+  .splash__logo--ak {
+    font-size: 16px;
+  }
+  .splash__line {
+    font-size: 10px;
+  }
+  .splash__data-rain {
+    display: none;
+  }
+  .splash__ak-file-scroll {
+    display: none;
   }
 }
 </style>

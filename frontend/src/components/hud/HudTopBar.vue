@@ -66,7 +66,7 @@
         <img v-if="userStore.user?.avatar" :src="userStore.user.avatar" alt="头像" class="topbar__user-avatar" />
         <NeonIcon v-else name="user" :size="18" />
         <span class="topbar__user-name">{{ userStore.user?.nickname }}</span>
-        <span class="topbar__user-badge">{{ userStore.gradeLabel }} · {{ userStore.majorLabel }}</span>
+        <span v-if="!isMobile" class="topbar__user-badge">{{ userStore.gradeLabel }} · {{ userStore.majorLabel }}</span>
       </button>
       <IdentityBadge :visible="showBadge" mode="view" @close="showBadge = false" />
 
@@ -421,6 +421,56 @@ function goNav(item: NavItem) {
   .topbar__icon-btn {
     width: 44px;
     height: 44px;
+  }
+  .topbar__brand-en {
+    font-size: 15px;
+    letter-spacing: 1px;
+  }
+  .topbar__user {
+    gap: 4px;
+    padding: 4px 8px;
+  }
+  .topbar__user-name {
+    font-size: 12px;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .topbar__user-avatar {
+    width: 24px;
+    height: 24px;
+  }
+  .theme-toggle {
+    padding: 4px 6px;
+  }
+  .theme-toggle__track {
+    width: 28px;
+    height: 14px;
+  }
+  .theme-toggle__knob {
+    width: 10px;
+    height: 10px;
+  }
+  .theme-toggle__knob--ak {
+    transform: translateX(14px);
+  }
+  .theme-toggle__label {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 380px) {
+  .topbar__brand-en {
+    font-size: 13px;
+  }
+  .topbar__user-name {
+    max-width: 60px;
+    font-size: 11px;
+  }
+  .topbar__user-avatar {
+    width: 20px;
+    height: 20px;
   }
 }
 </style>

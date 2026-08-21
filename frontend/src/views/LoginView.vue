@@ -1260,16 +1260,45 @@ function handleGuest() {
 
 @media (max-width: 767px) {
   .login {
-    padding: 16px 12px;
+    padding: 12px 10px;
+    align-items: flex-start;
+    min-height: 100vh;
   }
 
   .login__card {
-    padding: 28px 20px;
-    gap: 16px;
+    padding: 20px 16px;
+    gap: 12px;
+  }
+
+  .login__header {
+    gap: 4px;
+    margin-bottom: 0;
   }
 
   .login__title {
-    font-size: 26px;
+    font-size: 22px;
+  }
+
+  .login__subtitle {
+    font-size: 12px;
+  }
+
+  .login__field {
+    gap: 6px;
+  }
+
+  .login__label {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+  }
+
+  .login__avatar-upload {
+    width: 64px;
+    height: 64px;
+  }
+
+  .login__avatar-hint {
+    font-size: 9px;
   }
 
   .login__radio-group {
@@ -1280,9 +1309,100 @@ function handleGuest() {
     flex-wrap: wrap;
   }
 
+  .login__radio-group :deep(.z-radio) {
+    min-width: calc(50% - 3px);
+  }
+
+  .login__ak-radio {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
   .login__ak-enter {
-    font-size: 16px;
-    padding: 12px 18px;
+    font-size: 15px;
+    padding: 12px 16px;
+    letter-spacing: 3px;
+  }
+
+  .login__zenter {
+    padding: 10px 16px;
+  }
+
+  .login__guest {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  .login__note {
+    font-size: 10px;
+  }
+
+  .login__preview {
+    gap: 8px;
+  }
+
+  .login__preview-label {
+    font-size: 10px;
+  }
+
+  .login__preview-card {
+    padding: 16px 14px;
+    gap: 12px;
+  }
+
+  .login__preview-body {
+    gap: 10px;
+  }
+
+  .login__preview-avatar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .login__preview-key {
+    font-size: 9px;
+    width: 42px;
+  }
+
+  .login__preview-val {
+    font-size: 12px;
+  }
+
+  .login__tape {
+    font-size: 8px;
+    padding: 2px 6px;
+  }
+
+  .login__graffiti-circle {
+    width: 120px;
+    height: 50px;
+  }
+
+  .login__ak-data-stream {
+    display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .login__card {
+    padding: 16px 12px;
+    gap: 10px;
+  }
+
+  .login__title {
+    font-size: 20px;
+  }
+
+  .login__radio-group--4 .login__ak-radio,
+  .login__radio-group--4 :deep(.z-radio) {
+    min-width: calc(50% - 3px);
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+
+  .login__avatar-upload {
+    width: 56px;
+    height: 56px;
   }
 }
 </style>
