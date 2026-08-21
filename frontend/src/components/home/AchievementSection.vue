@@ -77,23 +77,24 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import SectionHeader from './SectionHeader.vue';
 import NeonIcon from '@/components/common/NeonIcon.vue';
 import { useThemeStore } from '@/stores/themeStore';
 import {
-  getUnlockedAchievements,
-  subscribeAchievements,
-  type AchievementDef,
-} from '@/data/achievements';
+  useAchievementStore,
+  subscribeAchievementStaleness,
+} from '@/stores/achievementStore';
 
 const theme = useThemeStore();
+const achStore = useAchievementStore();
 
-const unlocked = ref<AchievementDef[]>([]);
-const unlockedAtMap = ref<Record<string, string>>({});
 const page = ref(1);
 
 const PAGE_SIZE = 3;
+
+// 响应式：直接从 store 读取，任何地方解锁都会即时更新，无需刷新
+const unlocked = computed(() => achStore.unlocked);
 
 const totalPages = computed(() => Math.max(1, Math.ceil(unlocked.value.length / PAGE_SIZE)));
 
@@ -108,7 +109,7 @@ const emptySlots = computed(() => {
 });
 
 function formatDate(id: string): string {
-  const iso = unlockedAtMap.value[id];
+  const iso = achStore.unlockedAtMap[id];
   if (!iso) return '';
   const d = new Date(iso);
   const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -116,44 +117,25 @@ function formatDate(id: string): string {
   return `${d.getFullYear()}-${mm}-${dd}`;
 }
 
-function refresh() {
-  // 读取 localStorage 原始数据获取解锁时间
-  try {
-    const raw = localStorage.getItem('xkz_achievements');
-    if (raw) {
-      const store = JSON.parse(raw);
-      unlockedAtMap.value = Object.fromEntries(
-        Object.entries(store).map(([k, v]: [string, any]) => [k, v.unlockedAt ?? '']),
-      );
-    }
-  } catch {
-    // ignore
-  }
-  const prevCount = unlocked.value.length;
-  unlocked.value = getUnlockedAchievements();
-  // 如果新解锁了成就，回到第一页查看最新
-  if (unlocked.value.length > prevCount) {
-    page.value = 1;
-  }
-  // 防止页码越界
-  if (page.value > totalPages.value) {
-    page.value = totalPages.value;
-  }
-}
+// 新解锁时回到第一页查看最新
+watch(
+  () => achStore.unlocked.length,
+  (cur, prev) => {
+    if (cur > (prev ?? 0)) page.value = 1;
+  },
+);
 
+// 跨标签页同步
 let unsubscribe: (() => void) | null = null;
 
 onMounted(() => {
-  refresh();
-  unsubscribe = subscribeAchievements(refresh);
+  achStore.reload();
+  unsubscribe = subscribeAchievementStaleness(() => achStore.reload());
 });
 
 onUnmounted(() => {
   if (unsubscribe) unsubscribe();
 });
-
-// 暴露刷新方法供父组件触发
-defineExpose({ refresh });
 </script>
 
 <style scoped>

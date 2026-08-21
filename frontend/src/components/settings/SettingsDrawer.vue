@@ -289,7 +289,7 @@ import NeonIcon from '@/components/common/NeonIcon.vue';
 import { PROVIDER_PRESETS, useSettingsStore } from '@/stores/settingsStore';
 import { useThemeStore } from '@/stores/themeStore';
 import { fetchHealth, verifyKey } from '@/api/client';
-import { unlockAchievement } from '@/data/achievements';
+import { useAchievementStore } from '@/stores/achievementStore';
 
 const props = defineProps<{ visible: boolean }>();
 const emit = defineEmits<{ onClose: [] }>();
@@ -307,7 +307,7 @@ watch(
       verifyResult.value = null;
       health.value = await fetchHealth();
       // 成就：打开设置
-      unlockAchievement('open_settings');
+      useAchievementStore().unlock('open_settings');
     }
   },
 );
@@ -328,7 +328,7 @@ async function onVerify() {
   });
   verifying.value = false;
   // 成就：API Key 验证通过
-  if (verifyResult.value?.valid) unlockAchievement('api_key');
+  if (verifyResult.value?.valid) useAchievementStore().unlock('api_key');
 }
 
 function onClear() {

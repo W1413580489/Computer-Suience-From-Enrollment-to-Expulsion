@@ -1,4 +1,4 @@
-// 成就系统 — 数据定义 + localStorage 存储管理
+// 成就系统 — 数据定义 + localStorage 持久化层
 // 清除浏览器缓存后成就数据会消失
 
 export interface AchievementDef {
@@ -99,15 +99,16 @@ export interface AchievementRecord {
   unlockedAt: string | null; // ISO 时间戳
 }
 
-const STORAGE_KEY = 'xkz_achievements';
+export const STORAGE_KEY = 'xkz_achievements';
 
-type Store = Record<string, AchievementRecord>;
+export type AchievementData = Record<string, AchievementRecord>;
 
-function load(): Store {
+/** 读取 localStorage 持久化数据 */
+export function loadStore(): AchievementData {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      return JSON.parse(raw);
+      return JSON.parse(raw) as AchievementData;
     }
   } catch {
     // ignore
@@ -115,49 +116,11 @@ function load(): Store {
   return {};
 }
 
-function save(store: Store) {
+/** 写入 localStorage 持久化数据 */
+export function saveStore(store: AchievementData) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
   } catch {
     // ignore
   }
-}
-
-/** 获取所有已解锁成就（按解锁时间倒序） */
-export function getUnlockedAchievements(): AchievementDef[] {
-  const store = load();
-  const unlocked = ACHIEVEMENTS.filter((a) => store[a.id]?.unlocked);
-  return unlocked.sort((a, b) => {
-    const ta = store[a.id]?.unlockedAt ? new Date(store[a.id]!.unlockedAt!).getTime() : 0;
-    const tb = store[b.id]?.unlockedAt ? new Date(store[b.id]!.unlockedAt!).getTime() : 0;
-    return tb - ta;
-  });
-}
-
-/** 解锁成就（已解锁则跳过，不重复记录） */
-export function unlockAchievement(id: string): boolean {
-  const store = load();
-  if (store[id]?.unlocked) return false;
-  store[id] = {
-    id,
-    unlocked: true,
-    unlockedAt: new Date().toISOString(),
-  };
-  save(store);
-  return true;
-}
-
-/** 检查成就是否已解锁 */
-export function isAchievementUnlocked(id: string): boolean {
-  const store = load();
-  return !!store[id]?.unlocked;
-}
-
-/** 监听成就变化（localStorage 跨标签页同步） */
-export function subscribeAchievements(callback: () => void): () => void {
-  const handler = (e: StorageEvent) => {
-    if (e.key === STORAGE_KEY) callback();
-  };
-  window.addEventListener('storage', handler);
-  return () => window.removeEventListener('storage', handler);
 }

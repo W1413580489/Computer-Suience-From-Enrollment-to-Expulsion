@@ -258,7 +258,7 @@ import SectionHeader from './SectionHeader.vue';
 import { useThemeStore } from '@/stores/themeStore';
 import { useUserStore } from '@/stores/userStore';
 import { gradeBadges, gradeBars, type GradeBar } from '@/data/gradeContent';
-import { unlockAchievement } from '@/data/achievements';
+import { useAchievementStore } from '@/stores/achievementStore';
 
 const router = useRouter();
 const theme = useThemeStore();
@@ -348,7 +348,7 @@ function onModToggle() {
     if (theme.isZzz) message.success('允许开放调制模式');
     else showAkMsg('success', '允许开放调制模式');
     // 成就：第三次打开调制模式（闲得慌彩蛋）
-    unlockAchievement('control_you');
+    useAchievementStore().unlock('control_you');
     setTimeout(() => {
       showModModal.value = true;
     }, 1500);
@@ -378,8 +378,8 @@ function onLaunch(key: 'rail' | 'repo' | 'area', url: string) {
   flags[key] = true;
   window.open(url, '_blank', 'noopener');
   // 成就：轨道模式 / 区域探索
-  if (key === 'rail') unlockAchievement('rail_mode');
-  else if (key === 'area') unlockAchievement('area_explore');
+  if (key === 'rail') useAchievementStore().unlock('rail_mode');
+  else if (key === 'area') useAchievementStore().unlock('area_explore');
   setTimeout(() => {
     flags[key] = false;
   }, 800);

@@ -250,7 +250,7 @@ import { useThemeStore } from '@/stores/themeStore';
 import { useUserStore } from '@/stores/userStore';
 import type { Grade, MajorCategory } from '@/stores/userStore';
 import IdentityBadge from '@/components/login/IdentityBadge.vue';
-import { unlockAchievement } from '@/data/achievements';
+import { useAchievementStore } from '@/stores/achievementStore';
 
 const router = useRouter();
 const theme = useThemeStore();
@@ -327,7 +327,7 @@ function handleLogin() {
     avatar: avatarBase64.value || undefined,
   });
   // 成就：完成建号
-  unlockAchievement('id_card');
+  useAchievementStore().unlock('id_card');
   showBadge.value = true;
 }
 

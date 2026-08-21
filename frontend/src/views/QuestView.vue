@@ -144,7 +144,7 @@ import { loadProgress, saveProgress } from '@/composables/useQuest';
 import { questChapters } from '@/data/questData';
 import { renderMarkdown } from '@/composables/useMarkdown';
 import { useThemeStore } from '@/stores/themeStore';
-import { unlockAchievement } from '@/data/achievements';
+import { useAchievementStore } from '@/stores/achievementStore';
 
 type Phase = 'login' | 'levels' | 'reading';
 
@@ -222,7 +222,7 @@ function finishAll() {
   }
   saveProgress({ ...progress });
   // 成就：新手任务通关
-  unlockAchievement('quest_clear');
+  useAchievementStore().unlock('quest_clear');
   router.push('/');
 }
 

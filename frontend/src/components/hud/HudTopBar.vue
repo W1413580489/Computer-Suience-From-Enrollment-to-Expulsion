@@ -91,6 +91,7 @@ import IdentityBadge from '@/components/login/IdentityBadge.vue';
 import { useNavStore } from '@/stores/navStore';
 import { useThemeStore } from '@/stores/themeStore';
 import { useUserStore } from '@/stores/userStore';
+import { useAchievementStore } from '@/stores/achievementStore';
 
 const theme = useThemeStore();
 const userStore = useUserStore();
@@ -112,6 +113,7 @@ const emit = defineEmits<{
 
 const router = useRouter();
 const nav = useNavStore();
+const achStore = useAchievementStore();
 
 /* 身份工牌弹窗 */
 const showBadge = ref(false);
@@ -145,6 +147,8 @@ function goHome() {
 
 function goNav(item: NavItem) {
   if (item.url) {
+    // 成就：首次点击 Header 导航栏的 zzz 按钮跳转对应网站解锁
+    if (item.key === 'zzz') achStore.unlock('welcome_new_eridu');
     window.open(item.url, '_blank', 'noopener');
     return;
   }
