@@ -1,11 +1,9 @@
 <template>
-  <Teleport to="body">
-    <!-- ZZZ 夜间：ZModal 全屏 -->
+  <Teleport v-if="theme.isZzz && visible" to="body">
+    <!-- ZZZ 夜间：zenless-ui ZModal -->
     <z-modal
-      v-if="theme.isZzz && visible"
-      :is-visible="visible"
-      is-fullscreen
-      :show-close="false"
+      :model-value="visible"
+      :show-footer="false"
       @close="handleClose"
     >
       <div class="badge badge--zzz">
@@ -67,9 +65,11 @@
         </div>
       </div>
     </z-modal>
+  </Teleport>
 
-    <!-- AK 日间：自定义弹窗 -->
-    <div v-if="!theme.isZzz && visible" class="badge-overlay badge-overlay--ak" @click.self="handleClose">
+  <!-- AK 日间：自定义弹窗 -->
+  <Teleport v-else-if="!theme.isZzz && visible" to="body">
+    <div class="badge-overlay badge-overlay--ak" @click.self="handleClose">
       <div class="badge badge--ak">
         <!-- 左侧红色竖条 -->
         <div class="badge__left-bar" />
@@ -176,6 +176,14 @@ function handleSwitch() {
 </script>
 
 <style scoped>
+/* 隐藏 z-modal 默认头部和关闭按钮，工牌自带按钮 */
+:deep(.z-modal__header) {
+  display: none;
+}
+:deep(.z-modal__body) {
+  padding: 0;
+}
+
 /* ============================================
    通用
    ============================================ */

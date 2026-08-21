@@ -76,11 +76,20 @@
             <span class="login__label-dot" />
             专业类别
           </label>
-          <z-radio-group v-model="major" class="login__radio-group">
-            <z-radio-button value="software" size="large">软件类</z-radio-button>
-            <z-radio-button value="hardware" size="large">硬件类</z-radio-button>
-            <z-radio-button value="other" size="large">其他类</z-radio-button>
-          </z-radio-group>
+          <div class="login__radio-group">
+            <z-radio v-if="theme.isZzz" v-model="major" shape="button" value="software" size="large">软件类</z-radio>
+            <z-radio v-if="theme.isZzz" v-model="major" shape="button" value="hardware" size="large">硬件类</z-radio>
+            <z-radio v-if="theme.isZzz" v-model="major" shape="button" value="other" size="large">其他类</z-radio>
+            <template v-else>
+              <button
+                v-for="m in majorOptions"
+                :key="m.value"
+                class="login__ak-radio"
+                :class="{ 'login__ak-radio--active': major === m.value }"
+                @click="major = m.value"
+              >{{ m.label }}</button>
+            </template>
+          </div>
         </div>
 
         <!-- 年级 -->
@@ -89,12 +98,21 @@
             <span class="login__label-dot" />
             年级
           </label>
-          <z-radio-group v-model="grade" class="login__radio-group login__radio-group--4">
-            <z-radio-button :value="1" size="large">大一</z-radio-button>
-            <z-radio-button :value="2" size="large">大二</z-radio-button>
-            <z-radio-button :value="3" size="large">大三</z-radio-button>
-            <z-radio-button :value="4" size="large">大四</z-radio-button>
-          </z-radio-group>
+          <div class="login__radio-group login__radio-group--4">
+            <z-radio v-if="theme.isZzz" v-model="grade" shape="button" :value="1" size="large">大一</z-radio>
+            <z-radio v-if="theme.isZzz" v-model="grade" shape="button" :value="2" size="large">大二</z-radio>
+            <z-radio v-if="theme.isZzz" v-model="grade" shape="button" :value="3" size="large">大三</z-radio>
+            <z-radio v-if="theme.isZzz" v-model="grade" shape="button" :value="4" size="large">大四</z-radio>
+            <template v-else>
+              <button
+                v-for="g in gradeOptions"
+                :key="g.value"
+                class="login__ak-radio"
+                :class="{ 'login__ak-radio--active': grade === g.value }"
+                @click="grade = g.value"
+              >{{ g.label }}</button>
+            </template>
+          </div>
         </div>
 
         <!-- 建号按钮 -->
@@ -192,6 +210,18 @@ const avatarBase64 = ref<string>('');
 const showBadge = ref(false);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 
+const majorOptions = [
+  { value: 'software' as MajorCategory, label: '软件类' },
+  { value: 'hardware' as MajorCategory, label: '硬件类' },
+  { value: 'other' as MajorCategory, label: '其他类' },
+];
+const gradeOptions = [
+  { value: 1 as Grade, label: '大一' },
+  { value: 2 as Grade, label: '大二' },
+  { value: 3 as Grade, label: '大三' },
+  { value: 4 as Grade, label: '大四' },
+];
+
 const canEnter = computed(() => nickname.value.trim() && major.value !== null && grade.value !== null);
 
 const gradeLabel = computed(() => {
@@ -252,6 +282,7 @@ function handleBadgeClose() {
 }
 
 function handleGuest() {
+  userStore.logout();
   router.push('/?guest=1');
 }
 </script>
@@ -598,14 +629,40 @@ function handleGuest() {
   justify-content: space-between;
 }
 
-.login__radio-group :deep(.z-radio-button) {
+.login__radio-group :deep(.z-radio) {
   flex: 1;
-  justify-content: center;
+}
+
+.login__radio-group :deep(.z-radio__label) {
   font-family: var(--font-body);
 }
 
-.login__radio-group--4 :deep(.z-radio-button) {
-  max-width: none;
+/* AK 日间：自定义卡片式单选 */
+.login__ak-radio {
+  flex: 1;
+  padding: 10px 14px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-panel-2);
+  border: 1px solid var(--border-subtle);
+  border-bottom: 2px solid var(--border-subtle);
+  cursor: pointer;
+  transition: all 200ms;
+  text-align: center;
+}
+
+.login__ak-radio:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.login__ak-radio--active {
+  color: var(--amber);
+  border-color: var(--amber);
+  border-bottom-color: var(--amber);
+  background: var(--amber-soft);
 }
 
 /* ============================================
