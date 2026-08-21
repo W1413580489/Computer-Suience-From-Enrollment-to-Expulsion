@@ -39,6 +39,30 @@
       "number": "04",
       "route": "/changelog",
       "icon": "history"
+    },
+    {
+      "key": "feishu",
+      "label": "飞书",
+      "subLabel": "FEISHU",
+      "number": "05",
+      "route": "https://tralis2671.feishu.cn/wiki/VvKVwsHo2iIIC4ko0PmcKs4lnKd",
+      "icon": "doc"
+    },
+    {
+      "key": "genshin",
+      "label": "原！",
+      "subLabel": "GENSHIN",
+      "number": "06",
+      "route": "https://www.mihoyo.com/",
+      "icon": "globe"
+    },
+    {
+      "key": "galgame",
+      "label": "galgame",
+      "subLabel": "GALGAME",
+      "number": "07",
+      "route": "https://github.com/Live-GalGame/LiveGalGame",
+      "icon": "star"
     }
   ],
   "guides": [

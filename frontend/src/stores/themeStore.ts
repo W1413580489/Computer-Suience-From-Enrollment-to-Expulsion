@@ -2,6 +2,7 @@
 // 夜间 zzz = 绝区零风格（默认），日间 ak = 明日方舟风格。
 // 通过 <html data-theme="zzz|ak"> 切换 CSS 变量，持久化到 localStorage。
 import { defineStore } from 'pinia';
+import { unlockAchievement } from '@/data/achievements';
 
 export type ThemeMode = 'zzz' | 'ak';
 
@@ -37,11 +38,16 @@ export const useThemeStore = defineStore('theme', {
       this.mode = this.mode === 'zzz' ? 'ak' : 'zzz';
       this.persist();
       this.apply();
+      // 成就：切换日夜间主题
+      unlockAchievement('see_you_tomorrow');
+      if (this.mode === 'zzz') unlockAchievement('welcome_new_eridu');
     },
     set(mode: ThemeMode) {
       this.mode = mode;
       this.persist();
       this.apply();
+      // 成就：进入夜间 zzz 模式
+      if (mode === 'zzz') unlockAchievement('welcome_new_eridu');
     },
     persist() {
       try {

@@ -46,12 +46,6 @@
       @on-clear="chat.clear()"
     />
 
-    <MobileBottomTabs
-      v-if="isMobile"
-      :current-route="route.path"
-      :tabs="mobileTabs"
-      @on-tab-click="(t) => go(t.route)"
-    />
     <NavDrawer
       :visible="drawerOpen"
       :items="nav.sideMenu"
@@ -76,7 +70,6 @@ import HudTopBar from '@/components/hud/HudTopBar.vue';
 import ChatMessageList from '@/components/chat/ChatMessageList.vue';
 import ChatInputDock from '@/components/chat/ChatInputDock.vue';
 import FeedbackReasonModal from '@/components/chat/FeedbackReasonModal.vue';
-import MobileBottomTabs from '@/components/nav/MobileBottomTabs.vue';
 import NavDrawer from '@/components/nav/NavDrawer.vue';
 import SettingsDrawer from '@/components/settings/SettingsDrawer.vue';
 import NeonIcon from '@/components/common/NeonIcon.vue';
@@ -85,7 +78,7 @@ import { useChatStore } from '@/stores/chatStore';
 import { useNavStore } from '@/stores/navStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useViewport } from '@/composables/useViewport';
-import type { ChatMessage, MobileTab } from '@/types/nav';
+import type { ChatMessage } from '@/types/nav';
 
 const BANNER_LS_KEY = 'xkz_byok_banner_dismissed';
 
@@ -107,13 +100,6 @@ onMounted(async () => {
   if (!nav.loaded) nav.load();
   hotQuestions.value = await fetchHotQuestions();
 });
-
-const mobileTabs = computed<MobileTab[]>(() => [
-  { key: 'home', label: '首页', subLabel: 'HOME', icon: 'home', route: '/' },
-  { key: 'guide', label: '攻略', subLabel: 'GUIDE', icon: 'guide', route: '/guides' },
-  { key: 'chat', label: 'AI助手', subLabel: 'AI', icon: 'chat', route: '/chat' },
-  { key: 'about', label: '关于我', subLabel: 'ABOUT', icon: 'user', route: '/about' },
-]);
 
 const canRegenerate = computed(() => chat.messages.some((m) => m.role === 'user'));
 
@@ -221,9 +207,6 @@ function onFeedbackReason(reason: string) {
 }
 
 @media (max-width: 767px) {
-  .hud-page {
-    padding-bottom: var(--bottomtabs-h);
-  }
   /* 横幅紧凑化，释放内容区空间 */
   .byok-banner {
     margin: 8px auto 0;

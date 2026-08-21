@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia';
 import { askStream, sendFeedback, sha256Short } from '@/api/client';
 import { useSettingsStore } from '@/stores/settingsStore';
+import { unlockAchievement } from '@/data/achievements';
 import type { ChatMessage } from '@/types/nav';
 
 const MAX_HISTORY_ROUNDS = 6;
@@ -34,6 +35,9 @@ export const useChatStore = defineStore('chat', {
     async ask(question: string) {
       const q = question.trim();
       if (!q || this.sending) return;
+
+      // 成就：首次向 AI 提问（消耗 token）
+      unlockAchievement('token_enough');
 
       this.messages.push({ id: nextId(), role: 'user', content: q });
       const assistantMsgId = nextId();

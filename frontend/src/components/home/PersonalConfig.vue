@@ -131,12 +131,12 @@
         <div class="pc__col">
           <div class="pc__switch">
             <span class="pc__switch-label">调制模式</span>
-            <z-switch v-if="theme.isZzz" v-model="flags.mod" />
+            <z-switch v-if="theme.isZzz" v-model="flags.mod" @change="onModToggle" />
             <button
               v-else
               class="pc__toggle"
               :class="{ 'pc__toggle--on': flags.mod }"
-              @click="toggle('mod')"
+              @click="onModToggle"
             >
               <span class="pc__toggle-thumb" />
               <span class="pc__toggle-text">{{ flags.mod ? 'ON' : 'OFF' }}</span>
@@ -213,20 +213,57 @@
         </div>
       </div>
     </Teleport>
+
+    <!-- 日间 ak：自定义 message 浮层 -->
+    <Teleport v-if="!theme.isZzz" to="body">
+      <Transition name="pc-msg">
+        <div v-if="akMsg.visible" class="pc__msg" :class="`pc__msg--${akMsg.type}`">
+          <span class="pc__msg-icon">{{ akMsg.type === 'error' ? '✕' : akMsg.type === 'warning' ? '!' : '✓' }}</span>
+          <span class="pc__msg-text">{{ akMsg.text }}</span>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- 全屏 Modal：第三次打开调制模式后显示 -->
+    <!-- 夜间 zzz：zenless-ui 居中弹窗 -->
+    <Teleport v-if="theme.isZzz" to="body">
+      <z-modal
+        v-model="showModModal"
+        title="闲得慌 · BORED"
+        :show-footer="false"
+        @close="showModModal = false"
+      >
+        <p class="pc__modal-text">你真是一个闲的慌的人。。。。</p>
+      </z-modal>
+    </Teleport>
+    <!-- 日间 ak：自定义全屏模态 -->
+    <Teleport v-else to="body">
+      <Transition name="pc-modal">
+        <div v-if="showModModal" class="pc__fullscreen" @click="showModModal = false">
+          <div class="pc__fullscreen-inner" @click.stop>
+            <button class="pc__fullscreen-close" aria-label="关闭" @click="showModModal = false">×</button>
+            <p class="pc__fullscreen-text">你真是一个闲的慌的人。。。。</p>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useMessage } from 'zenless-ui';
 import SectionHeader from './SectionHeader.vue';
 import { useThemeStore } from '@/stores/themeStore';
 import { useUserStore } from '@/stores/userStore';
 import { gradeBadges, gradeBars, type GradeBar } from '@/data/gradeContent';
+import { unlockAchievement } from '@/data/achievements';
 
 const router = useRouter();
 const theme = useThemeStore();
 const userStore = useUserStore();
+const message = useMessage();
 
 const emit = defineEmits<{ onOpenApi: [] }>();
 
@@ -266,6 +303,63 @@ const flags = reactive({
 
 const showSettingsAlert = ref(false);
 
+// ---- 调制模式彩蛋 ----
+const modToggleCount = ref(0);
+const showModModal = ref(false);
+const akMsg = ref<{ visible: boolean; type: 'error' | 'warning' | 'success'; text: string }>({
+  visible: false,
+  type: 'success',
+  text: '',
+});
+let akMsgTimer: ReturnType<typeof setTimeout> | null = null;
+
+/** 日间 ak 自定义 message 浮层（3 秒后自动隐藏） */
+function showAkMsg(type: 'error' | 'warning' | 'success', text: string) {
+  if (akMsgTimer) clearTimeout(akMsgTimer);
+  akMsg.value = { visible: true, type, text };
+  akMsgTimer = setTimeout(() => {
+    akMsg.value.visible = false;
+  }, 3000);
+}
+
+/** 调制模式开关联动：三次打开分别触发 error → warning → success + 全屏 Modal */
+function onModToggle() {
+  // ZZZ 模式：v-model 已更新，如果 flags.mod 为 false 说明是关闭操作，跳过
+  // AK 模式：手动设为 true 模拟打开
+  if (theme.isZzz) {
+    if (!flags.mod) return;
+  } else {
+    flags.mod = true;
+  }
+
+  modToggleCount.value++;
+  const count = modToggleCount.value;
+
+  if (count === 1) {
+    // 第一次：error「请勿再次打开！」
+    if (theme.isZzz) message.error('请勿再次打开！');
+    else showAkMsg('error', '请勿再次打开！');
+  } else if (count === 2) {
+    // 第二次：warning「建议停止打开」
+    if (theme.isZzz) message.warning('建议停止打开');
+    else showAkMsg('warning', '建议停止打开');
+  } else {
+    // 第三次：success「允许开放调制模式」→ message 结束后全屏 Modal
+    if (theme.isZzz) message.success('允许开放调制模式');
+    else showAkMsg('success', '允许开放调制模式');
+    // 成就：第三次打开调制模式（闲得慌彩蛋）
+    unlockAchievement('control_you');
+    setTimeout(() => {
+      showModModal.value = true;
+    }, 1500);
+  }
+
+  // 开关自动关闭
+  setTimeout(() => {
+    flags.mod = false;
+  }, 200);
+}
+
 function goCalendar() {
   router.push('/calendar');
 }
@@ -283,6 +377,9 @@ function switchIdentity() {
 function onLaunch(key: 'rail' | 'repo' | 'area', url: string) {
   flags[key] = true;
   window.open(url, '_blank', 'noopener');
+  // 成就：轨道模式 / 区域探索
+  if (key === 'rail') unlockAchievement('rail_mode');
+  else if (key === 'area') unlockAchievement('area_explore');
   setTimeout(() => {
     flags[key] = false;
   }, 800);
@@ -748,6 +845,191 @@ function closeAlert() {
 @media (max-width: 900px) {
   .pc__grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   放大 Message（ZZZ + AK 双端）
+   ============================================ */
+/* 夜间 zzz：全局放大 z-message */
+:deep(.z-message) {
+  font-size: 18px !important;
+  padding: 16px 32px !important;
+  min-width: 280px;
+  text-align: center;
+  font-weight: 700;
+}
+
+/* ============================================
+   z-modal 内文字排版
+   ============================================ */
+.pc__modal-text {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  letter-spacing: 1px;
+  padding: 16px 0;
+}
+
+/* ============================================
+   日间 ak 自定义 message 浮层
+   ============================================ */
+.pc__msg {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 32px;
+  background: var(--bg-panel-2);
+  border: 2px solid var(--amber);
+  clip-path: polygon(var(--cut-sm) 0, 100% 0, 100% calc(100% - var(--cut-sm)), calc(100% - var(--cut-sm)) 100%, 0 100%, 0 var(--cut-sm));
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  min-width: 280px;
+  justify-content: center;
+}
+
+.pc__msg-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 900;
+  clip-path: var(--clip-sm);
+  flex-shrink: 0;
+}
+
+.pc__msg-text {
+  letter-spacing: 0.5px;
+}
+
+.pc__msg--error {
+  border-color: var(--neon-magenta);
+  color: var(--neon-magenta);
+}
+.pc__msg--error .pc__msg-icon {
+  background: var(--neon-magenta);
+  color: var(--text-primary);
+}
+
+.pc__msg--warning {
+  border-color: var(--warning);
+  color: var(--warning);
+}
+.pc__msg--warning .pc__msg-icon {
+  background: var(--warning);
+  color: var(--ink);
+}
+
+.pc__msg--success {
+  border-color: var(--success);
+  color: var(--success);
+}
+.pc__msg--success .pc__msg-icon {
+  background: var(--success);
+  color: var(--ink);
+}
+
+/* message 进入/离开动画 */
+.pc-msg-enter-active,
+.pc-msg-leave-active {
+  transition: opacity 300ms, transform 300ms;
+}
+.pc-msg-enter-from,
+.pc-msg-leave-to {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-12px);
+}
+
+/* ============================================
+   全屏 Modal（调制模式第三次触发）
+   ============================================ */
+.pc__fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 10002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.pc__fullscreen-inner {
+  position: relative;
+  padding: 80px 60px;
+  text-align: center;
+}
+
+.pc__fullscreen-text {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--amber);
+  text-shadow: 0 0 30px var(--amber-glow);
+}
+
+.pc__fullscreen-close {
+  position: absolute;
+  top: -40px;
+  right: -20px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  line-height: 1;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+  transition: color 200ms;
+}
+
+.pc__fullscreen-close:hover {
+  color: var(--amber);
+}
+
+/* 全屏 Modal 动画 */
+.pc-modal-enter-active,
+.pc-modal-leave-active {
+  transition: opacity 400ms;
+}
+.pc-modal-enter-active .pc__fullscreen-inner,
+.pc-modal-leave-active .pc__fullscreen-inner {
+  transition: transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 400ms;
+}
+.pc-modal-enter-from,
+.pc-modal-leave-to {
+  opacity: 0;
+}
+.pc-modal-enter-from .pc__fullscreen-inner,
+.pc-modal-leave-to .pc__fullscreen-inner {
+  transform: scale(0.8);
+  opacity: 0;
+}
+
+@media (max-width: 767px) {
+  .pc__fullscreen-text {
+    font-size: 24px;
+    letter-spacing: 1px;
+  }
+  .pc__fullscreen-inner {
+    padding: 60px 24px;
   }
 }
 

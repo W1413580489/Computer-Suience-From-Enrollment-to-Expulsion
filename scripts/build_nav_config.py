@@ -14,12 +14,16 @@ BASE = Path(r"D:\gitt\2026-07-26-17-31-16\xkz-agent")
 MANIFEST = BASE / "data" / "docs_manifest.csv"
 OUT = BASE / "data" / "nav_config.json"
 
-# 侧边菜单 4 项��固定）
+# 侧边菜单（00-07，固定）
 SIDE_MENU = [
-    {"key": "guide",    "label": "攻略",     "subLabel": "GUIDE",    "number": "01", "route": "/guides",    "icon": "guide"},
-    {"key": "appendix", "label": "附录",     "subLabel": "DATABASE", "number": "02", "route": "/appendix", "icon": "database"},
-    {"key": "about",    "label": "关于我",   "subLabel": "ABOUT",    "number": "03", "route": "/about",     "icon": "user"},
+    {"key": "home",     "label": "首页",     "subLabel": "HOME",     "number": "00", "route": "/",            "icon": "home"},
+    {"key": "guide",    "label": "攻略",     "subLabel": "GUIDE",    "number": "01", "route": "/guides",     "icon": "guide"},
+    {"key": "appendix", "label": "附录",     "subLabel": "DATABASE", "number": "02", "route": "/appendix",  "icon": "database"},
+    {"key": "about",    "label": "关于我",   "subLabel": "ABOUT",    "number": "03", "route": "/about",      "icon": "user"},
     {"key": "changelog","label": "更新日志", "subLabel": "UPDATE",   "number": "04", "route": "/changelog", "icon": "history"},
+    {"key": "feishu",   "label": "飞书",     "subLabel": "FEISHU",   "number": "05", "route": "https://tralis2671.feishu.cn/wiki/VvKVwsHo2iIIC4ko0PmcKs4lnKd", "icon": "doc"},
+    {"key": "genshin",  "label": "原！",     "subLabel": "GENSHIN",  "number": "06", "route": "https://www.mihoyo.com/", "icon": "globe"},
+    {"key": "galgame",  "label": "galgame",  "subLabel": "GALGAME",  "number": "07", "route": "https://github.com/Live-GalGame/LiveGalGame", "icon": "star"},
 ]
 
 # 章节描述（手工补充，用于列表页）

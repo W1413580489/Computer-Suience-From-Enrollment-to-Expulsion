@@ -175,8 +175,9 @@ watch(
   .msg-list {
     padding: 14px 12px;
   }
-  .msg-list__hot-grid {
-    grid-template-columns: 1fr;
+  /* 手机端隐藏推荐问题，保障页面简洁 */
+  .msg-list__hot {
+    display: none;
   }
 }
 </style>

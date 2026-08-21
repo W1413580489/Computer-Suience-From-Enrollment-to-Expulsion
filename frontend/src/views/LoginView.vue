@@ -178,6 +178,14 @@
         <p class="login__note">数据仅保存在本浏览器，不会上传</p>
       </div>
 
+      <!-- 移动端下滑提示 -->
+      <div class="login__scroll-hint">
+        <span class="login__scroll-hint-text">下滑查看工牌预览</span>
+        <svg class="login__scroll-hint-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 5v14M19 12l-7 7-7-7"/>
+        </svg>
+      </div>
+
       <!-- 右侧：工牌预览 -->
       <div class="login__preview">
         <div class="login__preview-label">
@@ -242,6 +250,7 @@ import { useThemeStore } from '@/stores/themeStore';
 import { useUserStore } from '@/stores/userStore';
 import type { Grade, MajorCategory } from '@/stores/userStore';
 import IdentityBadge from '@/components/login/IdentityBadge.vue';
+import { unlockAchievement } from '@/data/achievements';
 
 const router = useRouter();
 const theme = useThemeStore();
@@ -317,6 +326,8 @@ function handleLogin() {
     major: major.value!,
     avatar: avatarBase64.value || undefined,
   });
+  // 成就：完成建号
+  unlockAchievement('id_card');
   showBadge.value = true;
 }
 
@@ -344,13 +355,14 @@ function handleGuest() {
 }
 
 .login {
-  min-height: 100vh;
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px 16px;
-  overflow-x: hidden;
-  position: relative;
   transition: background 300ms;
 }
 
@@ -1245,6 +1257,32 @@ function handleGuest() {
 }
 
 /* ============================================
+   移动端下滑提示
+   ============================================ */
+.login__scroll-hint {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 0 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.login__scroll-hint-arrow {
+  animation: login-hint-bounce 1.6s ease-in-out infinite;
+}
+
+@keyframes login-hint-bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(4px); opacity: 1; }
+}
+
+/* ============================================
    响应式
    ============================================ */
 @media (max-width: 879px) {
@@ -1256,13 +1294,17 @@ function handleGuest() {
   .login__preview {
     width: 100%;
   }
+
+  /* 下滑提示：仅移动端可见 */
+  .login__scroll-hint {
+    display: flex;
+  }
 }
 
 @media (max-width: 767px) {
   .login {
     padding: 12px 10px;
     align-items: flex-start;
-    min-height: 100vh;
   }
 
   .login__card {

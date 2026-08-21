@@ -35,6 +35,9 @@
 
       <!-- 个人配置 -->
       <PersonalConfig @on-open-api="settingsOpen = true" />
+
+      <!-- 成就系统 -->
+      <AchievementSection />
     </main>
 
     <main v-else class="home-main home-main--loading">
@@ -47,12 +50,6 @@
     <!-- 第四视觉：外部系统（低视觉层级） -->
     <HudFooterTools :items="nav.footerTools" @on-item-click="(i) => openExternal(i.url)" />
 
-    <MobileBottomTabs
-      v-if="isMobile"
-      :current-route="route.path"
-      :tabs="mobileTabs"
-      @on-tab-click="(t) => go(t.route)"
-    />
     <NavDrawer
       :visible="drawerOpen"
       :items="nav.sideMenu"
@@ -84,7 +81,7 @@ import DestinationGrid from '@/components/home/DestinationGrid.vue';
 import AiInvitation from '@/components/home/AiInvitation.vue';
 import DataPanel from '@/components/home/DataPanel.vue';
 import PersonalConfig from '@/components/home/PersonalConfig.vue';
-import MobileBottomTabs from '@/components/nav/MobileBottomTabs.vue';
+import AchievementSection from '@/components/home/AchievementSection.vue';
 import NavDrawer from '@/components/nav/NavDrawer.vue';
 import SettingsDrawer from '@/components/settings/SettingsDrawer.vue';
 import { useNavStore } from '@/stores/navStore';
@@ -92,7 +89,6 @@ import { useThemeStore } from '@/stores/themeStore';
 import { useUserStore } from '@/stores/userStore';
 import { useViewport, openExternal } from '@/composables/useViewport';
 import { heroSubtitles } from '@/data/gradeContent';
-import type { MobileTab } from '@/types/nav';
 import characterImg from '@/assets/images/character.webp';
 
 const route = useRoute();
@@ -118,13 +114,6 @@ onMounted(() => {
 const activeKey = computed(
   () => nav.sideMenu.find((i) => (i.route === '/' ? route.path === '/' : route.path.startsWith(i.route)))?.key ?? '',
 );
-
-const mobileTabs = computed<MobileTab[]>(() => [
-  { key: 'home', label: '首页', subLabel: 'HOME', icon: 'home', route: '/' },
-  { key: 'guide', label: '攻略', subLabel: 'GUIDE', icon: 'guide', route: '/guides' },
-  { key: 'chat', label: 'AI助手', subLabel: 'AI', icon: 'chat', route: nav.chatRoute },
-  { key: 'about', label: '关于我', subLabel: 'ABOUT', icon: 'user', route: '/about' },
-]);
 
 function go(path: string) {
   router.push(path);
@@ -214,7 +203,6 @@ function onDrawerNav(path: string) {
   .hud-root {
     overflow-y: auto;
     display: block;
-    padding-bottom: var(--bottomtabs-h);
   }
 }
 </style>

@@ -26,6 +26,6 @@
   }
 
   .hud-page-body {
-    padding: 16px 16px calc(var(--bottomtabs-h) + 24px);
+    padding: 16px 16px 24px;
   }
 }

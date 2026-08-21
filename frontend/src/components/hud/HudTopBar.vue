@@ -37,8 +37,9 @@
       <!-- 夜间 zzz：zenless-ui 标签 / 日间 ak：原版标签 -->
       <z-tag v-if="!isMobile && !isHome && theme.isZzz" size="mini" class="topbar__ztag">{{ routeLabel }}</z-tag>
       <span v-else-if="!isMobile && !isHome" class="topbar__tag">{{ routeLabel }}</span>
-      <!-- 日夜间模式切换（绝区零 ↔ 明日方舟），紧邻「更新日志」铃铛 -->
+      <!-- 日夜间模式切换（手机端子页面隐藏，可从首页操作） -->
       <button
+        v-if="!isMobile || !showHome"
         class="theme-toggle"
         :aria-label="theme.isAk ? '切换到夜间模式' : '切换到日间模式'"
         :title="theme.isAk ? '切换到夜间模式 · 绝区零' : '切换到日间模式 · 明日方舟'"
@@ -49,29 +50,33 @@
         </span>
         <span class="theme-toggle__label">{{ theme.isAk ? '日' : '夜' }}</span>
       </button>
-      <!-- 更新日志：夜间 zzz 用 zenless-ui 徽标+气泡 / 日间 ak 原版 -->
-      <z-tooltip v-if="theme.isZzz" content="更新日志" placement="bottom">
+      <!-- 更新日志：夜间 zzz 用 zenless-ui 徽标+气泡 / 日间 ak 原版（手机端隐藏，可从菜单进入） -->
+      <z-tooltip v-if="theme.isZzz && !isMobile" content="更新日志" placement="bottom">
         <z-badge is-dot type="fire" class="topbar__zbadge">
           <button class="topbar__icon-btn" aria-label="更新日志" @click="emit('onNotificationClick')">
             <NeonIcon name="notification" :size="22" />
           </button>
         </z-badge>
       </z-tooltip>
-      <button v-else class="topbar__icon-btn" aria-label="更新日志" @click="emit('onNotificationClick')">
+      <button v-else-if="!isMobile" class="topbar__icon-btn" aria-label="更新日志" @click="emit('onNotificationClick')">
         <NeonIcon name="notification" :size="22" />
       </button>
 
-      <!-- 用户信息（登录后）：点击弹出身份工牌 -->
-      <button v-if="userStore.isLoggedIn" class="topbar__user" @click="showBadge = true">
+      <!-- 用户信息（登录后）：点击弹出身份工牌（手机端子页面隐藏） -->
+      <button v-if="userStore.isLoggedIn && (!isMobile || !showHome)" class="topbar__user" @click="showBadge = true">
         <img v-if="userStore.user?.avatar" :src="userStore.user.avatar" alt="头像" class="topbar__user-avatar" />
         <NeonIcon v-else name="user" :size="18" />
         <span class="topbar__user-name">{{ userStore.user?.nickname }}</span>
         <span v-if="!isMobile" class="topbar__user-badge">{{ userStore.gradeLabel }} · {{ userStore.majorLabel }}</span>
       </button>
       <IdentityBadge :visible="showBadge" mode="view" @close="showBadge = false" />
-
-      <button v-if="!userStore.isLoggedIn" class="topbar__avatar" aria-label="用户" @click="emit('onAvatarClick')">
+      <!-- 未登录头像按钮（手机端子页面隐藏） -->
+      <button v-if="!userStore.isLoggedIn && (!isMobile || !showHome)" class="topbar__avatar" aria-label="用户" @click="emit('onAvatarClick')">
         <NeonIcon name="user" :size="18" />
+      </button>
+      <!-- 电脑端菜单导航 -->
+      <button v-if="!isMobile" class="topbar__icon-btn" aria-label="菜单" @click="emit('onMenuClick')">
+        <NeonIcon name="menu" :size="22" />
       </button>
     </div>
   </header>
@@ -317,6 +322,8 @@ function goNav(item: NavItem) {
   color: var(--amber);
   font-size: 14px;
   font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: background 200ms, box-shadow 200ms;
 }
 
