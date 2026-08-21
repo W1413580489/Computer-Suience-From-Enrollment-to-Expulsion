@@ -1,6 +1,6 @@
 <template>
   <div class="login" :class="theme.isZzz ? 'login--zzz' : 'login--ak'">
-    <!-- ZZZ 夜间：装饰几何元素 -->
+    <!-- ZZZ 夜间：涂鸦装饰 + 几何元素 + CRT扫描线 -->
     <div v-if="theme.isZzz" class="login__deco">
       <span class="login__deco-diamond" />
       <span class="login__deco-diamond login__deco-diamond--2" />
@@ -8,12 +8,35 @@
       <span class="login__deco-line login__deco-line--2" />
       <span class="login__deco-dot" />
       <span class="login__deco-dot login__deco-dot--2" />
+      <!-- 涂鸦飞溅 -->
+      <span class="login__graffiti-splash login__graffiti-splash--1" />
+      <span class="login__graffiti-splash login__graffiti-splash--2" />
+      <!-- 胶带贴纸 -->
+      <span class="login__tape login__tape--1">NEW ERIDU</span>
+      <span class="login__tape login__tape--2">PROXY NET</span>
+      <!-- 手写圈标记 -->
+      <svg class="login__graffiti-circle" viewBox="0 0 200 80" fill="none">
+        <path d="M20,40 Q40,15 100,20 T180,40 Q160,65 100,60 T20,40 Z" stroke="#FFD93D" stroke-width="2" opacity="0.15" stroke-linecap="round" />
+      </svg>
+      <!-- CRT扫描线 -->
+      <div class="login__crt-overlay" />
     </div>
-    <!-- AK 日间：背景装饰 -->
+    <!-- AK 日间：档案夹底纹 + 战术装饰 -->
     <div v-else class="login__ak-bg">
       <span class="login__ak-stripe" />
       <span class="login__ak-stripe login__ak-stripe--2" />
       <span class="login__ak-diamond" />
+      <!-- 档案夹条纹底纹 -->
+      <div class="login__ak-archive-bg" />
+      <!-- 战术角标 -->
+      <span class="login__ak-tac-corner login__ak-tac-corner--tl" />
+      <span class="login__ak-tac-corner login__ak-tac-corner--br" />
+      <!-- 数据流装饰 -->
+      <div class="login__ak-data-stream">
+        <span v-for="i in 5" :key="i" class="login__ak-data-line" :style="{ animationDelay: (i * -0.5) + 's' }">
+          REC_{{ String(i).padStart(3, '0') }} :: ARCHIVE
+        </span>
+      </div>
     </div>
 
     <div class="login__layout">
@@ -22,7 +45,11 @@
         <div class="login__header">
           <z-tag v-if="theme.isZzz" type="fire" class="login__ztag">JNU INFORMATION</z-tag>
           <span v-else class="login__ak-kicker">JNU INFORMATION</span>
-          <h1 class="login__title">建号</h1>
+          <h1 v-if="theme.isZzz" class="login__title">建 号</h1>
+          <div v-else class="login__title-wrap">
+            <h1 class="login__title login__title--ak">档案初始化</h1>
+            <span class="login__title-en">ARCHIVE INITIALIZATION</span>
+          </div>
           <p class="login__subtitle">选择你的身份，开启个性化指南</p>
         </div>
 
@@ -32,7 +59,7 @@
             <span class="login__label-dot" />
             头像
           </label>
-          <div class="login__avatar-upload" @click="triggerFileInput">
+          <div class="login__avatar-upload" :class="theme.isZzz ? 'login__avatar-upload--monitor' : 'login__avatar-upload--archive'" @click="triggerFileInput">
             <img v-if="avatarBase64" :src="avatarBase64" alt="头像" class="login__avatar-img" />
             <div v-else class="login__avatar-placeholder" :class="theme.isZzz ? 'login__avatar-placeholder--zzz' : 'login__avatar-placeholder--ak'">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -41,6 +68,12 @@
               </svg>
               <span class="login__avatar-hint">点击上传</span>
             </div>
+            <!-- ZZZ 监控录制指示器 -->
+            <span v-if="theme.isZzz" class="login__rec-dot" />
+            <!-- ZZZ 监控网格叠加 -->
+            <div v-if="theme.isZzz" class="login__monitor-grid" />
+            <!-- ZZZ 扫描线 -->
+            <div v-if="theme.isZzz" class="login__monitor-scan" />
           </div>
           <input ref="fileInputRef" type="file" accept="image/*" class="login__file-input" @change="handleFileChange" />
           <button v-if="avatarBase64" class="login__avatar-remove" @click="removeAvatar">移除</button>
@@ -147,9 +180,20 @@
 
       <!-- 右侧：工牌预览 -->
       <div class="login__preview">
-        <div class="login__preview-label">工牌预览</div>
+        <div class="login__preview-label">
+          {{ theme.isZzz ? 'CH.01 // 工牌预览' : '工牌预览 // PREVIEW' }}
+        </div>
         <div class="login__preview-card" :class="theme.isZzz ? 'login__preview-card--zzz' : 'login__preview-card--ak'">
           <div v-if="theme.isZzz" class="login__preview-grid" />
+          <!-- ZZZ CRT 扫描线 -->
+          <div v-if="theme.isZzz" class="login__preview-scanline" />
+          <!-- AK 四角标记 -->
+          <template v-if="!theme.isZzz">
+            <span class="login__preview-corner login__preview-corner--tl" />
+            <span class="login__preview-corner login__preview-corner--tr" />
+            <span class="login__preview-corner login__preview-corner--bl" />
+            <span class="login__preview-corner login__preview-corner--br" />
+          </template>
           <div class="login__preview-header">
             <span v-if="theme.isZzz" class="login__preview-logo login__preview-logo--zzz">TERMINAL CONNECT</span>
             <span v-else class="login__preview-logo login__preview-logo--ak">MEMBER ARCHIVE</span>
@@ -468,6 +512,257 @@ function handleGuest() {
 
 .login--ak .login__card {
   box-shadow: 0 2px 16px rgba(60, 80, 120, 0.06);
+}
+
+/* ZZZ CRT扫描线覆盖层 */
+.login__crt-overlay {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(255, 217, 61, 0.015) 2px,
+    rgba(255, 217, 61, 0.015) 3px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 涂鸦飞溅 */
+.login__graffiti-splash {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+.login__graffiti-splash--1 {
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(255, 217, 61, 0.06) 0%, transparent 70%);
+  top: 15%;
+  right: 8%;
+}
+
+.login__graffiti-splash--2 {
+  width: 90px;
+  height: 90px;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.05) 0%, transparent 70%);
+  bottom: 20%;
+  left: 5%;
+}
+
+/* 胶带贴纸 */
+.login__tape {
+  position: absolute;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: rgba(255, 217, 61, 0.25);
+  background: rgba(255, 217, 61, 0.06);
+  padding: 3px 10px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.login__tape--1 {
+  top: 8%;
+  left: 4%;
+  transform: rotate(-8deg);
+  clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 100%, 0 100%);
+}
+
+.login__tape--2 {
+  bottom: 12%;
+  right: 6%;
+  transform: rotate(6deg);
+  color: rgba(0, 240, 255, 0.25);
+  background: rgba(0, 240, 255, 0.05);
+  clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 100%, 0 100%);
+}
+
+/* 手写圈标记 */
+.login__graffiti-circle {
+  position: absolute;
+  width: 180px;
+  height: 70px;
+  top: 40%;
+  right: 3%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ZZZ 监控风格头像 */
+.login__avatar-upload--monitor {
+  position: relative;
+  border-radius: 8px !important;
+  border: 1px solid rgba(255, 217, 61, 0.4) !important;
+  box-shadow: 0 0 16px rgba(255, 217, 61, 0.15), inset 0 0 20px rgba(0, 0, 0, 0.5) !important;
+  overflow: hidden;
+}
+
+.login__avatar-upload--archive {
+  position: relative;
+  border-radius: 2px !important;
+  border: 1px solid rgba(200, 50, 63, 0.3) !important;
+  box-shadow: 0 1px 4px rgba(200, 50, 63, 0.08) !important;
+}
+
+.login__rec-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FF3B3B;
+  box-shadow: 0 0 6px rgba(255, 59, 59, 0.8);
+  animation: login-rec-blink 1.2s ease-in-out infinite;
+  z-index: 2;
+}
+
+@keyframes login-rec-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.login__monitor-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 217, 61, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 217, 61, 0.06) 1px, transparent 1px);
+  background-size: 12px 12px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.login__monitor-scan {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(255, 217, 61, 0.08) 50%, transparent 100%);
+  background-size: 100% 8px;
+  pointer-events: none;
+  z-index: 1;
+  animation: login-monitor-scan 3s linear infinite;
+}
+
+@keyframes login-monitor-scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+/* AK 档案夹条纹底纹 */
+.login__ak-archive-bg {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    135deg,
+    transparent 0px,
+    transparent 60px,
+    rgba(200, 50, 63, 0.015) 60px,
+    rgba(200, 50, 63, 0.015) 61px
+  );
+  pointer-events: none;
+}
+
+/* AK 战术角标 */
+.login__ak-tac-corner {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border: 1px solid rgba(200, 50, 63, 0.15);
+  pointer-events: none;
+}
+
+.login__ak-tac-corner--tl {
+  top: 20px;
+  left: 20px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.login__ak-tac-corner--br {
+  bottom: 20px;
+  right: 20px;
+  border-left: none;
+  border-top: none;
+}
+
+/* AK 数据流装饰 */
+.login__ak-data-stream {
+  position: absolute;
+  right: 20px;
+  top: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: rgba(200, 50, 63, 0.12);
+  pointer-events: none;
+  overflow: hidden;
+  height: 200px;
+  mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
+}
+
+.login__ak-data-line {
+  white-space: nowrap;
+  animation: login-data-scroll 8s linear infinite;
+}
+
+@keyframes login-data-scroll {
+  0% { transform: translateY(0); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(-60px); opacity: 0; }
+}
+
+/* AK 双行标题 */
+.login__title-wrap {
+  text-align: center;
+}
+
+.login__title-en {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--amber);
+  opacity: 0.5;
+  margin-top: 2px;
+}
+
+/* AK 预览四角标记 */
+.login__preview-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 1px solid rgba(200, 50, 63, 0.3);
+  pointer-events: none;
+}
+
+.login__preview-corner--tl { top: 6px; left: 6px; border-right: none; border-bottom: none; }
+.login__preview-corner--tr { top: 6px; right: 6px; border-left: none; border-bottom: none; }
+.login__preview-corner--bl { bottom: 6px; left: 6px; border-right: none; border-top: none; }
+.login__preview-corner--br { bottom: 6px; right: 6px; border-left: none; border-top: none; }
+
+/* ZZZ 预览扫描线 */
+.login__preview-scanline {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(255, 217, 61, 0.02) 2px,
+    rgba(255, 217, 61, 0.02) 3px
+  );
+  pointer-events: none;
 }
 
 /* ============================================

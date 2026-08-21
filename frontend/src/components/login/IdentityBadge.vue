@@ -10,10 +10,15 @@
         <!-- 扫描线装饰 -->
         <div class="badge__scanline" />
         <div class="badge__grid-bg" />
+        <!-- CRT 噪点纹理 -->
+        <div class="badge__crt-noise" />
 
         <!-- 头部 -->
         <div class="badge__header badge__header--zzz">
-          <span class="badge__logo-text">TERMINAL CONNECT</span>
+          <div class="badge__header-left">
+            <span class="badge__logo-text">TERMINAL CONNECT</span>
+            <span class="badge__header-sub">PROXY ACCESS CARD</span>
+          </div>
           <span class="badge__status">● ACTIVE</span>
         </div>
 
@@ -27,20 +32,22 @@
                 <path d="M12 12a4 4 0 100-8 4 4 0 000 8zm0 2c-4 0-8 2-8 6v2h16v-2c0-4-4-6-8-6z" fill="currentColor" opacity="0.4"/>
               </svg>
             </div>
+            <!-- 监控录制指示器 -->
+            <span class="badge__rec-indicator" />
           </div>
 
           <!-- 信息区 -->
           <div class="badge__info">
-            <div class="badge__info-row">
-              <span class="badge__info-label badge__info-label--zzz">代理人</span>
+            <div class="badge__info-row badge__info-row--neon">
+              <span class="badge__info-label badge__info-label--zzz">代号</span>
               <span class="badge__info-value">{{ user?.nickname || '未知' }}</span>
             </div>
-            <div class="badge__info-row">
+            <div class="badge__info-row badge__info-row--neon">
               <span class="badge__info-label badge__info-label--zzz">等级</span>
               <span class="badge__info-value">{{ userStore.gradeLabel }}</span>
             </div>
-            <div class="badge__info-row">
-              <span class="badge__info-label badge__info-label--zzz">职业</span>
+            <div class="badge__info-row badge__info-row--neon">
+              <span class="badge__info-label badge__info-label--zzz">资质</span>
               <span class="badge__info-value">{{ userStore.majorLabel }}</span>
             </div>
             <div class="badge__info-row">
@@ -48,10 +55,18 @@
               <span class="badge__info-value badge__info-value--mono">{{ user?.uid || '---' }}</span>
             </div>
             <div class="badge__info-row">
-              <span class="badge__info-label badge__info-label--zzz">建号日期</span>
+              <span class="badge__info-label badge__info-label--zzz">注册</span>
               <span class="badge__info-value">{{ user?.createdAt || '---' }}</span>
             </div>
           </div>
+        </div>
+
+        <!-- 条形码区 -->
+        <div class="badge__barcode-area">
+          <div class="badge__barcode">
+            <span v-for="i in 30" :key="i" class="badge__barcode-bar" :style="{ width: (i % 3 === 0 ? 3 : 1) + 'px' }" />
+          </div>
+          <span class="badge__barcode-text">{{ user?.uid || 'XKZ-00000000-0000' }}</span>
         </div>
 
         <!-- 按钮区 -->
@@ -71,18 +86,25 @@
   <Teleport v-else-if="!theme.isZzz && visible" to="body">
     <div class="badge-overlay badge-overlay--ak" @click.self="handleClose">
       <div class="badge badge--ak">
-        <!-- 左侧红色竖条 -->
+        <!-- 左侧红色竖条（加粗） -->
         <div class="badge__left-bar" />
-        <!-- 四角标记 -->
+        <!-- 四角标记（双线战术风格） -->
         <span class="badge__corner badge__corner--tl" />
         <span class="badge__corner badge__corner--tr" />
         <span class="badge__corner badge__corner--bl" />
         <span class="badge__corner badge__corner--br" />
+        <span class="badge__corner-inner badge__corner-inner--tl" />
+        <span class="badge__corner-inner badge__corner-inner--tr" />
+        <span class="badge__corner-inner badge__corner-inner--bl" />
+        <span class="badge__corner-inner badge__corner-inner--br" />
 
         <!-- 头部 -->
         <div class="badge__header badge__header--ak">
-          <span class="badge__logo-text badge__logo-text--ak">MEMBER ARCHIVE</span>
-          <span class="badge__archive-id">#{{ user?.uid?.slice(-4) || '----' }}</span>
+          <div class="badge__header-left">
+            <span class="badge__logo-text badge__logo-text--ak">MEMBER ARCHIVE</span>
+            <span class="badge__header-sub badge__header-sub--ak">PERSONNEL FILE</span>
+          </div>
+          <span class="badge__archive-id">ARK-{{ user?.uid?.slice(-8) || '--------' }}</span>
         </div>
 
         <!-- 主体 -->
@@ -95,20 +117,24 @@
                 <path d="M12 12a4 4 0 100-8 4 4 0 000 8zm0 2c-4 0-8 2-8 6v2h16v-2c0-4-4-6-8-6z" fill="currentColor" opacity="0.3"/>
               </svg>
             </div>
+            <!-- 评级装饰 -->
+            <div class="badge__rating">
+              <span v-for="i in 5" :key="i" class="badge__rating-star" :class="{ 'badge__rating-star--filled': i <= (user?.grade || 1) }" />
+            </div>
           </div>
 
           <!-- 信息区 -->
           <div class="badge__info">
             <div class="badge__info-row">
-              <span class="badge__info-label badge__info-label--ak">昵称</span>
+              <span class="badge__info-label badge__info-label--ak">代号</span>
               <span class="badge__info-value">{{ user?.nickname || '未知' }}</span>
             </div>
             <div class="badge__info-row">
-              <span class="badge__info-label badge__info-label--ak">年级</span>
+              <span class="badge__info-label badge__info-label--ak">职级</span>
               <span class="badge__info-value">{{ userStore.gradeLabel }}</span>
             </div>
             <div class="badge__info-row">
-              <span class="badge__info-label badge__info-label--ak">专业</span>
+              <span class="badge__info-label badge__info-label--ak">专长</span>
               <span class="badge__info-value">{{ userStore.majorLabel }}</span>
             </div>
             <div class="badge__info-row">
@@ -116,10 +142,17 @@
               <span class="badge__info-value">{{ user?.createdAt || '---' }}</span>
             </div>
             <div class="badge__info-row">
-              <span class="badge__info-label badge__info-label--ak">身份权限</span>
-              <span class="badge__info-value">LEVEL {{ user?.grade || 1 }}</span>
+              <span class="badge__info-label badge__info-label--ak">权限等级</span>
+              <span class="badge__info-value badge__info-value--ak-level">LEVEL {{ user?.grade || 1 }}</span>
             </div>
           </div>
+        </div>
+
+        <!-- 档案编号区 -->
+        <div class="badge__archive-area">
+          <div class="badge__archive-line" />
+          <span class="badge__archive-no">FILE NO. {{ user?.uid?.replace('XKZ-', 'ARK-') || 'ARK-00000000-0000' }}</span>
+          <div class="badge__archive-line" />
         </div>
 
         <!-- 按钮区 -->
@@ -385,6 +418,101 @@ function handleSwitch() {
   border-color: #FFD93D;
 }
 
+/* ZZZ CRT 噪点纹理 */
+.badge__crt-noise {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255, 217, 61, 0.02) 0%, transparent 8%),
+    radial-gradient(circle at 70% 60%, rgba(0, 240, 255, 0.015) 0%, transparent 6%);
+  background-size: 60px 60px, 50px 50px;
+  pointer-events: none;
+  clip-path: inherit;
+}
+
+/* ZZZ 头部副标题 */
+.badge__header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.badge__header-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: rgba(255, 217, 61, 0.4);
+  text-transform: uppercase;
+}
+
+/* ZZZ 监控录制指示器 */
+.badge__rec-indicator {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FF3B3B;
+  box-shadow: 0 0 6px rgba(255, 59, 59, 0.8);
+  animation: badge-rec-blink 1.2s ease-in-out infinite;
+  z-index: 2;
+}
+
+@keyframes badge-rec-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+/* ZZZ 霓虹下划线信息行 */
+.badge__info-row--neon {
+  position: relative;
+  padding-bottom: 4px;
+}
+
+.badge__info-row--neon::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 217, 61, 0.4), transparent);
+  box-shadow: 0 0 4px rgba(255, 217, 61, 0.2);
+}
+
+/* ZZZ 条形码区 */
+.badge__barcode-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 217, 61, 0.15);
+  border-bottom: 1px solid rgba(255, 217, 61, 0.15);
+}
+
+.badge__barcode {
+  display: flex;
+  gap: 1px;
+  height: 32px;
+  align-items: center;
+}
+
+.badge__barcode-bar {
+  height: 100%;
+  background: #FFD93D;
+  opacity: 0.7;
+}
+
+.badge__barcode-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(255, 217, 61, 0.5);
+}
+
 /* ============================================
    AK 日间模式
    ============================================ */
@@ -411,8 +539,87 @@ function handleSwitch() {
   top: 0;
   left: 0;
   bottom: 0;
-  width: 3px;
+  width: 5px;
+  background: linear-gradient(180deg, #C8323F, #8B1F2A);
+  box-shadow: 1px 0 4px rgba(200, 50, 63, 0.2);
+}
+
+/* AK 双线战术角标内框 */
+.badge__corner-inner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 1px solid rgba(200, 50, 63, 0.2);
+  pointer-events: none;
+}
+
+.badge__corner-inner--tl { top: 14px; left: 18px; border-right: none; border-bottom: none; }
+.badge__corner-inner--tr { top: 14px; right: 14px; border-left: none; border-bottom: none; }
+.badge__corner-inner--bl { bottom: 14px; left: 18px; border-right: none; border-top: none; }
+.badge__corner-inner--br { bottom: 14px; right: 14px; border-left: none; border-top: none; }
+
+/* AK 头部副标题 */
+.badge__header-sub--ak {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: rgba(200, 50, 63, 0.4);
+  text-transform: uppercase;
+}
+
+/* AK 评级装饰（星级） */
+.badge__rating {
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2px;
+}
+
+.badge__rating-star {
+  width: 8px;
+  height: 8px;
+  background: rgba(200, 50, 63, 0.15);
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.badge__rating-star--filled {
   background: #C8323F;
+  box-shadow: 0 0 4px rgba(200, 50, 63, 0.4);
+}
+
+/* AK 权限等级值 */
+.badge__info-value--ak-level {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: #C8323F;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* AK 档案编号区 */
+.badge__archive-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.badge__archive-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200, 50, 63, 0.2), transparent);
+}
+
+.badge__archive-no {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: rgba(200, 50, 63, 0.5);
+  white-space: nowrap;
 }
 
 .badge__corner {
