@@ -62,20 +62,30 @@
     <button class="splash__guest" @click.stop="guestBrowse">
       游客模式浏览
     </button>
+
+    <!-- 主题切换：预览日/夜间两种开屏风格 -->
+    <button class="splash__theme" @click.stop="theme.toggle()">
+      <span class="splash__theme-track">
+        <span class="splash__theme-knob" :class="{ 'splash__theme-knob--ak': theme.isAk }"></span>
+      </span>
+      <span class="splash__theme-label">{{ theme.isAk ? '日' : '夜' }}</span>
+    </button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useThemeStore } from '@/stores/themeStore';
 
 const router = useRouter();
 const theme = useThemeStore();
 
-const lines = theme.isZzz
-  ? ['连接终端中枢...', '正在验证身份凭证...', '同步角色数据...', '连接成功。欢迎回来。']
-  : ['正在加载组织成员档案...', '校验身份密钥...', '同步战术数据...', '档案加载完成。欢迎入职。'];
+const lines = computed(() =>
+  theme.isZzz
+    ? ['连接终端中枢...', '正在验证身份凭证...', '同步角色数据...', '连接成功。欢迎回来。']
+    : ['正在加载组织成员档案...', '校验身份密钥...', '同步战术数据...', '档案加载完成。欢迎入职。'],
+);
 
 const visibleLines = ref<string[]>([]);
 const currentText = ref('');
@@ -100,13 +110,14 @@ function particleStyle(i: number) {
 }
 
 function tick() {
-  if (lineIdx >= lines.length) {
+  const cur = lines.value;
+  if (lineIdx >= cur.length) {
     allDone.value = true;
     doneTimer = setTimeout(() => skipToLogin(), 600);
     if (intervalId) clearInterval(intervalId);
     return;
   }
-  const target = lines[lineIdx];
+  const target = cur[lineIdx];
   if (charIdx < target.length) {
     charIdx++;
     currentText.value = target.slice(0, charIdx);
@@ -124,6 +135,19 @@ function tick() {
     currentText.value = '';
   }
 }
+
+// 主题切换时重置打字机，重新播放新风格的文字
+watch(() => theme.mode, () => {
+  if (intervalId) clearInterval(intervalId);
+  if (doneTimer) clearTimeout(doneTimer);
+  visibleLines.value = [];
+  currentText.value = '';
+  progress.value = 0;
+  allDone.value = false;
+  lineIdx = 0;
+  charIdx = 0;
+  intervalId = setInterval(tick, 55);
+});
 
 function skipToLogin() {
   if (intervalId) clearInterval(intervalId);
@@ -446,6 +470,84 @@ onUnmounted(() => {
 
 .splash__guest:hover {
   opacity: 0.8;
+}
+
+/* 主题切换按钮 — 与 HudTopBar 风格一致 */
+.splash__theme {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 10px 0 8px;
+  border: 1px solid;
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  color: inherit;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 200ms, border-color 200ms;
+}
+
+.splash--ak .splash__theme {
+  border-color: rgba(200, 50, 63, 0.2);
+  background: rgba(200, 50, 63, 0.04);
+}
+
+.splash__theme:hover {
+  opacity: 1;
+  border-color: var(--amber);
+}
+
+.splash__theme-track {
+  position: relative;
+  width: 34px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+  transition: background 400ms;
+}
+
+.splash--ak .splash__theme-track {
+  background: rgba(200, 50, 63, 0.08);
+  border-color: rgba(200, 50, 63, 0.15);
+}
+
+.splash__theme-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  background: #FFD93D;
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  transition: transform 400ms cubic-bezier(0.4, 0, 0.2, 1), background 400ms;
+}
+
+.splash__theme-knob--ak {
+  transform: translateX(16px);
+  background: #C8323F;
+}
+
+.splash__theme-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  min-width: 12px;
+  text-align: center;
+}
+
+.splash--zzz .splash__theme-label {
+  color: #FFD93D;
+}
+
+.splash--ak .splash__theme-label {
+  color: #C8323F;
 }
 
 @media (max-width: 767px) {
