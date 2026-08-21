@@ -61,33 +61,16 @@
         <NeonIcon name="notification" :size="22" />
       </button>
 
-      <!-- 用户信息（登录后） -->
-      <div v-if="userStore.isLoggedIn" class="topbar__user-wrap" ref="userWrapRef">
-        <button class="topbar__user" @click="toggleUserMenu">
-          <span class="topbar__user-name">{{ userStore.user?.nickname }}</span>
-          <span class="topbar__user-badge">{{ userStore.gradeLabel }} · {{ userStore.majorLabel }}</span>
-        </button>
-        <!-- 下拉菜单 -->
-        <Teleport to="body">
-          <div
-            v-if="showUserMenu"
-            class="topbar__user-menu"
-            :style="menuStyle"
-            @click.stop
-          >
-            <button class="topbar__user-menu-item" @click="switchIdentity">
-              <NeonIcon name="user" :size="14" />
-              切换身份
-            </button>
-            <button class="topbar__user-menu-item topbar__user-menu-item--danger" @click="doLogout">
-              <NeonIcon name="user" :size="14" />
-              退出登录
-            </button>
-          </div>
-        </Teleport>
-      </div>
+      <!-- 用户信息（登录后）：点击弹出身份工牌 -->
+      <button v-if="userStore.isLoggedIn" class="topbar__user" @click="showBadge = true">
+        <img v-if="userStore.user?.avatar" :src="userStore.user.avatar" alt="头像" class="topbar__user-avatar" />
+        <NeonIcon v-else name="user" :size="18" />
+        <span class="topbar__user-name">{{ userStore.user?.nickname }}</span>
+        <span class="topbar__user-badge">{{ userStore.gradeLabel }} · {{ userStore.majorLabel }}</span>
+      </button>
+      <IdentityBadge :visible="showBadge" mode="view" @close="showBadge = false" />
 
-      <button v-else class="topbar__avatar" aria-label="用户" @click="emit('onAvatarClick')">
+      <button v-if="!userStore.isLoggedIn" class="topbar__avatar" aria-label="用户" @click="emit('onAvatarClick')">
         <NeonIcon name="user" :size="18" />
       </button>
     </div>
@@ -95,10 +78,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import JnuLogo from '@/components/common/JnuLogo.vue';
 import NeonIcon from '@/components/common/NeonIcon.vue';
+import IdentityBadge from '@/components/login/IdentityBadge.vue';
 import { useNavStore } from '@/stores/navStore';
 import { useThemeStore } from '@/stores/themeStore';
 import { useUserStore } from '@/stores/userStore';
@@ -124,44 +108,8 @@ const emit = defineEmits<{
 const router = useRouter();
 const nav = useNavStore();
 
-/* 用户下拉菜单 */
-const showUserMenu = ref(false);
-const userWrapRef = ref<HTMLElement | null>(null);
-const menuStyle = ref({});
-
-function toggleUserMenu() {
-  if (!showUserMenu.value) {
-    const rect = userWrapRef.value?.getBoundingClientRect();
-    if (rect) {
-      menuStyle.value = {
-        top: rect.bottom + 4 + 'px',
-        right: window.innerWidth - rect.right + 'px',
-      };
-    }
-  }
-  showUserMenu.value = !showUserMenu.value;
-}
-
-function closeUserMenu(e: MouseEvent) {
-  if (userWrapRef.value && !userWrapRef.value.contains(e.target as Node)) {
-    showUserMenu.value = false;
-  }
-}
-
-onMounted(() => document.addEventListener('click', closeUserMenu));
-onUnmounted(() => document.removeEventListener('click', closeUserMenu));
-
-function switchIdentity() {
-  showUserMenu.value = false;
-  userStore.logout();
-  router.push('/login');
-}
-
-function doLogout() {
-  showUserMenu.value = false;
-  userStore.logout();
-  router.push('/login');
-}
+/* 身份工牌弹窗 */
+const showBadge = ref(false);
 
 const isHome = computed(() => props.currentRoute === '/');
 
@@ -422,10 +370,6 @@ function goNav(item: NavItem) {
 }
 
 /* 用户信息标签 */
-.topbar__user-wrap {
-  position: relative;
-}
-
 .topbar__user {
   display: flex;
   align-items: center;
@@ -441,6 +385,13 @@ function goNav(item: NavItem) {
 .topbar__user:hover {
   border-color: var(--amber);
   background: var(--bg-panel-2);
+}
+
+.topbar__user-avatar {
+  width: 24px;
+  height: 24px;
+  object-fit: cover;
+  clip-path: var(--clip-sm);
 }
 
 .topbar__user-name {
@@ -459,48 +410,6 @@ function goNav(item: NavItem) {
   padding: 2px 6px;
   background: var(--amber-soft);
   clip-path: var(--clip-sm);
-}
-
-/* 用户下拉菜单 */
-.topbar__user-menu {
-  position: fixed;
-  z-index: 9999;
-  min-width: 160px;
-  background: var(--bg-panel);
-  border: 1px solid var(--border-subtle);
-  clip-path: polygon(var(--cut-sm) 0, 100% 0, 100% calc(100% - var(--cut-sm)), calc(100% - var(--cut-sm)) 100%, 0 100%, 0 var(--cut-sm));
-  padding: 6px;
-  box-shadow: 0 8px 24px var(--shadow-deep);
-}
-
-.topbar__user-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 10px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-primary);
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: background 160ms, color 160ms;
-  text-align: left;
-}
-
-.topbar__user-menu-item:hover {
-  background: var(--bg-panel-2);
-  color: var(--amber);
-}
-
-.topbar__user-menu-item--danger {
-  color: var(--danger);
-}
-
-.topbar__user-menu-item--danger:hover {
-  background: var(--bg-panel-2);
-  color: var(--danger);
 }
 
 @media (max-width: 767px) {

@@ -7,10 +7,10 @@ export interface GradeCardContent {
 
 export const gradeCardContent: Record<number, GradeCardContent> = {
   1: {
-    title: '新生指南补缺',
-    en: 'FRESHMAN GUIDE',
-    desc: '入学前准备与新生常见问题',
-    url: 'https://tralis2671.feishu.cn/wiki/DYhvw9owZivrJskU5LicGl06nAg',
+    title: '新手任务',
+    en: 'NEW QUEST',
+    desc: '账号登录 · 关卡解锁 · 入学指南',
+    url: '/quest',
   },
   2: {
     title: '学术发展规划',

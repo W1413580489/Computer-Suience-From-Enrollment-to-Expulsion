@@ -16,102 +16,160 @@
       <span class="login__ak-diamond" />
     </div>
 
-    <div class="login__card">
-      <!-- 标题区 -->
-      <div class="login__header">
-        <!-- ZZZ 夜间：zenless-ui 标签 -->
-        <z-tag v-if="theme.isZzz" type="fire" class="login__ztag">JNU INFORMATION</z-tag>
-        <!-- AK 日间：文本标签 -->
-        <span v-else class="login__ak-kicker">JNU INFORMATION</span>
-        <h1 class="login__title">信科院指南</h1>
-        <p class="login__subtitle">选择你的身份，开启个性化指南</p>
-      </div>
+    <div class="login__layout">
+      <!-- 左侧：建号表单 -->
+      <div class="login__card">
+        <div class="login__header">
+          <z-tag v-if="theme.isZzz" type="fire" class="login__ztag">JNU INFORMATION</z-tag>
+          <span v-else class="login__ak-kicker">JNU INFORMATION</span>
+          <h1 class="login__title">建号</h1>
+          <p class="login__subtitle">选择你的身份，开启个性化指南</p>
+        </div>
 
-      <!-- 昵称 -->
-      <div class="login__field">
-        <label class="login__label">
-          <span class="login__label-dot" />
-          昵称
-        </label>
-        <!-- ZZZ 夜间：zenless-ui ZInput -->
-        <z-input
+        <!-- 头像上传 -->
+        <div class="login__field">
+          <label class="login__label">
+            <span class="login__label-dot" />
+            头像
+          </label>
+          <div class="login__avatar-upload" @click="triggerFileInput">
+            <img v-if="avatarBase64" :src="avatarBase64" alt="头像" class="login__avatar-img" />
+            <div v-else class="login__avatar-placeholder" :class="theme.isZzz ? 'login__avatar-placeholder--zzz' : 'login__avatar-placeholder--ak'">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+              <span class="login__avatar-hint">点击上传</span>
+            </div>
+          </div>
+          <input ref="fileInputRef" type="file" accept="image/*" class="login__file-input" @change="handleFileChange" />
+          <button v-if="avatarBase64" class="login__avatar-remove" @click="removeAvatar">移除</button>
+        </div>
+
+        <!-- 昵称 -->
+        <div class="login__field">
+          <label class="login__label">
+            <span class="login__label-dot" />
+            昵称
+          </label>
+          <z-input
+            v-if="theme.isZzz"
+            v-model="nickname"
+            placeholder="输入你的昵称"
+            maxlength="20"
+            clearable
+            class="login__zinput"
+          />
+          <input
+            v-else
+            v-model="nickname"
+            class="login__ak-input"
+            :class="{ 'login__ak-input--filled': nickname }"
+            placeholder="输入你的昵称"
+            maxlength="20"
+          />
+        </div>
+
+        <!-- 专业类别 -->
+        <div class="login__field">
+          <label class="login__label">
+            <span class="login__label-dot" />
+            专业类别
+          </label>
+          <z-radio-group v-model="major" class="login__radio-group">
+            <z-radio-button value="software" size="large">软件类</z-radio-button>
+            <z-radio-button value="hardware" size="large">硬件类</z-radio-button>
+            <z-radio-button value="other" size="large">其他类</z-radio-button>
+          </z-radio-group>
+        </div>
+
+        <!-- 年级 -->
+        <div class="login__field">
+          <label class="login__label">
+            <span class="login__label-dot" />
+            年级
+          </label>
+          <z-radio-group v-model="grade" class="login__radio-group login__radio-group--4">
+            <z-radio-button :value="1" size="large">大一</z-radio-button>
+            <z-radio-button :value="2" size="large">大二</z-radio-button>
+            <z-radio-button :value="3" size="large">大三</z-radio-button>
+            <z-radio-button :value="4" size="large">大四</z-radio-button>
+          </z-radio-group>
+        </div>
+
+        <!-- 建号按钮 -->
+        <z-button
           v-if="theme.isZzz"
-          v-model="nickname"
-          placeholder="输入你的昵称"
-          maxlength="20"
-          clearable
-          class="login__zinput"
-        />
-        <!-- AK 日间：自定义输入 -->
-        <input
+          type="primary"
+          size="large"
+          class="login__zenter"
+          :disabled="!canEnter"
+          @click="handleLogin"
+        >
+          建 号
+        </z-button>
+        <button
           v-else
-          v-model="nickname"
-          class="login__ak-input"
-          :class="{ 'login__ak-input--filled': nickname }"
-          placeholder="输入你的昵称"
-          maxlength="20"
-        />
+          class="login__ak-enter"
+          :class="{ 'login__ak-enter--disabled': !canEnter }"
+          :disabled="!canEnter"
+          @click="handleLogin"
+        >
+          <span>建 号</span>
+          <span class="login__ak-enter-arrow">→</span>
+        </button>
+
+        <button class="login__guest" @click="handleGuest">
+          游客模式浏览
+          <span class="login__guest-arrow">→</span>
+        </button>
+
+        <p class="login__note">数据仅保存在本浏览器，不会上传</p>
       </div>
 
-      <!-- 专业类别 (zenless-ui 组件) -->
-      <div class="login__field">
-        <label class="login__label">
-          <span class="login__label-dot" />
-          专业类别
-        </label>
-        <z-radio-group v-model="major" class="login__radio-group">
-          <z-radio-button value="software" size="large">软件类</z-radio-button>
-          <z-radio-button value="hardware" size="large">硬件类</z-radio-button>
-          <z-radio-button value="other" size="large">其他类</z-radio-button>
-        </z-radio-group>
+      <!-- 右侧：工牌预览 -->
+      <div class="login__preview">
+        <div class="login__preview-label">工牌预览</div>
+        <div class="login__preview-card" :class="theme.isZzz ? 'login__preview-card--zzz' : 'login__preview-card--ak'">
+          <div v-if="theme.isZzz" class="login__preview-grid" />
+          <div class="login__preview-header">
+            <span v-if="theme.isZzz" class="login__preview-logo login__preview-logo--zzz">TERMINAL CONNECT</span>
+            <span v-else class="login__preview-logo login__preview-logo--ak">MEMBER ARCHIVE</span>
+            <span v-if="!theme.isZzz" class="login__preview-id">#{{ previewUid.slice(-4) }}</span>
+          </div>
+          <div class="login__preview-body">
+            <div class="login__preview-avatar" :class="theme.isZzz ? 'login__preview-avatar--zzz' : 'login__preview-avatar--ak'">
+              <img v-if="avatarBase64" :src="avatarBase64" alt="" class="login__preview-avatar-img" />
+              <div v-else class="login__preview-avatar-ph">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 12a4 4 0 100-8 4 4 0 000 8zm0 2c-4 0-8 2-8 6v2h16v-2c0-4-4-6-8-6z" fill="currentColor" opacity="0.3"/>
+                </svg>
+              </div>
+            </div>
+            <div class="login__preview-info">
+              <div class="login__preview-row">
+                <span class="login__preview-key" :class="theme.isZzz ? 'login__preview-key--zzz' : 'login__preview-key--ak'">{{ theme.isZzz ? '代理人' : '昵称' }}</span>
+                <span class="login__preview-val">{{ nickname || '---' }}</span>
+              </div>
+              <div class="login__preview-row">
+                <span class="login__preview-key" :class="theme.isZzz ? 'login__preview-key--zzz' : 'login__preview-key--ak'">{{ theme.isZzz ? '等级' : '年级' }}</span>
+                <span class="login__preview-val">{{ gradeLabel || '---' }}</span>
+              </div>
+              <div class="login__preview-row">
+                <span class="login__preview-key" :class="theme.isZzz ? 'login__preview-key--zzz' : 'login__preview-key--ak'">{{ theme.isZzz ? '职业' : '专业' }}</span>
+                <span class="login__preview-val">{{ majorLabel || '---' }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="login__preview-footer">
+            <span class="login__preview-uid">UID: {{ previewUid }}</span>
+          </div>
+        </div>
       </div>
-
-      <!-- 年级 (zenless-ui 组件) -->
-      <div class="login__field">
-        <label class="login__label">
-          <span class="login__label-dot" />
-          年级
-        </label>
-        <z-radio-group v-model="grade" class="login__radio-group login__radio-group--4">
-          <z-radio-button :value="1" size="large">大一</z-radio-button>
-          <z-radio-button :value="2" size="large">大二</z-radio-button>
-          <z-radio-button :value="3" size="large">大三</z-radio-button>
-          <z-radio-button :value="4" size="large">大四</z-radio-button>
-        </z-radio-group>
-      </div>
-
-      <!-- 进入按钮 -->
-      <!-- ZZZ 夜间：zenless-ui ZButton -->
-      <z-button
-        v-if="theme.isZzz"
-        type="primary"
-        size="large"
-        class="login__zenter"
-        :disabled="!canEnter"
-        @click="handleLogin"
-      >
-        进 入
-      </z-button>
-      <!-- AK 日间：自定义按钮 -->
-      <button
-        v-else
-        class="login__ak-enter"
-        :class="{ 'login__ak-enter--disabled': !canEnter }"
-        :disabled="!canEnter"
-        @click="handleLogin"
-      >
-        <span>进 入</span>
-        <span class="login__ak-enter-arrow">→</span>
-      </button>
-
-      <!-- 游客模式 -->
-      <button class="login__guest" @click="handleGuest">
-        游客模式浏览
-        <span class="login__guest-arrow">→</span>
-      </button>
-
-      <p class="login__note">数据仅保存在本浏览器，不会上传</p>
     </div>
+
+    <!-- 身份工牌弹窗（建号完成） -->
+    <IdentityBadge :visible="showBadge" mode="create" @close="handleBadgeClose" />
   </div>
 </template>
 
@@ -121,6 +179,7 @@ import { useRouter } from 'vue-router';
 import { useThemeStore } from '@/stores/themeStore';
 import { useUserStore } from '@/stores/userStore';
 import type { Grade, MajorCategory } from '@/stores/userStore';
+import IdentityBadge from '@/components/login/IdentityBadge.vue';
 
 const router = useRouter();
 const theme = useThemeStore();
@@ -129,8 +188,52 @@ const userStore = useUserStore();
 const nickname = ref('');
 const major = ref<MajorCategory | null>(null);
 const grade = ref<Grade | null>(null);
+const avatarBase64 = ref<string>('');
+const showBadge = ref(false);
+const fileInputRef = ref<HTMLInputElement | null>(null);
 
 const canEnter = computed(() => nickname.value.trim() && major.value !== null && grade.value !== null);
+
+const gradeLabel = computed(() => {
+  if (grade.value === null) return '';
+  return { 1: '大一', 2: '大二', 3: '大三', 4: '大四' }[grade.value];
+});
+
+const majorLabel = computed(() => {
+  if (major.value === null) return '';
+  return { software: '软件类', hardware: '硬件类', other: '其他类' }[major.value];
+});
+
+const previewUid = computed(() => {
+  const d = new Date();
+  const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+  return `XKZ-${ymd}-****`;
+});
+
+function triggerFileInput() {
+  fileInputRef.value?.click();
+}
+
+function handleFileChange(e: Event) {
+  const target = e.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
+    alert('图片不能超过 2MB');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    avatarBase64.value = reader.result as string;
+  };
+  reader.readAsDataURL(file);
+  // reset input so same file can be re-selected
+  target.value = '';
+}
+
+function removeAvatar() {
+  avatarBase64.value = '';
+}
 
 function handleLogin() {
   if (!canEnter.value) return;
@@ -138,7 +241,13 @@ function handleLogin() {
     nickname: nickname.value.trim(),
     grade: grade.value!,
     major: major.value!,
+    avatar: avatarBase64.value || undefined,
   });
+  showBadge.value = true;
+}
+
+function handleBadgeClose() {
+  showBadge.value = false;
   router.push('/');
 }
 
@@ -148,20 +257,17 @@ function handleGuest() {
 </script>
 
 <style scoped>
-/* ============================================
-   基础盒模型
-   ============================================ */
 .login,
 .login__card,
 .login__card *,
 .login__radio-group,
-.login__radio-group * {
+.login__radio-group *,
+.login__layout,
+.login__preview,
+.login__preview * {
   box-sizing: border-box;
 }
 
-/* ============================================
-   登录页 — 外层容器
-   ============================================ */
 .login {
   min-height: 100vh;
   display: flex;
@@ -173,13 +279,7 @@ function handleGuest() {
   transition: background 300ms;
 }
 
-/* ---- ZZZ 夜间模式 ---- */
-.login--zzz {
-  background: var(--bg-body);
-}
-
-/* ---- AK 日间模式 ---- */
-.login--ak {
+.login--zzz, .login--ak {
   background: var(--bg-body);
 }
 
@@ -304,52 +404,37 @@ function handleGuest() {
 }
 
 /* ============================================
-   Radio Group 适配双主题
+   双栏布局
    ============================================ */
-.login__radio-group {
-  width: 100%;
+.login__layout {
+  position: relative;
+  z-index: 2;
   display: flex;
-  gap: 8px;
-}
-
-.login__radio-group--4 {
-  justify-content: space-between;
-}
-
-.login__radio-group :deep(.z-radio-button) {
-  flex: 1;
-  justify-content: center;
-  font-family: var(--font-body);
-}
-
-.login__radio-group--4 :deep(.z-radio-button) {
-  max-width: none;
+  gap: 32px;
+  align-items: stretch;
+  width: 100%;
+  max-width: 880px;
 }
 
 /* ============================================
-   卡片
+   建号表单卡片
    ============================================ */
 .login__card {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  max-width: 440px;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 40px 36px;
+  gap: 18px;
+  padding: 36px 32px;
   background: var(--bg-panel);
   border: 1px solid var(--border-subtle);
   transition: background 300ms, border-color 300ms;
   overflow-x: hidden;
 }
 
-/* ZZZ 夜间卡片 — 切角 */
 .login--zzz .login__card {
   clip-path: polygon(var(--cut-md) 0, 100% 0, 100% calc(100% - var(--cut-md)), calc(100% - var(--cut-md)) 100%, 0 100%, 0 var(--cut-md));
 }
 
-/* AK 日间卡片 — 无切角，用发丝细线 + 轻微阴影 */
 .login--ak .login__card {
   box-shadow: 0 2px 16px rgba(60, 80, 120, 0.06);
 }
@@ -365,12 +450,8 @@ function handleGuest() {
   margin-bottom: 4px;
 }
 
-/* ZZZ 夜间标签 */
-.login__ztag {
-  margin-bottom: 4px;
-}
+.login__ztag { margin-bottom: 4px; }
 
-/* AK 日间标签 */
 .login__ak-kicker {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -434,14 +515,104 @@ function handleGuest() {
 }
 
 /* ============================================
-   昵称输入
+   头像上传
    ============================================ */
-/* ZZZ 夜间：ZInput 覆盖 */
-.login__zinput {
-  width: 100%;
+.login__avatar-upload {
+  width: 80px;
+  height: 80px;
+  cursor: pointer;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
-/* AK 日间：自定义输入 */
+.login--zzz .login__avatar-upload {
+  border-radius: 50%;
+  border: 2px solid var(--amber);
+  box-shadow: 0 0 12px var(--amber-glow);
+}
+
+.login--ak .login__avatar-upload {
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+}
+
+.login__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.login__avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.login__avatar-placeholder--zzz {
+  color: var(--text-muted);
+  background: var(--bg-panel-2);
+}
+
+.login__avatar-placeholder--ak {
+  color: var(--text-muted);
+  background: var(--bg-panel-2);
+}
+
+.login__avatar-hint {
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.login__file-input {
+  display: none;
+}
+
+.login__avatar-remove {
+  align-self: flex-start;
+  font-size: 12px;
+  color: var(--danger);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.login__avatar-remove:hover {
+  text-decoration: underline;
+}
+
+/* ============================================
+   Radio Group
+   ============================================ */
+.login__radio-group {
+  width: 100%;
+  display: flex;
+  gap: 8px;
+}
+
+.login__radio-group--4 {
+  justify-content: space-between;
+}
+
+.login__radio-group :deep(.z-radio-button) {
+  flex: 1;
+  justify-content: center;
+  font-family: var(--font-body);
+}
+
+.login__radio-group--4 :deep(.z-radio-button) {
+  max-width: none;
+}
+
+/* ============================================
+   昵称输入
+   ============================================ */
+.login__zinput { width: 100%; }
+
 .login__ak-input {
   width: 100%;
   padding: 12px 14px;
@@ -452,7 +623,6 @@ function handleGuest() {
   border-bottom: 2px solid var(--border-subtle);
   outline: none;
   transition: border-color 200ms, background 200ms;
-  box-sizing: border-box;
   font-family: var(--font-body);
 }
 
@@ -471,15 +641,13 @@ function handleGuest() {
 }
 
 /* ============================================
-   进入按钮
+   建号按钮
    ============================================ */
-/* ZZZ 夜间：ZButton 覆盖 */
 .login__zenter {
   width: 100%;
   margin-top: 4px;
 }
 
-/* AK 日间：自定义按钮 */
 .login__ak-enter {
   display: flex;
   align-items: center;
@@ -498,7 +666,6 @@ function handleGuest() {
   cursor: pointer;
   transition: filter 200ms, transform 160ms, box-shadow 200ms;
   margin-top: 4px;
-  box-sizing: border-box;
 }
 
 .login__ak-enter:hover:not(:disabled) {
@@ -541,7 +708,6 @@ function handleGuest() {
   cursor: pointer;
   padding: 8px;
   transition: color 200ms, gap 200ms;
-  box-sizing: border-box;
 }
 
 .login__guest:hover {
@@ -566,15 +732,187 @@ function handleGuest() {
 }
 
 /* ============================================
+   工牌预览
+   ============================================ */
+.login__preview {
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login__preview-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.login__preview-card {
+  position: relative;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.login__preview-card--zzz {
+  background: #101114;
+  border: 1px solid rgba(255, 217, 61, 0.3);
+  clip-path: polygon(var(--cut-sm) 0, 100% 0, 100% calc(100% - var(--cut-sm)), calc(100% - var(--cut-sm)) 100%, 0 100%, 0 var(--cut-sm));
+}
+
+.login__preview-card--ak {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(200, 50, 63, 0.15);
+  border-left: 3px solid #C8323F;
+}
+
+.login__preview-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 217, 61, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 217, 61, 0.02) 1px, transparent 1px);
+  background-size: 16px 16px;
+  pointer-events: none;
+}
+
+.login__preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+
+.login__preview-logo--zzz {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: #FFD93D;
+}
+
+.login__preview-logo--ak {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #C8323F;
+}
+
+.login__preview-id {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgba(200, 50, 63, 0.5);
+}
+
+.login__preview-body {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.login__preview-avatar {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login__preview-avatar--zzz {
+  border-radius: 50%;
+  border: 2px solid #FFD93D;
+}
+
+.login__preview-avatar--ak {
+  border-radius: 4px;
+  border: 1px solid rgba(200, 50, 63, 0.2);
+  background: #E0E4E8;
+}
+
+.login__preview-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.login__preview-avatar-ph {
+  color: var(--text-muted);
+}
+
+.login__preview-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.login__preview-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.login__preview-key {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.login__preview-key--zzz { color: rgba(255, 217, 61, 0.5); }
+.login__preview-key--ak { color: rgba(200, 50, 63, 0.5); }
+
+.login__preview-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.login__preview-footer {
+  position: relative;
+  z-index: 1;
+}
+
+.login__preview-uid {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+/* ============================================
    响应式
    ============================================ */
+@media (max-width: 879px) {
+  .login__layout {
+    flex-direction: column;
+    max-width: 440px;
+  }
+
+  .login__preview {
+    width: 100%;
+  }
+}
+
 @media (max-width: 767px) {
   .login {
     padding: 16px 12px;
   }
 
   .login__card {
-    padding: 32px 20px;
+    padding: 28px 20px;
     gap: 16px;
   }
 

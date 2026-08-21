@@ -106,8 +106,12 @@ function go(route: string) {
 }
 
 function openGradeUrl() {
-  if (gradeCard.value.url) {
-    window.open(gradeCard.value.url, '_blank', 'noopener');
+  const url = gradeCard.value.url;
+  if (!url) return;
+  if (url.startsWith('/')) {
+    router.push(url);
+  } else {
+    window.open(url, '_blank', 'noopener');
   }
 }
 </script>

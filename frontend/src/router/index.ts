@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
 
 const routes = [
+  { path: '/splash', name: 'splash', component: () => import('@/components/login/SplashScreen.vue') },
   { path: '/login', name: 'login', component: () => import('@/views/LoginView.vue') },
   { path: '/', name: 'home', component: () => import('@/views/HomeView.vue') },
   { path: '/guides', name: 'guides', component: () => import('@/views/GuidesView.vue') },
@@ -21,17 +22,21 @@ export const router = createRouter({
   routes,
 });
 
-// 登录守卫：未登录访问首页 → 跳转登录页（游客模式除外）
+// 开屏 / 建号 守卫
 router.beforeEach((to) => {
-  // 登录页不检查
-  if (to.name === 'login') return true;
-
   const userStore = useUserStore();
 
-  // 未登录时访问首页 → 跳转登录页
-  // 带 ?guest=1 的请求视为游客模式，允许通过
+  // 已登录用户访问开屏/建号页 → 直接进入主页
+  if ((to.name === 'splash' || to.name === 'login') && userStore.isLoggedIn) {
+    return { name: 'home' };
+  }
+
+  // 开屏页和建号页无需登录
+  if (to.name === 'splash' || to.name === 'login') return true;
+
+  // 未登录时访问首页 → 跳转开屏页（游客模式除外）
   if (to.path === '/' && !userStore.isLoggedIn && to.query.guest !== '1') {
-    return { name: 'login' };
+    return { name: 'splash' };
   }
 
   return true;

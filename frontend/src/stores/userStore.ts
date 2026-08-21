@@ -8,6 +8,21 @@ export interface UserProfile {
   nickname: string;
   grade: Grade;
   major: MajorCategory;
+  avatar?: string;       // base64 图片数据
+  uid: string;           // 唯一编号 XKZ-YYYYMMDD-XXXX
+  createdAt: string;     // 建号日期 YYYY-MM-DD
+}
+
+function generateUid(): string {
+  const d = new Date();
+  const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+  const rand = Math.random().toString(16).slice(2, 6).toUpperCase();
+  return `XKZ-${ymd}-${rand}`;
+}
+
+function todayStr(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 export const useUserStore = defineStore('user', () => {
@@ -37,9 +52,13 @@ export const useUserStore = defineStore('user', () => {
 
   const isSoftware = computed(() => user.value?.major === 'software');
 
-  function login(data: UserProfile) {
-    user.value = data;
-    localStorage.setItem('xkz_user', JSON.stringify(data));
+  function login(data: Omit<UserProfile, 'uid' | 'createdAt'> & Partial<Pick<UserProfile, 'uid' | 'createdAt'>>) {
+    user.value = {
+      ...data,
+      uid: data.uid ?? generateUid(),
+      createdAt: data.createdAt ?? todayStr(),
+    };
+    localStorage.setItem('xkz_user', JSON.stringify(user.value));
   }
 
   function logout() {
@@ -47,5 +66,12 @@ export const useUserStore = defineStore('user', () => {
     localStorage.removeItem('xkz_user');
   }
 
-  return { user, isLoggedIn, gradeLabel, majorLabel, isSoftware, login, logout };
+  function updateAvatar(base64: string) {
+    if (user.value) {
+      user.value.avatar = base64;
+      localStorage.setItem('xkz_user', JSON.stringify(user.value));
+    }
+  }
+
+  return { user, isLoggedIn, gradeLabel, majorLabel, isSoftware, login, logout, updateAvatar };
 });
