@@ -112,32 +112,44 @@ onUnmounted(() => {
   clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
 }
 
-/* 手机端：全宽居中，减小内边距，加显式关闭区 */
+/* 手机端：极简单行通知，去掉 ribbon 和 label，只留徽章+标题 */
 @media (max-width: 767px) {
   .ach-toasts {
-    top: 12px;
-    right: 10px;
-    left: 10px;
+    top: 8px;
+    right: 8px;
+    left: 8px;
     max-width: none;
     width: auto;
+    gap: 8px;
   }
   .ach-toast {
-    padding: 12px 14px;
-    min-height: 56px; /* 足够大的点击区域 */
+    padding: 8px 12px;
+    min-height: 0;
+    clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
   }
   .ach-toast__ribbon {
-    font-size: 8px;
-    margin-bottom: 4px;
+    display: none; /* 手机端隐藏 ribbon 节省高度 */
+  }
+  .ach-toast__row {
+    gap: 8px;
   }
   .ach-toast__badge {
-    padding: 3px 8px;
+    padding: 2px 8px;
     font-size: 10px;
+    clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+  }
+  .ach-toast__label {
+    display: none; /* 手机端隐藏 label */
   }
   .ach-toast__title {
     font-size: 14px;
+    margin-top: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .ach-toast__label {
-    font-size: 9px;
+  .ach-toast__bar {
+    height: 2px;
   }
 }
 

@@ -389,12 +389,18 @@ onUnmounted(() => {
 /* ====== 响应式：手机端纵向 ====== */
 @media (max-width: 767px) {
   .ach {
-    padding: 24px 16px 48px;
+    padding: 16px 12px 40px;
+  }
+
+  .ach__notice {
+    padding: 6px 12px;
+    font-size: 11px;
+    margin-bottom: 16px;
   }
 
   .ach__grid {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 10px;
   }
 
   /* 手机端隐藏空槽位 */
@@ -402,8 +408,48 @@ onUnmounted(() => {
     display: none;
   }
 
+  /* 手机端票据卡片紧凑化 */
+  .ach__ticket-main {
+    padding: 12px 14px;
+    gap: 4px;
+  }
+
+  .ach__ticket-stub {
+    width: 40px;
+    padding: 12px 6px;
+  }
+
+  .ach__ticket-stub-label {
+    font-size: 8px;
+    letter-spacing: 0.1em;
+  }
+
+  .ach__badge {
+    padding: 2px 7px;
+    font-size: 9px;
+  }
+
   .ach__ticket-title {
-    font-size: 16px;
+    font-size: 15px;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+  }
+
+  /* 手机端描述缩小 + 限制 2 行 */
+  .ach__ticket-desc {
+    font-size: 11px;
+    line-height: 1.4;
+    -webkit-line-clamp: 2;
+  }
+
+  /* 手机端隐藏日期（节省垂直空间） */
+  .ach__ticket-foot {
+    display: none;
+  }
+
+  .ach__pagination {
+    margin-top: 16px;
+    gap: 10px;
   }
 }
 </style>
