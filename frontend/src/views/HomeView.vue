@@ -21,7 +21,7 @@
         :character-image="characterImg"
         :grade-subtitle="gradeSubtitle"
         @on-go-dest="scrollToDest"
-        @on-open-api="settingsOpen = true"
+        @on-go-roadmap="goRoadmap"
       />
 
       <!-- 目的地 -->
@@ -34,7 +34,7 @@
       <DataPanel />
 
       <!-- 个人配置 -->
-      <PersonalConfig @on-open-api="settingsOpen = true" />
+      <PersonalConfig @on-open-hub="hubOpen = true" />
 
       <!-- 成就系统 -->
       <AchievementSection />
@@ -58,6 +58,7 @@
       @on-close="drawerOpen = false"
     />
     <SettingsDrawer :visible="settingsOpen" @on-close="settingsOpen = false" />
+<SettingsHub :visible="hubOpen" @on-close="hubOpen = false" @on-open-api="hubOpen = false; settingsOpen = true" />
 
     <!-- 夜间 zzz：zenless-ui 回到顶部（首页主滚动区） -->
     <z-backtop
@@ -84,9 +85,11 @@ import PersonalConfig from '@/components/home/PersonalConfig.vue';
 import AchievementSection from '@/components/home/AchievementSection.vue';
 import NavDrawer from '@/components/nav/NavDrawer.vue';
 import SettingsDrawer from '@/components/settings/SettingsDrawer.vue';
+import SettingsHub from '@/components/settings/SettingsHub.vue';
 import { useNavStore } from '@/stores/navStore';
 import { useThemeStore } from '@/stores/themeStore';
 import { useUserStore } from '@/stores/userStore';
+import { useAchievementStore } from '@/stores/achievementStore';
 import { useViewport, openExternal } from '@/composables/useViewport';
 import { heroSubtitles } from '@/data/gradeContent';
 import characterImg from '@/assets/images/character.webp';
@@ -105,6 +108,7 @@ const gradeSubtitle = computed(() => {
 
 const drawerOpen = ref(false);
 const settingsOpen = ref(false);
+const hubOpen = ref(false);
 const homeMainEl = ref<HTMLElement | null>(null);
 
 onMounted(() => {
@@ -132,8 +136,27 @@ function scrollToDest() {
   document.getElementById('destinations')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+// 点击"路线导航"按钮：跳转成长路线图
+function goRoadmap() {
+  useAchievementStore().unlock('where_wander');
+  router.push('/roadmap');
+}
+
 function onDrawerNav(path: string) {
   drawerOpen.value = false;
+  // 特殊项：API 配置 → 打开设置抽屉
+  if (path === '__settings__') {
+    settingsOpen.value = true;
+    return;
+  }
+  // 成就：首次点击"关于我"
+  if (path === '/about') {
+    useAchievementStore().unlock('what_is_this');
+  }
+  // 成就：首次从导航菜单点击路线图
+  if (path === '/roadmap') {
+    useAchievementStore().unlock('homepage_has_entry');
+  }
   router.push(path);
 }
 </script>

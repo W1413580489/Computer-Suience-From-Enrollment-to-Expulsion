@@ -173,6 +173,7 @@
 import { useRouter } from 'vue-router';
 import { useThemeStore } from '@/stores/themeStore';
 import { useUserStore } from '@/stores/userStore';
+import { useAchievementStore } from '@/stores/achievementStore';
 
 const props = withDefaults(
   defineProps<{
@@ -203,6 +204,14 @@ function handlePrimary() {
 
 function handleSwitch() {
   emit('close');
+  // 成就：切换身份3次
+  try {
+    const count = parseInt(localStorage.getItem('xkz_switch_clicks') || '0', 10) + 1;
+    localStorage.setItem('xkz_switch_clicks', String(count));
+    if (count >= 3) useAchievementStore().unlock('who_am_i');
+  } catch {
+    // ignore
+  }
   userStore.logout();
   router.push('/login');
 }

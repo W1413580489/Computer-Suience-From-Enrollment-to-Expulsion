@@ -10,8 +10,8 @@
       @on-menu-click="drawerOpen = true"
     />
     <main class="hud-page-body hud-fade-in" ref="scrollBodyEl">
-      <div class="hud-page-container">
-        <h1 class="page-title">{{ title }}</h1>
+      <div class="hud-page-container" :class="{ 'hud-page-container--wide': wide }">
+        <h1 v-if="title" class="page-title">{{ title }}</h1>
         <p v-if="subtitle" class="page-subtitle">{{ subtitle }}</p>
         <slot />
       </div>
@@ -43,9 +43,10 @@ import { useThemeStore } from '@/stores/themeStore';
 import { useUserStore } from '@/stores/userStore';
 import { useViewport } from '@/composables/useViewport';
 
-const props = withDefaults(defineProps<{ title: string; subtitle?: string; activeKey?: string }>(), {
+const props = withDefaults(defineProps<{ title: string; subtitle?: string; activeKey?: string; wide?: boolean }>(), {
   subtitle: '',
   activeKey: '',
+  wide: false,
 });
 
 const route = useRoute();
@@ -78,6 +79,11 @@ function handleAvatarClick() {
 
 function onDrawerNav(path: string) {
   drawerOpen.value = false;
+  // 特殊项：API 配置 → 打开设置抽屉
+  if (path === '__settings__') {
+    settingsOpen.value = true;
+    return;
+  }
   router.push(path);
 }
 </script>

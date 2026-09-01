@@ -1,5 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
+import { useAchievementStore } from '@/stores/achievementStore';
+
+const TRACK_PAGES = ['guides', 'appendix', 'about', 'changelog', 'glossary', 'resources', 'calendar', 'chat'];
 
 const routes = [
   { path: '/splash', name: 'splash', component: () => import('@/components/login/SplashScreen.vue') },
@@ -11,6 +14,8 @@ const routes = [
   { path: '/changelog', name: 'changelog', component: () => import('@/views/ChangelogView.vue') },
   { path: '/glossary', name: 'glossary', component: () => import('@/views/GlossaryView.vue') },
   { path: '/quest', name: 'quest', component: () => import('@/views/QuestView.vue') },
+  { path: '/roadmap', name: 'roadmap', component: () => import('@/views/RoadmapView.vue') },
+  { path: '/teach', name: 'teach', component: () => import('@/views/TeachView.vue') },
   { path: '/resources', name: 'resources', component: () => import('@/views/ResourceView.vue') },
   { path: '/calendar', name: 'calendar', component: () => import('@/views/CalendarView.vue') },
   { path: '/chat', name: 'chat', component: () => import('@/views/ChatView.vue') },
@@ -40,4 +45,31 @@ router.beforeEach((to) => {
   }
 
   return true;
+});
+
+// 成就：页面访问追踪
+router.afterEach((to) => {
+  const ach = useAchievementStore();
+
+  // 成就：首次访问更新日志
+  if (to.name === 'changelog') {
+    ach.unlock('view_changelog');
+  }
+
+  // 成就：访问过全部 8 个页面
+  if (TRACK_PAGES.includes(to.name as string)) {
+    try {
+      const raw = localStorage.getItem('xkz_visited_pages');
+      const visited: string[] = raw ? JSON.parse(raw) : [];
+      if (!visited.includes(to.name as string)) {
+        visited.push(to.name as string);
+        localStorage.setItem('xkz_visited_pages', JSON.stringify(visited));
+      }
+      if (visited.length >= TRACK_PAGES.length) {
+        ach.unlock('understand_all');
+      }
+    } catch {
+      // ignore
+    }
+  }
 });

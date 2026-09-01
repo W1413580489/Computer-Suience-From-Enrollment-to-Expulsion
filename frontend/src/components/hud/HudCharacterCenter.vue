@@ -19,7 +19,7 @@
           <!-- 夜间 zzz：zenless-ui 按钮 -->
           <template v-if="theme.isZzz">
             <z-button type="primary" size="large" @click="emit('onGoDest')">目的地</z-button>
-            <z-button size="large" @click="emit('onOpenApi')">配置 API</z-button>
+            <z-button size="large" @click="emit('onGoRoadmap')">路线导航</z-button>
           </template>
           <!-- 日间 ak：原版按钮 -->
           <template v-else>
@@ -27,8 +27,8 @@
               <span>目的地</span>
               <span class="hero__btn-arrow">→</span>
             </button>
-            <button class="hero__btn hero__btn--secondary" @click="emit('onOpenApi')">
-              配置 API
+            <button class="hero__btn hero__btn--secondary" @click="emit('onGoRoadmap')">
+              路线导航
             </button>
           </template>
         </div>
@@ -64,7 +64,7 @@ const theme = useThemeStore();
 
 const emit = defineEmits<{
   onGoDest: [];
-  onOpenApi: [];
+  onGoRoadmap: [];
 }>();
 </script>
 

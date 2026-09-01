@@ -14,6 +14,19 @@
     </div>
     <div class="ext-system__icp">
       <a
+        href="https://beian.mps.gov.cn/#/query/webSearch?code=44011302005840"
+        target="_blank"
+        rel="noreferrer"
+        class="ext-system__icp-link"
+      >
+        <img
+          :src="beianIcon"
+          alt="公安备案图标"
+          class="ext-system__beian-icon"
+        />
+        粤公网安备44011302005840号
+      </a>
+      <a
         href="https://beian.miit.gov.cn"
         target="_blank"
         rel="noopener noreferrer"
@@ -27,6 +40,7 @@
 
 <script setup lang="ts">
 import type { FooterToolItem } from '@/types/nav';
+import beianIcon from '@/assets/images/beian_icon.png';
 
 defineProps<{ items: FooterToolItem[] }>();
 const emit = defineEmits<{ onItemClick: [item: FooterToolItem] }>();
@@ -87,15 +101,26 @@ const emit = defineEmits<{ onItemClick: [item: FooterToolItem] }>();
 
 .ext-system__icp {
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
   margin-top: 8px;
 }
 
 .ext-system__icp-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 14.4px;
   color: var(--text-muted);
   text-decoration: none;
   transition: color 200ms;
+}
+
+.ext-system__beian-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 
 .ext-system__icp-link:hover {

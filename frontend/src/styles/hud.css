@@ -34,6 +34,12 @@
   padding-bottom: 32px;
 }
 
+.hud-page-container--wide {
+  max-width: 100%;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
 .page-title {
   font-family: var(--font-display);
   font-size: 28px;

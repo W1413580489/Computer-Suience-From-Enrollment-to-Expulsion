@@ -183,6 +183,7 @@ def chunk_document(
         }
 
     lines = clean.split("\n")
+    in_code = False  # 围栏代码块（```）内的注释行不是 Markdown 标题
     for line in lines:
         stripped = line.strip()
         if not stripped:
@@ -190,9 +191,15 @@ def chunk_document(
                 buf.append("")
             continue
 
+        # 围栏代码块开关：``` 内不检测标题，避免 # 注释被误判为标题
+        if stripped.startswith("```"):
+            in_code = not in_code
+            buf.append(stripped)
+            continue
+
         # 检查是否匹配下一个标题（从 clean 文本可能检测不到标题，用原始行号映射）
         # 简化：在 clean 文本中检测剩余 # 行
-        if re.match(r"^#{1,3}\s+\S", stripped):
+        if not in_code and re.match(r"^#{1,3}\s+\S", stripped):
             # 与 header_stack 同步：弹出比我深或同级的标题
             m = re.match(r"^(#{1,3})\s+(.+)", stripped)
             level = len(m.group(1))

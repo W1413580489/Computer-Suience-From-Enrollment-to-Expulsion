@@ -114,6 +114,11 @@ function go(path: string) {
 
 function onDrawerNav(path: string) {
   drawerOpen.value = false;
+  // 特殊项：API 配置 → 打开设置抽屉
+  if (path === '__settings__') {
+    settingsOpen.value = true;
+    return;
+  }
   router.push(path);
 }
 

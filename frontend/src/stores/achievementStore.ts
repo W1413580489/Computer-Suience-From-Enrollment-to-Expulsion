@@ -43,6 +43,15 @@ export const useAchievementStore = defineStore('achievement', {
       saveStore(data);
       const def = ACHIEVEMENTS.find((a) => a.id === id);
       if (def) this.toastQueue.push(def);
+      // 全成就达成Ⅰ检查：解锁数达到20个（排除自身避免递归）
+      if (id !== 'all_achievements') {
+        const otherCount = ACHIEVEMENTS.filter(
+          (a) => a.id !== 'all_achievements' && this.unlockedAtMap[a.id],
+        ).length;
+        if (otherCount >= 20) {
+          this.unlock('all_achievements');
+        }
+      }
       return true;
     },
     /** 查询是否已解锁 */

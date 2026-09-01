@@ -1,0 +1,848 @@
+<template>
+  <PageShell title="" subtitle="" active-key="teach" :wide="true">
+    <div class="teach" :data-theme="theme.isZzz ? 'zzz' : 'ak'">
+      <!-- 左侧配置栏 -->
+      <aside class="teach__side">
+        <div class="teach__group">
+          <label>API Key（BYOK · 仅存本机）</label>
+          <div class="teach__keyrow">
+            <input v-model="apiKey" :type="showKey ? 'text' : 'password'" placeholder="sk-..." autocomplete="off" />
+            <button class="teach__ghost" :title="showKey ? '隐藏' : '显示'" @click="showKey = !showKey">👁</button>
+          </div>
+          <div class="teach__status">
+            {{ apiKey.trim() ? '已保存到本机' : '未配置 Key（访问将返回 400）' }}
+          </div>
+        </div>
+
+        <div class="teach__group">
+          <label>模型</label>
+          <select v-model="model">
+            <option v-for="m in models" :key="m.model" :value="m.model">{{ m.label }}</option>
+          </select>
+        </div>
+
+        <div class="teach__group">
+          <label>教学任务</label>
+          <select v-model="projectId" @change="onProjectChange">
+            <option v-for="p in projects" :key="p.project_id" :value="p.project_id">{{ p.title }}</option>
+          </select>
+          <div class="teach__stages">
+            <div
+              v-for="sg in stages"
+              :key="sg.stage_id"
+              class="teach__stagechip"
+              :class="{ active: currentStage === sg.stage_id, done: isStageDone(sg) }"
+            >{{ sg.title }}</div>
+          </div>
+          <select v-model="taskId" @change="onTaskChange">
+            <template v-for="sg in stages" :key="sg.stage_id">
+              <optgroup :label="sg.title">
+                <option v-for="t in sg.tasks" :key="t.task_id" :value="t.task_id">{{ t.title }}</option>
+              </optgroup>
+            </template>
+          </select>
+        </div>
+
+        <div class="teach__group">
+          <label>辅导模式</label>
+          <div class="teach__modes">
+            <button
+              v-for="m in MODES"
+              :key="m.id"
+              class="teach__mode"
+              :class="{ active: mode === m.id }"
+              @click="mode = m.id"
+            >
+              <div class="t">{{ m.t }}</div>
+              <div class="d">{{ m.d }}</div>
+            </button>
+          </div>
+          <details class="teach__guide">
+            <summary>📘 四个模式怎么选？（教学模式）</summary>
+            <div class="teach__guide-body">
+              <p><b>刚拿到任务、不知道怎么下手</b> → 用 <b>Tutor</b>，让 AI 把任务拆成可执行步骤。</p>
+              <p><b>开始动手做、需要推进度</b> → 用 <b>Coach</b>，AI 会追问进度、推你执行。</p>
+              <p><b>遇到报错卡住</b> → 用 <b>Debugger</b>，AI 帮你定位原因、给排查步骤。</p>
+              <p><b>做完了要验收</b> → 用 <b>Reviewer</b>，AI 对照验收标准打分。</p>
+              <p class="tip">💡 AI 每次回答后会在下方提示「建议切到哪个模式」，点一下就能切换。</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="teach__group">
+          <label>GitHub 仓库链接</label>
+          <input
+            v-model="repoUrl"
+            class="teach__repo"
+            placeholder="https://github.com/用户名/仓库名"
+            autocomplete="off"
+          />
+          <div class="teach__status">
+            {{ repoUrl.trim() ? '已设置仓库地址' : '未配置（Reviewer 将跳过 CI/代码证据）' }}
+          </div>
+        </div>
+
+        <div class="teach__student">
+          <label>学生状态（localStorage）</label>
+          <div class="teach__badge">进度：完成任务 {{ doneCount }} · 已尝试 {{ attemptedCount }} 个任务</div>
+          <div class="teach__row2">
+            <button class="teach__ghost" @click="resetStudent">重置学生进度</button>
+            <button class="teach__ghost" @click="clearChat">清空对话</button>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- 右侧对话区 -->
+      <main class="teach__main">
+        <div class="teach__chathead">
+          <p class="teach__task">{{ currentTaskTitle }}</p>
+          <div class="teach__chips">
+            <span class="teach__metachip">{{ modeLabel }}</span>
+            <span class="teach__metachip">会话 {{ student.session_id }}</span>
+          </div>
+        </div>
+
+        <div ref="messagesEl" class="teach__messages">
+          <div v-if="chat.length === 0" class="teach__welcome">
+            <h2>{{ taskObjective || '👨‍🏫 AI 项目导师' }}</h2>
+            <p>{{ taskObjective ? '请选择左侧的辅导模式，开始完成这个任务。' : '选择左侧课程与任务，输入你的进展 / 代码 / 报错，AI 会按 Hint Level 渐进辅导。' }}</p>
+          </div>
+          <div v-for="(msg, i) in chat" :key="i" class="teach__msg" :class="msg.role">
+            <!-- 系统状态条（服务异常提示，不进入 AI 对话上下文） -->
+            <div v-if="msg.role === 'system'" class="teach__sysmsg">{{ msg.text }}</div>
+            <!-- 用户/AI 气泡 -->
+            <div v-else class="teach__bubble">{{ msg.role === 'user' ? msg.payload : msg.payload.message || '(空回复)' }}</div>
+
+            <!-- AI 结构化附加信息 -->
+            <template v-if="msg.role === 'assistant' && !msg.review">
+              <div class="teach__meta">
+                <span v-if="msg.payload.hint_level != null" class="teach__chip hint">提示 L{{ msg.payload.hint_level }}</span>
+                <span v-if="msg.payload.hints_used != null" class="teach__chip">提示档 {{ msg.payload.hints_used }}/5</span>
+                <span v-if="msg.payload.material_sources != null" class="teach__chip">参考源 {{ msg.payload.material_sources }}</span>
+                <span v-if="msg.payload.latency_ms != null" class="teach__chip">{{ msg.payload.latency_ms }} ms</span>
+                <span v-if="msg.payload.passed != null" class="teach__chip" :class="{ fail: !msg.payload.passed }">{{ msg.payload.passed ? '✓ 通过' : '未通过' }}</span>
+                <span v-if="msg.payload.score != null" class="teach__chip">评分 {{ msg.payload.score }}</span>
+                <span v-if="msg.payload.debug_state && msg.payload.debug_state.rounds" class="teach__chip">调试 {{ msg.payload.debug_state.rounds }}轮 · {{ msg.payload.debug_state.phase_desc }}</span>
+                <span class="teach__fb">
+                  <button title="有帮助" :class="{ on: msg.feedback === true }" @click="sendFb(msg, true)">👍</button>
+                  <button title="没帮助" :class="{ on: msg.feedback === false }" @click="sendFb(msg, false)">👎</button>
+                </span>
+              </div>
+
+              <div v-if="qualityLines(msg.payload).length" class="teach__kv">
+                <div v-for="(l, j) in qualityLines(msg.payload)" :key="j" v-html="l"></div>
+              </div>
+              <div v-if="(msg.payload.quality_warnings || []).length" class="teach__warn">⚠ {{ msg.payload.quality_warnings.join('<br>') }}</div>
+
+              <!-- mode_advice 推荐卡 -->
+              <div v-if="msg.payload.mode_advice" class="teach__advice">
+                <div class="a-tag">▶ 建议下一步</div>
+                <div class="a-reason">{{ msg.payload.mode_advice.reason }}</div>
+                <div class="a-actions">
+                  <button class="teach__btn" @click="applyAdvice(msg.payload.mode_advice)">切到 {{ modeName(msg.payload.mode_advice.mode) }}</button>
+                </div>
+                <div v-if="msg.payload.mode_advice.task_id" class="a-next">
+                  目标任务：{{ msg.payload.mode_advice.task_title }}{{ msg.payload.mode_advice.task_stage_title ? `（${msg.payload.mode_advice.task_stage_title}）` : '' }}
+                </div>
+              </div>
+            </template>
+
+            <!-- 评审卡 -->
+            <template v-if="msg.role === 'assistant' && msg.review">
+              <div class="teach__reviewcard">
+                <div class="teach__reviewhead">
+                  <b>⚖ 评审结论 · {{ msg.review.evaluation.status }} <span :style="{ color: stColor(msg.review.evaluation.status) }">{{ stMark(msg.review.evaluation.status) }}</span></b>
+                  <span class="teach__chip" style="font-size: 16px">{{ msg.review.evaluation.score ?? '–' }} / 100</span>
+                </div>
+                <div v-if="evidLine(msg.review)" class="teach__evline" v-html="evidLine(msg.review)"></div>
+                <div v-if="ciLine(msg.review)" class="teach__evline" v-html="ciLine(msg.review)"></div>
+                <div v-for="c in msg.review.evaluation.criteria || []" :key="c.rubric_id" class="teach__critrow">
+                  <span :style="{ color: stColor(c.status), fontWeight: 700 }">{{ stMark(c.status) }}</span>
+                  <div class="teach__critbody">
+                    <div class="teach__crittitle">{{ c.rubric_id }} · {{ c.reason }}</div>
+                    <div v-if="c.evidence" class="teach__critev">依据：{{ c.evidence }}</div>
+                  </div>
+                </div>
+                <div v-if="msg.review.evaluation.next_step" class="teach__nextstep"><b>下一步：</b>{{ msg.review.evaluation.next_step }}</div>
+              </div>
+            </template>
+          </div>
+          <div v-if="loading" class="teach__msg assistant">
+            <div class="teach__bubble teach__loading"><i></i><i></i><i></i> AI 思考中…</div>
+          </div>
+        </div>
+
+        <div class="teach__composer">
+          <textarea
+            v-model="input"
+            rows="2"
+            placeholder="描述你当前的进展、粘贴代码或报错…（Enter 发送，Shift+Enter 换行）"
+            @keydown="onKeydown"
+          ></textarea>
+          <button class="teach__btn" :disabled="loading" @click="send">发送</button>
+        </div>
+      </main>
+    </div>
+    <div v-if="toastMsg" class="teach__toast">{{ toastMsg }}</div>
+  </PageShell>
+</template>
+
+<script setup lang="ts">
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import PageShell from '@/components/common/PageShell.vue';
+import { useThemeStore } from '@/stores/themeStore';
+import { useAchievementStore } from '@/stores/achievementStore';
+
+const theme = useThemeStore();
+
+const MODES = [
+  { id: 'tutor', t: 'Tutor 教练', d: '拆解任务 · 引导方向' },
+  { id: 'coach', t: 'Coach 督学', d: '追问进度 · 推动执行' },
+  { id: 'debugger', t: 'Debugger 调错', d: '定位报错 · 逐步修复' },
+  { id: 'reviewer', t: 'Reviewer 评审', d: '对照验收标准评估' },
+] as const;
+const MODE_NAMES = MODES.reduce<Record<string, string>>((o, m) => { o[m.id] = m.t; return o; }, {});
+
+// ---------- 状态 ----------
+const LS_STATUS = 'xkz_ai_student';
+const LS_API = 'xkz_ai_api_key';
+const LS_REPO = 'xkz_ai_repo';
+
+interface StudentState { session_id: string; name: string; skills: Record<string, unknown>; completed_tasks: string[]; attempt_count: Record<string, number>; timestamp: string }
+function loadStudent(): StudentState {
+  try {
+    const raw = localStorage.getItem(LS_STATUS);
+    if (raw) { const s = JSON.parse(raw); if (s && s.session_id) return s; }
+  } catch { /* ignore */ }
+  return { session_id: 's_' + Math.random().toString(16).slice(2, 10), name: '匿名学生', skills: {}, completed_tasks: [], attempt_count: {}, timestamp: new Date().toISOString() };
+}
+
+interface Project { project_id: string; title: string; description: string; stages: Stage[] }
+interface Stage { stage_id: string; title: string; tasks: { task_id: string; title: string; objective: string }[] }
+const projects = ref<Project[]>([]);
+const projectId = ref('');
+const stages = ref<Stage[]>([]);
+const models = ref<{ model: string; label: string }[]>([]);
+const mode = ref<string>('tutor');
+const apiKey = ref(localStorage.getItem(LS_API) || '');
+const repoUrl = ref(localStorage.getItem(LS_REPO) || '');
+const model = ref('');
+const taskId = ref('');
+const depUrl = ref('');
+const codeBlock = ref('');
+const descr = ref('');
+const input = ref('');
+const loading = ref(false);
+const showKey = ref(false);
+const statsOpen = ref(false);
+const stats = ref<Record<string, unknown> | null>(null);
+const messagesEl = ref<HTMLElement | null>(null);
+const toastMsg = ref('');
+let toastTimer: ReturnType<typeof setTimeout> | null = null;
+
+interface ChatMsg { role: 'user' | 'assistant'; payload: any; review?: any; feedback?: boolean }
+const chat = ref<ChatMsg[]>([]);
+const history = ref<{ role: string; content: string }[]>([]);
+const student = ref<StudentState>(loadStudent());
+
+watch(apiKey, v => localStorage.setItem(LS_API, v.trim()));
+watch(repoUrl, v => localStorage.setItem(LS_REPO, v.trim()));
+
+// 成就：首次配置 API Key
+watch(apiKey, v => { if (v.trim()) useAchievementStore().unlock('green_fruit_2'); });
+// 成就：辅导模式切换
+watch(mode, m => {
+  if (m === 'coach') useAchievementStore().unlock('trust_me');
+  else if (m === 'debugger') useAchievementStore().unlock('power_home_ideal');
+  else if (m === 'reviewer') useAchievementStore().unlock('why_birds_fly');
+});
+
+// ---------- 计算属性 ----------
+const currentStage = computed(() => {
+  for (const sg of stages.value) {
+    if (sg.tasks.some(t => t.task_id === taskId.value)) return sg.stage_id;
+  }
+  return '';
+});
+const taskObjective = computed(() => {
+  for (const sg of stages.value) {
+    const t = sg.tasks.find(t => t.task_id === taskId.value);
+    if (t) return t.objective || '';
+  }
+  return '';
+});
+const currentTaskTitle = computed(() => {
+  for (const sg of stages.value) {
+    const t = sg.tasks.find(t => t.task_id === taskId.value);
+    if (t) return `${t.title} — ${t.objective || ''}`;
+  }
+  return '选择任务开始';
+});
+const modeLabel = computed(() => MODE_NAMES[mode.value] || mode.value);
+const doneCount = computed(() => (student.value.completed_tasks || []).length);
+const attemptedCount = computed(() => Object.keys(student.value.attempt_count || {}).length);
+const blockedTasks = computed(() => {
+  const b = (stats.value as any)?.probably_blocked_tasks || {};
+  return Object.keys(b).join(', ') || '';
+});
+const hintDist = computed(() => {
+  const h = (stats.value as any)?.hint_distribution || {};
+  return Object.entries(h).map(([k, v]) => `L${k}:${v}`).join(' · ');
+});
+
+function isStageDone(sg: Stage) {
+  const done = new Set(student.value.completed_tasks || []);
+  return sg.tasks.length > 0 && sg.tasks.every(t => done.has(t.task_id));
+}
+
+// ---------- 配置加载 ----------
+function loadProject(p: Project | undefined) {
+  stages.value = (p?.stages || []).map(sg => ({
+    stage_id: sg.stage_id, title: sg.title, tasks: (sg.tasks || []).map(t => ({ task_id: t.task_id, title: t.title, objective: t.objective || '' })),
+  }));
+  const first = stages.value[0]?.tasks[0];
+  taskId.value = first ? first.task_id : '';
+}
+
+onMounted(async () => {
+  useAchievementStore().unlock('green_fruit_1');
+  try {
+    const r = await fetch(`/api/ai/config`);
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error?.message || 'config 加载失败');
+    const cfg = j.data;
+    models.value = cfg.models || [];
+    if (models.value.length) model.value = models.value[0].model;
+    projects.value = (cfg.projects || []).map((p: any) => ({
+      project_id: p.project_id, title: p.title, description: p.description || '', stages: p.stages || [],
+    }));
+    if (projects.value.length) {
+      projectId.value = projects.value[0].project_id;
+      loadProject(projects.value[0]);
+    }
+  } catch (e: any) {
+    toast('无法连接引擎：' + e.message);
+  }
+});
+
+function onProjectChange() {
+  const p = projects.value.find(x => x.project_id === projectId.value);
+  loadProject(p);
+  toast(p ? `已切换到课程：${p.title}` : '');
+}
+
+function onTaskChange() { /* objective 通过 computed 自动更新 */ }
+
+// ---------- 发送 ----------
+function saveStudent() {
+  student.value.timestamp = new Date().toISOString();
+  localStorage.setItem(LS_STATUS, JSON.stringify(student.value));
+}
+
+async function send() {
+  const text = input.value.trim();
+  if (!text || loading.value) return;
+  if (!taskId.value) { toast('请先选择一个任务'); return; }
+  if (!apiKey.value.trim()) { toast('请先填写 DeepSeek API Key'); return; }
+
+  useAchievementStore().unlock('green_fruit_3');
+
+  input.value = '';
+  pushMsg('user', text);
+  loading.value = true;
+  scrollToBottom();
+
+  student.value.attempt_count = student.value.attempt_count || {};
+  student.value.attempt_count[taskId.value] = (student.value.attempt_count[taskId.value] || 0) + 1;
+
+  const body = {
+    session_id: student.value.session_id, student: student.value,
+    course_id: 'course_001', project_id: 'project_chatbot',
+    task_id: taskId.value, mode: mode.value, user_input: text,
+    repo_url: repoUrl.value.trim() || null,
+    api_key: apiKey.value.trim(), model: model.value, history: history.value.slice(-6),
+  };
+
+  try {
+    const r = await fetch(`/api/ai/teach`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+    const j = await r.json();
+    if (!j.ok) {
+      const code = j.error?.code || '';
+      const msg = j.error?.message || '未知错误';
+      if (code === 'KEY_INVALID') { toast('API Key 无效或已过期'); pushSystem(msg); }
+      else if (code === 'RATE_LIMITED') { toast('服务商限流，请稍后重试'); pushSystem(msg); }
+      else if (code === 'ENGINE_ERROR' || code === 'PROVIDER_DOWN' || code === 'REVIEW_UNAVAILABLE') {
+        pushSystem(msg + '\n（系统故障，与你提交的项目无关，请稍后重试）');
+      }
+      else toast(msg);
+      return;
+    }
+    const d = j.data;
+    pushMsg('assistant', d);
+    if (d.passed && !student.value.completed_tasks.includes(taskId.value)) {
+      student.value.completed_tasks.push(taskId.value);
+      toast('🎉 Reviewer 判定通过，任务完成！');
+    }
+    saveStudent();
+  } catch (e: any) {
+    pushSystem('网络请求失败：' + e.message + '\n（网络/系统故障，与你提交的项目无关，请稍后重试）');
+    toast('网络请求失败：' + e.message);
+  } finally {
+    loading.value = false;
+    scrollToBottom();
+  }
+}
+
+// 系统状态条：只渲染在聊天流里，绝不写入 history（避免污染 AI 对话上下文）
+function pushSystem(text: string) {
+  chat.value.push({ role: 'system', text });
+  scrollToBottom();
+}
+
+function pushMsg(role: 'user' | 'assistant', payload: any, review?: any) {
+  chat.value.push({ role, payload, review });
+  if (role === 'user') history.value.push({ role: 'user', content: typeof payload === 'string' ? payload : payload.message });
+  else history.value.push({ role: 'assistant', content: payload?.message || '' });
+  if (history.value.length > 40) history.value = history.value.slice(-40);
+}
+
+function scrollToBottom() {
+  nextTick(() => { if (messagesEl.value) messagesEl.value.scrollTop = messagesEl.value.scrollHeight; });
+}
+
+// ---------- 评审链 ----------
+const ST_REVIEW: Record<string, [string, string]> = {
+  PASS: ['✓', 'var(--t-green)'], FAIL: ['✕', 'var(--t-red)'], NEED_REVIEW: ['?', 'var(--t-yellow)'],
+};
+function stMark(s: string) { return (ST_REVIEW[s] || ST_REVIEW.NEED_REVIEW)[0]; }
+function stColor(s: string) { return (ST_REVIEW[s] || ST_REVIEW.NEED_REVIEW)[1]; }
+
+async function doReview() {
+  if (!taskId.value) { toast('请先选择一个任务'); return; }
+  if (!apiKey.value.trim()) { toast('请先填写 DeepSeek API Key'); return; }
+  loading.value = true;
+  scrollToBottom();
+  const body = {
+    session_id: student.value.session_id, task_id: taskId.value,
+    submission: {
+      github_url: repoUrl.value.trim() || '',
+      deployment_url: depUrl.value.trim() || '',
+      code: codeBlock.value.trim() || '',
+      description: descr.value.trim() || '',
+    },
+    api_key: apiKey.value.trim(), model: model.value,
+  };
+  try {
+    const r = await fetch(`/api/ai/review`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+    const j = await r.json();
+    if (!j.ok) {
+      const code = j.error?.code || '';
+      if (code === 'REVIEW_UNAVAILABLE' || code === 'ENGINE_ERROR' || code === 'PROVIDER_DOWN') {
+        pushSystem(j.error?.message || '评审服务暂时不可用（系统故障，与你提交的项目无关）');
+      } else { toast(j.error?.message || '评审失败'); }
+      return;
+    }
+    chat.value.push({ role: 'assistant', payload: { message: `评审完成：${j.data.evaluation.status}（${j.data.score} 分）` }, review: j.data });
+    if (j.data.passed && !student.value.completed_tasks.includes(taskId.value)) {
+      student.value.completed_tasks.push(taskId.value);
+      saveStudent();
+      toast('🎉 评审判定通过，任务完成！');
+    } else { saveStudent(); }
+  } catch (e: any) {
+    toast('网络请求失败：' + e.message);
+  } finally {
+    loading.value = false;
+    scrollToBottom();
+  }
+}
+
+function esc(s: unknown) {
+  return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
+}
+function evidLine(d: any) {
+  const ev = d.evidence || {};
+  if (!ev || ev.status === 'none') return '';
+  let s = '';
+  if (ev.status === 'ok') s = `代码证据 ✓ 已读取仓库 ${esc(ev.repo || '')}（${ev.file_count || 0} 个文件）`;
+  else if (ev.status === 'error') s = `代码证据 ✕ 未能读取：${ev.error ? esc(ev.error) : '未知原因'}${ev.code ? `（${esc(ev.code)}）` : ''}`;
+  else return '';
+  return s;
+}
+function ciLine(d: any) {
+  const ci = d.ci || {};
+  if (!ci || ci.status !== 'ok') return '';
+  if (!Array.isArray(ci.workflows) || !ci.workflows.length) {
+    return 'CI：仓库无 GitHub Actions 工作流（运行/测试类需学生提交真实运行证据）';
+  }
+  const map: Record<string, [string, string]> = { success: ['✓', 'var(--t-green)'], failure: ['✕', 'var(--t-red)'], none: ['·', 'var(--t-yellow)'] };
+  const chips = ci.workflows.map((w: any) => {
+    const c = (w.conclusion || w.status || 'none').toLowerCase();
+    const [m, cc] = map[c in map ? c : 'none'];
+    return `CI[${esc(w.dimension)}] ${esc(w.name)} <span style="color:${cc};font-weight:700">${m}</span>`;
+  }).join(' · ');
+  return `CI 自动验收：${chips}`;
+}
+
+// ---------- 反馈 / 统计 ----------
+function sendFb(msg: ChatMsg, accepted: boolean) {
+  fetch(`/api/ai/feedback`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ session_id: student.value.session_id, task_id: taskId.value, accepted }),
+  }).then(r => r.json()).then(j => {
+    if (j.ok) {
+      msg.feedback = accepted;
+      toast(accepted ? '已记录：有帮助' : '已记录：没帮助');
+    }
+  }).catch(() => { /* ignore */ });
+}
+
+async function toggleStats() {
+  statsOpen.value = !statsOpen.value;
+  if (statsOpen.value && !stats.value) {
+    try {
+      const j = await (await fetch(`/api/ai/stats`)).json();
+      if (j.ok) stats.value = j.data;
+      else toast('统计加载失败');
+    } catch (e: any) { toast('统计加载失败：' + e.message); }
+  }
+}
+
+// ---------- 其他操作 ----------
+function resetStudent() {
+  student.value = { session_id: 's_' + Math.random().toString(16).slice(2, 10), name: '匿名学生', skills: {}, completed_tasks: [], attempt_count: {}, timestamp: new Date().toISOString() };
+  saveStudent();
+  useAchievementStore().unlock('great_discipline_officer');
+  toast('已重置学生进度，新会话 ' + student.value.session_id);
+}
+function clearChat() {
+  chat.value = [];
+  history.value = [];
+  useAchievementStore().unlock('traveler');
+}
+function applyAdvice(adv: any) {
+  if (adv.task_id) taskId.value = adv.task_id;
+  mode.value = adv.mode;
+  toast('已切换到 ' + (MODE_NAMES[adv.mode] || adv.mode));
+}
+function qualityLines(p: any): string[] {
+  const lines: string[] = [];
+  const esc = (s: string) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
+  if (p.leading_question) lines.push(`<b>引导问题：</b>${esc(p.leading_question)}`);
+  if (p.current_step) lines.push(`<b>当前只需做：</b>${esc(p.current_step)}`);
+  if (p.suspected_cause) lines.push(`<b>疑似原因：</b>${esc(p.suspected_cause)}`);
+  if (p.verify_steps && p.verify_steps.length) lines.push(`<b>排查步骤：</b>${p.verify_steps.map(esc).join(' → ')}`);
+  if (p.diagnostic_question) lines.push(`<b>诊断反问：</b>${esc(p.diagnostic_question)}`);
+  if (p.evaluation) lines.push(`<b>评审意见：</b>${esc(p.evaluation)}`);
+  if (p.next_action) lines.push(`<b>下一步：</b>${esc(p.next_action)}`);
+  if (p.hint_level_desc) lines.push(`<b>提示档：</b>${esc(p.hint_level_desc)}`);
+  return lines;
+}
+function modeName(m: string) { return MODE_NAMES[m] || m; }
+
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+}
+
+function toast(msg: string) {
+  toastMsg.value = msg;
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { toastMsg.value = ''; }, 3200);
+}
+</script>
+
+<style scoped>
+.teach {
+  --t-bg: #1A1A1A; --t-bg2: #222222; --t-bg3: #2A2A2A; --t-line: #333333;
+  --t-fg: #E8E8E8; --t-dim: #999999; --t-mut: #666666;
+  --t-acc: #FFD93D; --t-acc-dim: #C9A800;
+  --t-green: #4ECCA3; --t-yellow: #FFD93D; --t-red: #FF5D6C;
+  display: flex; gap: 0; height: calc(100vh - 120px); min-height: 600px;
+  border: 1px solid var(--t-line); border-radius: 14px; overflow: hidden;
+  background: var(--t-bg);
+  /* 突破父容器 .hud-page-container 的 max-width: 860px 限制 */
+  width: calc(100vw - 48px);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+/* 日间 ak 主题 — 统一红白色调 */
+.teach[data-theme='ak'] {
+  --t-bg: #fafafa; --t-bg2: #ffffff; --t-bg3: #ffffff; --t-line: #e8e8e8;
+  --t-fg: #1a1a1a; --t-dim: #555555; --t-mut: #999999;
+  --t-acc: #c0392b; --t-acc-dim: #a93226;
+  --t-green: #34d399; --t-yellow: #fbbf24; --t-red: #f87171;
+}
+
+.teach * { box-sizing: border-box; }
+
+.teach__side {
+  width: 320px; min-width: 320px; border-right: 1px solid var(--t-line);
+  background: var(--t-bg2); padding: 16px 14px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.teach__group { display: flex; flex-direction: column; gap: 5px; }
+.teach__group label { font-size: 12px; color: var(--t-dim); font-weight: 600; letter-spacing: .03em; }
+.teach select, .teach input, .teach textarea {
+  background: var(--t-bg3); border: 1px solid var(--t-line); color: var(--t-fg);
+  border-radius: 8px; padding: 8px 10px; font-size: 13px; width: 100%;
+  outline: none; transition: border-color .15s; font-family: inherit;
+}
+.teach select:focus, .teach input:focus, .teach textarea:focus { border-color: var(--t-acc); }
+.teach textarea { resize: vertical; min-height: 48px; }
+.teach__code-area { min-height: 54px; font-family: ui-monospace, Consolas, monospace; font-size: 12px; }
+.teach__keyrow { display: flex; gap: 8px; align-items: center; }
+.teach__keyrow input { flex: 1; }
+.teach__hint { font-size: 11px; color: var(--t-mut); }
+.teach__status { font-size: 11px; color: var(--t-mut); }
+.teach__stages { display: flex; gap: 4px; margin-bottom: 4px; flex-wrap: wrap; }
+.teach__stagechip {
+  flex: 1; min-width: 0; text-align: center; font-size: 11px; line-height: 1.3;
+  padding: 4px 2px; border-radius: 6px; border: 1px solid var(--t-line);
+  background: var(--t-bg3); color: var(--t-mut); pointer-events: none;
+}
+.teach__stagechip.active { border-color: var(--t-acc); color: var(--t-acc); font-weight: 700; }
+.teach[data-theme='ak'] .teach__stagechip.active { background: rgba(192, 57, 43, .08); }
+.teach__stagechip.done { border-color: var(--t-green); color: var(--t-green); }
+.teach__modes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.teach__mode {
+  background: var(--t-bg3); border: 1px solid var(--t-line); color: var(--t-fg);
+  border-radius: 8px; padding: 8px; cursor: pointer; text-align: left; font-size: 12px; transition: .15s;
+}
+.teach__mode .t { font-weight: 600; font-size: 13px; }
+.teach__mode .d { color: var(--t-mut); font-size: 11px; }
+.teach__mode.active { border-color: var(--t-acc); box-shadow: 0 0 0 1px var(--t-acc); }
+.teach__guide { margin-top: 6px; }
+.teach__guide summary { cursor: pointer; font-size: 12px; color: var(--t-dim); }
+.teach__guide summary:hover { color: var(--t-fg); }
+.teach__guide-body {
+  font-size: 12px; color: var(--t-dim); margin-top: 6px; border: 1px solid var(--t-line);
+  background: var(--t-bg3); border-radius: 8px; padding: 8px 10px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.teach__guide-body p { margin: 0; }
+.teach__guide-body .tip { color: var(--t-acc); }
+.teach__btn {
+  background: var(--t-acc); color: #fff; border: 0; border-radius: 8px;
+  padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: .15s;
+}
+.teach__btn:hover { background: var(--t-acc-dim); }
+.teach__btn:disabled { opacity: .5; cursor: not-allowed; }
+.teach__ghost {
+  background: transparent; border: 1px solid var(--t-line); color: var(--t-dim);
+  border-radius: 8px; padding: 7px 10px; font-size: 12px; cursor: pointer; transition: .15s;
+}
+.teach__ghost:hover { color: var(--t-fg); border-color: var(--t-acc); }
+.teach__full { width: 100%; }
+.teach__row2 { display: flex; gap: 8px; }
+.teach__row2 .teach__ghost { flex: 1; }
+.teach__student { display: flex; flex-direction: column; gap: 6px; }
+.teach__badge {
+  display: flex; align-items: center; gap: 6px; background: var(--t-bg3); border: 1px solid var(--t-line);
+  border-radius: 8px; padding: 4px 9px; font-size: 12px; color: var(--t-dim);
+}
+.teach__stats { font-size: 11px; color: var(--t-dim); display: flex; flex-direction: column; gap: 3px; }
+.teach__stats b { color: var(--t-fg); }
+.teach__red { color: var(--t-red); }
+.teach__yellow { color: var(--t-yellow); }
+.teach__dim { color: var(--t-mut); }
+.teach__apifoot { margin-top: auto; }
+
+/* 右侧对话区 */
+.teach__main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.teach__chathead {
+  padding: 10px 18px; border-bottom: 1px solid var(--t-line); background: var(--t-bg2);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.teach__chathead .teach__task { margin: 0; font-size: 13px; color: var(--t-fg); }
+.teach__chips { display: flex; gap: 8px; }
+.teach__metachip {
+  font-size: 11px; color: var(--t-dim); background: var(--t-bg3); border: 1px solid var(--t-line);
+  border-radius: 20px; padding: 3px 10px; white-space: nowrap;
+}
+.teach__messages {
+  flex: 1; overflow-y: auto; padding: 18px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.teach__welcome { max-width: 560px; margin: auto auto; text-align: center; color: var(--t-mut); }
+.teach__welcome h2 { color: var(--t-dim); font-size: 20px; font-weight: 600; margin-bottom: 10px; line-height: 1.5; }
+.teach__welcome p { font-size: 13px; line-height: 1.7; color: var(--t-dim); }
+.teach__msg { display: flex; flex-direction: column; }
+.teach__msg.user { align-self: flex-end; align-items: flex-end; }
+.teach__msg.assistant { align-self: flex-start; align-items: flex-start; max-width: 88%; }
+.teach__bubble {
+  max-width: 100%; background: var(--t-bg3); border: 1px solid var(--t-line);
+  border-radius: 14px; padding: 11px 13px; white-space: pre-wrap; word-break: break-word; color: var(--t-fg);
+}
+.teach__msg.user .teach__bubble { background: var(--t-acc); border-color: var(--t-acc); color: #fff; }
+.teach__msg.system { align-self: center; max-width: 92%; }
+.teach__sysmsg {
+  background: color-mix(in srgb, var(--t-yellow) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--t-yellow) 40%, transparent);
+  color: var(--t-yellow); border-radius: 8px; padding: 8px 12px;
+  font-size: 12px; text-align: center; white-space: pre-wrap; word-break: break-word;
+}
+.teach__meta { font-size: 11px; color: var(--t-mut); margin-top: 6px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.teach__chip {
+  background: color-mix(in srgb, var(--t-acc) 14%, transparent); color: var(--t-acc);
+  border: 1px solid color-mix(in srgb, var(--t-acc) 35%, transparent);
+  border-radius: 6px; padding: 1px 7px; font-size: 11px;
+}
+.teach__chip.hint {
+  background: color-mix(in srgb, var(--t-yellow) 14%, transparent); color: var(--t-yellow);
+  border-color: color-mix(in srgb, var(--t-yellow) 35%, transparent);
+}
+.teach__chip.fail {
+  background: color-mix(in srgb, var(--t-red) 14%, transparent); color: var(--t-red);
+  border-color: color-mix(in srgb, var(--t-red) 35%, transparent);
+}
+.teach__fb { display: inline-flex; gap: 4px; margin-left: 4px; align-items: center; }
+.teach__fb button {
+  background: transparent; border: 1px solid var(--t-line); color: var(--t-dim);
+  border-radius: 6px; width: 22px; height: 22px; cursor: pointer; font-size: 12px; line-height: 1;
+}
+.teach__fb button:hover { border-color: var(--t-acc); color: var(--t-acc); }
+.teach__fb button.on { background: color-mix(in srgb, var(--t-acc) 20%, transparent); border-color: var(--t-acc); color: var(--t-fg); }
+.teach__kv {
+  font-size: 12px; color: var(--t-dim); border-top: 1px dashed var(--t-line);
+  margin-top: 8px; padding-top: 6px; display: flex; flex-direction: column; gap: 2px;
+}
+.teach__kv b { color: var(--t-fg); }
+.teach__warn {
+  background: color-mix(in srgb, var(--t-red) 9%, transparent);
+  border: 1px solid color-mix(in srgb, var(--t-red) 28%, transparent); color: var(--t-red);
+  border-radius: 8px; padding: 6px 10px; font-size: 12px; margin-top: 8px; white-space: pre-wrap;
+}
+.teach__advice {
+  margin-top: 10px; border: 1px solid color-mix(in srgb, var(--t-acc) 45%, transparent);
+  background: color-mix(in srgb, var(--t-acc) 10%, transparent); border-radius: 10px;
+  padding: 9px 12px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start;
+}
+.teach__advice .a-tag { font-size: 11px; font-weight: 700; color: var(--t-acc); letter-spacing: .04em; }
+.teach__advice .a-reason { font-size: 13px; color: var(--t-fg); }
+.teach__advice .a-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.teach__advice .a-actions .teach__btn { padding: 6px 12px; font-size: 12px; }
+.teach__advice .a-next { font-size: 11px; color: var(--t-mut); }
+
+/* 评审卡 */
+.teach__reviewcard {
+  margin-top: 8px; background: var(--t-bg3); border: 1px solid var(--t-line);
+  border-radius: 14px; padding: 12px 14px; min-width: 340px; max-width: 100%;
+}
+.teach__reviewhead {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;
+  font-size: 14px; color: var(--t-fg);
+}
+.teach__evline { font-size: 11px; color: var(--t-dim); margin: 2px 0 6px; }
+.teach__critrow {
+  display: flex; gap: 8px; align-items: flex-start; padding: 7px 0;
+  border-bottom: 1px solid var(--t-line);
+}
+.teach__critbody { flex: 1; min-width: 0; }
+.teach__crittitle { font-weight: 600; color: var(--t-fg); }
+.teach__critev { color: var(--t-dim); font-size: 12px; }
+.teach__nextstep { margin-top: 8px; color: var(--t-dim); }
+.teach__nextstep b { color: var(--t-fg); }
+
+/* 输入区 */
+.teach__composer {
+  border-top: 1px solid var(--t-line); padding: 10px 14px; background: var(--t-bg2);
+  display: flex; gap: 10px; align-items: flex-end;
+}
+.teach__composer textarea { flex: 1; min-height: 44px; max-height: 140px; }
+.teach__loading { display: inline-flex; gap: 4px; align-items: center; color: var(--t-mut); }
+.teach__loading i { width: 6px; height: 6px; border-radius: 50%; background: var(--t-acc); animation: tb 1.1s infinite; }
+.teach__loading i:nth-child(2) { animation-delay: .15s; }
+.teach__loading i:nth-child(3) { animation-delay: .3s; }
+@keyframes tb { 0%, 60%, 100% { opacity: .25; transform: scale(.8); } 30% { opacity: 1; transform: scale(1); } }
+
+.teach__toast {
+  position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+  background: #2a2110; border: 1px solid var(--t-yellow); color: #fde68a;
+  padding: 9px 16px; border-radius: 9px; font-size: 13px; z-index: 99; max-width: 80%;
+}
+
+@media (max-width: 760px) {
+  .teach { flex-direction: column; height: auto; min-height: 70vh; }
+  .teach__side { width: 100%; min-width: 0; max-height: 46vh; border-right: 0; border-bottom: 1px solid var(--t-line); }
+  .teach__messages { min-height: 300px; }
+  .teach__reviewcard { min-width: 0; }
+}
+
+/* ============================================
+   夜间 zzz 主题 — 绝区零风格（克制版）
+   深灰底 + 黄色仅用于 active 填充 / 点缀
+   无辉光 / 无扫描线 / 小圆角
+   放在末尾确保源码顺序优先
+   ============================================ */
+.teach[data-theme='zzz'] {
+  --t-bg: #1A1A1A; --t-bg2: #222222; --t-bg3: #2A2A2A; --t-line: #333333;
+  --t-fg: #E8E8E8; --t-dim: #999999; --t-mut: #666666;
+  --t-acc: #FFD93D; --t-acc-dim: #C9A800;
+  --t-green: #4ECCA3; --t-yellow: #FFD93D; --t-red: #FF5D6C;
+  border-radius: 10px; border-color: #333; box-shadow: none; background: var(--t-bg);
+}
+.teach[data-theme='zzz'] .teach__side { border-right-color: #333; }
+.teach[data-theme='zzz'] .teach__chathead { border-bottom-color: #333; }
+.teach[data-theme='zzz'] .teach__composer { border-top-color: #333; }
+.teach[data-theme='zzz'] .teach__btn {
+  background: #333; color: var(--t-fg); border: 1px solid #444; border-radius: 6px; font-weight: 600;
+}
+.teach[data-theme='zzz'] .teach__btn:hover {
+  background: var(--t-acc); color: #0A0A0A; border-color: var(--t-acc); box-shadow: none;
+}
+.teach[data-theme='zzz'] .teach__ghost {
+  background: transparent; color: var(--t-dim); border: 1px solid #444; border-radius: 6px;
+}
+.teach[data-theme='zzz'] .teach__ghost:hover {
+  color: #0A0A0A; border-color: var(--t-acc); background: var(--t-acc); box-shadow: none;
+}
+.teach[data-theme='zzz'] .teach__mode {
+  border-radius: 6px; border: 1px solid #444; background: #2A2A2A;
+}
+.teach[data-theme='zzz'] .teach__mode.active {
+  border-color: var(--t-acc); background: var(--t-acc) !important; color: #0A0A0A !important; box-shadow: none !important;
+}
+.teach[data-theme='zzz'] .teach__mode.active .t { color: #0A0A0A !important; font-weight: 700; }
+.teach[data-theme='zzz'] .teach__mode.active .d { color: rgba(10,10,10,0.6) !important; }
+.teach[data-theme='zzz'] .teach__stagechip {
+  border-radius: 4px; border: 1px solid #444; background: #2A2A2A;
+}
+.teach[data-theme='zzz'] .teach__stagechip.active {
+  border-color: var(--t-acc); background: var(--t-acc) !important; color: #0A0A0A !important; font-weight: 700;
+}
+.teach[data-theme='zzz'] .teach__stagechip.done {
+  border-color: var(--t-green); background: var(--t-green) !important; color: #0A0A0A !important;
+}
+.teach[data-theme='zzz'] select:focus,
+.teach[data-theme='zzz'] input:focus,
+.teach[data-theme='zzz'] textarea:focus {
+  border-color: var(--t-acc); box-shadow: none;
+}
+.teach[data-theme='zzz'] .teach__msg.user .teach__bubble {
+  background: #2A2A2A !important; border: 1px solid #444; color: var(--t-fg) !important; border-left: 3px solid var(--t-acc);
+}
+.teach[data-theme='zzz'] .teach__reviewcard {
+  border: 1px solid #444; border-top: 2px solid var(--t-acc); border-radius: 8px; box-shadow: none;
+}
+.teach[data-theme='zzz'] .teach__advice {
+  border: 1px solid #444; border-left: 3px solid var(--t-acc); background: #222; border-radius: 6px;
+}
+.teach[data-theme='zzz'] .teach__advice .a-tag {
+  color: var(--t-acc); text-shadow: none;
+}
+.teach[data-theme='zzz'] .teach__loading i {
+  background: var(--t-acc); box-shadow: none;
+}
+.teach[data-theme='zzz'] .teach__chip,
+.teach[data-theme='zzz'] .teach__metachip,
+.teach[data-theme='zzz'] .teach__badge,
+.teach[data-theme='zzz'] .teach__bubble,
+.teach[data-theme='zzz'] .teach__warn {
+  border-radius: 6px; clip-path: none;
+}
+</style>
+

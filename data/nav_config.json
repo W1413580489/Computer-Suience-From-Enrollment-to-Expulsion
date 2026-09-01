@@ -17,10 +17,26 @@
       "icon": "guide"
     },
     {
+      "key": "roadmap",
+      "label": "路线图",
+      "subLabel": "ROADMAP",
+      "number": "02",
+      "route": "/roadmap",
+      "icon": "academics"
+    },
+    {
+      "key": "teach",
+      "label": "AI 项目导师",
+      "subLabel": "TEACH",
+      "number": "03",
+      "route": "/teach",
+      "icon": "chat"
+    },
+    {
       "key": "appendix",
       "label": "附录",
       "subLabel": "DATABASE",
-      "number": "02",
+      "number": "04",
       "route": "/appendix",
       "icon": "database"
     },
@@ -28,23 +44,23 @@
       "key": "about",
       "label": "关于我",
       "subLabel": "ABOUT",
-      "number": "03",
+      "number": "05",
       "route": "/about",
       "icon": "user"
     },
     {
-      "key": "changelog",
-      "label": "更新日志",
-      "subLabel": "UPDATE",
-      "number": "04",
-      "route": "/changelog",
-      "icon": "history"
+      "key": "api",
+      "label": "API 配置",
+      "subLabel": "API CONFIG",
+      "number": "06",
+      "route": "__settings__",
+      "icon": "settings"
     },
     {
       "key": "feishu",
       "label": "飞书",
       "subLabel": "FEISHU",
-      "number": "05",
+      "number": "07",
       "route": "https://tralis2671.feishu.cn/wiki/VvKVwsHo2iIIC4ko0PmcKs4lnKd",
       "icon": "doc"
     },
@@ -52,7 +68,7 @@
       "key": "genshin",
       "label": "原！",
       "subLabel": "GENSHIN",
-      "number": "06",
+      "number": "08",
       "route": "https://www.mihoyo.com/",
       "icon": "globe"
     },
@@ -60,7 +76,7 @@
       "key": "galgame",
       "label": "galgame",
       "subLabel": "GALGAME",
-      "number": "07",
+      "number": "09",
       "route": "https://github.com/Live-GalGame/LiveGalGame",
       "icon": "star"
     }

@@ -328,6 +328,9 @@ function handleLogin() {
   });
   // 成就：完成建号
   useAchievementStore().unlock('id_card');
+  // 成就：大一 / 大四身份
+  if (grade.value === 1) useAchievementStore().unlock('youth_spring');
+  if (grade.value === 4) useAchievementStore().unlock('twenty_years');
   showBadge.value = true;
 }
 
@@ -338,6 +341,8 @@ function handleBadgeClose() {
 
 function handleGuest() {
   userStore.logout();
+  // 成就：以游客模式进入首页
+  useAchievementStore().unlock('passing_rider');
   router.push('/?guest=1');
 }
 </script>

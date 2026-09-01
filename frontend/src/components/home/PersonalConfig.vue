@@ -13,14 +13,14 @@
         <template v-if="theme.isZzz">
           <z-button type="primary" size="large" class="pc__zbtn" @click="goCalendar">校历</z-button>
           <z-button size="large" class="pc__zbtn" @click="goProject">项目</z-button>
-          <z-button type="fire" size="large" class="pc__zbtn" @click="emit('onOpenApi')">设置</z-button>
+          <z-button type="fire" size="large" class="pc__zbtn" @click="emit('onOpenHub')">设置</z-button>
           <z-button v-if="userStore.isLoggedIn" size="large" class="pc__zbtn" @click="switchIdentity">切换身份</z-button>
         </template>
         <!-- 日间 ak：原版按钮 -->
         <template v-else>
           <button class="pc__btn pc__btn--primary" @click="goCalendar">校历 <em>CALENDAR</em></button>
           <button class="pc__btn pc__btn--secondary" @click="goProject">项目 <em>PROJECT</em></button>
-          <button class="pc__btn pc__btn--neon" @click="emit('onOpenApi')">设置 <em>SETTINGS</em></button>
+          <button class="pc__btn pc__btn--neon" @click="emit('onOpenHub')">设置 <em>SETTINGS</em></button>
           <button v-if="userStore.isLoggedIn" class="pc__btn pc__btn--secondary" @click="switchIdentity">切换身份 <em>SWITCH</em></button>
         </template>
       </div>
@@ -265,7 +265,7 @@ const theme = useThemeStore();
 const userStore = useUserStore();
 const message = useMessage();
 
-const emit = defineEmits<{ onOpenApi: [] }>();
+const emit = defineEmits<{ onOpenHub: [] }>();
 
 // ---- 年级驱动的情绪标签 / 进度条 ----
 const DEFAULT_GRADE = 1; // 游客默认展示大一文案
@@ -361,6 +361,14 @@ function onModToggle() {
 }
 
 function goCalendar() {
+  // 成就：打开校历三次
+  try {
+    const count = parseInt(localStorage.getItem('xkz_calendar_clicks') || '0', 10) + 1;
+    localStorage.setItem('xkz_calendar_clicks', String(count));
+    if (count >= 3) useAchievementStore().unlock('reverse_clock');
+  } catch {
+    // ignore
+  }
   router.push('/calendar');
 }
 
@@ -725,8 +733,7 @@ function closeAlert() {
   background: linear-gradient(90deg, var(--amber), var(--success));
 }
 
-/* ---- 弹窗 ---- */
-/* z-modal 内容排版 */
+/* ---- 弹窗内容排版（样式主体已迁移至全局 responsive.css） ---- */
 .pc__alert-line {
   margin: 0;
   font-size: 14px;
@@ -734,58 +741,10 @@ function closeAlert() {
   text-align: center;
   letter-spacing: 0.5px;
 }
+
 .pc__alert-line--dim {
   font-size: 12px;
   color: var(--text-muted);
-}
-
-.pc__alert-mask {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-.pc__alert {
-  position: relative;
-  width: 320px;
-  padding: 28px 32px;
-  background: var(--bg-panel-2);
-  border: 2px solid var(--amber);
-  clip-path: polygon(var(--cut-md) 0, 100% 0, 100% calc(100% - var(--cut-md)), calc(100% - var(--cut-md)) 100%, 0 100%, 0 var(--cut-md));
-  font-size: 15px;
-  color: var(--text-primary);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-}
-
-.pc__alert p {
-  letter-spacing: 0.5px;
-}
-
-.pc__alert-close {
-  position: absolute;
-  top: 8px;
-  right: 12px;
-  font-size: 22px;
-  line-height: 1;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 4px 8px;
-  background: transparent;
-  transition: color 160ms;
-}
-
-.pc__alert-close:hover {
-  color: var(--amber);
 }
 
 .pc__alert-title {
@@ -814,55 +773,7 @@ function closeAlert() {
   margin: 0 2px;
 }
 
-.pc__modal-mask {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-.pc__modal {
-  position: relative;
-  width: 360px;
-  padding: 32px 36px;
-  background: var(--bg-panel-2);
-  border: 2px solid var(--amber);
-  clip-path: polygon(var(--cut-md) 0, 100% 0, 100% calc(100% - var(--cut-md)), calc(100% - var(--cut-md)) 100%, 0 100%, 0 var(--cut-md));
-  font-size: 14px;
-  color: var(--text-primary);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* ---- 响应式 ---- */
-@media (max-width: 900px) {
-  .pc__grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* ============================================
-   放大 Message（ZZZ + AK 双端）
-   ============================================ */
-/* 夜间 zzz：全局放大 z-message */
-:deep(.z-message) {
-  font-size: 18px !important;
-  padding: 16px 32px !important;
-  min-width: 280px;
-  text-align: center;
-  font-weight: 700;
-}
-
-/* ============================================
-   z-modal 内文字排版
-   ============================================ */
+/* z-modal 内文字排版 */
 .pc__modal-text {
   margin: 0;
   font-size: 20px;
@@ -871,74 +782,6 @@ function closeAlert() {
   text-align: center;
   letter-spacing: 1px;
   padding: 16px 0;
-}
-
-/* ============================================
-   日间 ak 自定义 message 浮层
-   ============================================ */
-.pc__msg {
-  position: fixed;
-  top: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10001;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px 32px;
-  background: var(--bg-panel-2);
-  border: 2px solid var(--amber);
-  clip-path: polygon(var(--cut-sm) 0, 100% 0, 100% calc(100% - var(--cut-sm)), calc(100% - var(--cut-sm)) 100%, 0 100%, 0 var(--cut-sm));
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-primary);
-  min-width: 280px;
-  justify-content: center;
-}
-
-.pc__msg-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  font-family: var(--font-mono);
-  font-size: 18px;
-  font-weight: 900;
-  clip-path: var(--clip-sm);
-  flex-shrink: 0;
-}
-
-.pc__msg-text {
-  letter-spacing: 0.5px;
-}
-
-.pc__msg--error {
-  border-color: var(--neon-magenta);
-  color: var(--neon-magenta);
-}
-.pc__msg--error .pc__msg-icon {
-  background: var(--neon-magenta);
-  color: var(--text-primary);
-}
-
-.pc__msg--warning {
-  border-color: var(--warning);
-  color: var(--warning);
-}
-.pc__msg--warning .pc__msg-icon {
-  background: var(--warning);
-  color: var(--ink);
-}
-
-.pc__msg--success {
-  border-color: var(--success);
-  color: var(--success);
-}
-.pc__msg--success .pc__msg-icon {
-  background: var(--success);
-  color: var(--ink);
 }
 
 /* message 进入/离开动画 */
@@ -950,58 +793,6 @@ function closeAlert() {
 .pc-msg-leave-to {
   opacity: 0;
   transform: translateX(-50%) translateY(-12px);
-}
-
-/* ============================================
-   全屏 Modal（调制模式第三次触发）
-   ============================================ */
-.pc__fullscreen {
-  position: fixed;
-  inset: 0;
-  z-index: 10002;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.88);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-.pc__fullscreen-inner {
-  position: relative;
-  padding: 80px 60px;
-  text-align: center;
-}
-
-.pc__fullscreen-text {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 36px;
-  font-weight: 700;
-  letter-spacing: 3px;
-  color: var(--amber);
-  text-shadow: 0 0 30px var(--amber-glow);
-}
-
-.pc__fullscreen-close {
-  position: absolute;
-  top: -40px;
-  right: -20px;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  line-height: 1;
-  color: var(--text-muted);
-  background: transparent;
-  cursor: pointer;
-  transition: color 200ms;
-}
-
-.pc__fullscreen-close:hover {
-  color: var(--amber);
 }
 
 /* 全屏 Modal 动画 */
@@ -1024,22 +815,12 @@ function closeAlert() {
 }
 
 @media (max-width: 767px) {
-  .pc__fullscreen-text {
-    font-size: 24px;
-    letter-spacing: 1px;
-  }
-  .pc__fullscreen-inner {
-    padding: 60px 24px;
-  }
-}
-
-@media (max-width: 767px) {
   .pc {
     padding: 0 16px 64px;
   }
 
   .pc__panel {
-    padding: 18px;
+    padding: 14px;
   }
 
   .pc__btn {
@@ -1055,6 +836,92 @@ function closeAlert() {
 
   .pc__badge em {
     font-size: 9px;
+  }
+
+  /* ---- 移动端：grid 单列堆叠 ---- */
+  .pc__grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .pc__col {
+    gap: 8px;
+  }
+
+  .pc__switch {
+    padding: 8px 10px;
+  }
+
+  .pc__switch-label {
+    font-size: 13px;
+  }
+
+  /* z-switch 移动端缩小 */
+  .pc__switch :deep(.z-switch) {
+    transform: scale(0.8);
+    transform-origin: right center;
+  }
+
+  /* 原版 toggle 移动端缩小 */
+  .pc__toggle {
+    width: 52px;
+    height: 24px;
+    padding: 0 4px;
+  }
+
+  .pc__toggle-thumb {
+    width: 14px;
+    height: 14px;
+  }
+
+  .pc__toggle--on .pc__toggle-thumb {
+    left: calc(100% - 18px);
+  }
+
+  .pc__toggle-text {
+    font-size: 9px;
+  }
+
+  .pc__col--bars {
+    padding: 14px;
+    gap: 14px;
+  }
+
+  /* z-progress 移动端缩小 */
+  .pc__col--bars :deep(.z-progress) {
+    height: 8px;
+  }
+
+  .pc__bar {
+    gap: 4px;
+  }
+
+  .pc__bar-label {
+    font-size: 12px;
+  }
+
+  .pc__bar-val {
+    font-size: 15px;
+  }
+
+  .pc__bar-track {
+    height: 8px;
+  }
+
+  /* 按钮行移动端两列 */
+  .pc__btns {
+    gap: 8px;
+  }
+
+  .pc__zbtn {
+    min-width: 0;
+    font-size: 13px;
+  }
+
+  .pc__btn {
+    min-width: 0;
+    font-size: 13px;
+    padding: 10px 12px;
   }
 }
 </style>

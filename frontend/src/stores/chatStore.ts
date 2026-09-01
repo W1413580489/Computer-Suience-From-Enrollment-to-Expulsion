@@ -130,6 +130,8 @@ export const useChatStore = defineStore('chat', {
       this.stop();
       this.messages = [];
       this.sessionId = `s_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+      // 成就：首次清空会话
+      useAchievementStore().unlock('ending');
     },
   },
 });

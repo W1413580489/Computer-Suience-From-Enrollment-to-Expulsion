@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 教学引擎 · 测试台</title>
+<style>
+  :root{
+    --bg:#0f1115; --bg2:#181b22; --bg3:#1f242e; --line:#2a3040;
+    --fg:#e6e9f0; --dim:#9aa4b5; --mut:#6b7686;
+    --acc:#4f7cff; --acc-dim:#3a5fd1; --green:#34d399; --yellow:#fbbf24;
+    --red:#f87171; --radius:12px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--bg); color:var(--fg);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Microsoft YaHei",sans-serif;
+    font-size:14px; line-height:1.55;
+  }
+  #app{display:flex;height:100vh}
+  /* 左侧配置栏 */
+  aside{
+    width:320px;min-width:320px;border-right:1px solid var(--line);
+    background:var(--bg2);padding:18px 16px;overflow-y:auto;
+    display:flex;flex-direction:column;gap:16px;
+  }
+  aside h1{font-size:16px;margin:0;display:flex;align-items:center;gap:8px}
+  aside h1 .dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+  .group{display:flex;flex-direction:column;gap:6px}
+  .group label{font-size:12px;color:var(--dim);font-weight:600;letter-spacing:.03em}
+  select,input,textarea{
+    background:var(--bg3);border:1px solid var(--line);color:var(--fg);
+    border-radius:8px;padding:9px 11px;font-size:13px;width:100%;
+    outline:none;transition:border-color .15s;
+  }
+  select:focus,input:focus,textarea:focus{border-color:var(--acc)}
+  textarea{resize:vertical;min-height:56px}
+  .badge{display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:4px 9px;font-size:12px;color:var(--dim)}
+  .mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .mode-btn{
+    background:var(--bg3);border:1px solid var(--line);color:var(--fg);
+    border-radius:8px;padding:8px;cursor:pointer;text-align:left;font-size:12px;
+    transition:.15s;position:relative;
+  }
+  .mode-btn .t{font-weight:600;font-size:13px}
+  .mode-btn .d{color:var(--mut);font-size:11px}
+  .mode-btn.active{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc);background:#141a2b}
+  .key-row{display:flex;gap:8px;align-items:center}
+  .key-row input{flex:1}
+  .key-row button{flex:0 0 auto}
+  button.btn{
+    background:var(--acc);color:#fff;border:0;border-radius:8px;
+    padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;
+  }
+  button.btn:hover{background:var(--acc-dim)}
+  button.btn:disabled{opacity:.5;cursor:not-allowed}
+  button.ghost{background:transparent;border:1px solid var(--line);color:var(--dim)}
+  button.ghost:hover{color:var(--fg);border-color:var(--acc)}
+  .hintbar{font-size:11px;color:var(--mut);margin-top:-6px}
+  /* 状态徽章 */
+  .status{font-size:11px}
+  .status .ok{color:var(--green)}
+  .status .bad{color:var(--red)}
+  /* 右侧对话区 */
+  main{flex:1;display:flex;flex-direction:column;min-width:0}
+  .chat-head{
+    padding:12px 20px;border-bottom:1px solid var(--line);background:var(--bg2);
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+  }
+  .chat-head .task{margin:0;font-size:14px}
+  .chat-head .task small{color:var(--mut)}
+  .meta-chip{font-size:11px;color:var(--dim);background:var(--bg3);border:1px solid var(--line);border-radius:20px;padding:4px 10px}
+  .messages{flex:1;overflow-y:auto;padding:22px;
+    background:radial-gradient(1200px 500px at 50% -10%, #141821 0%, var(--bg) 60%);
+    display:flex;flex-direction:column;gap:16px}
+  .welcome{max-width:560px;margin:auto auto;text-align:center;color:var(--mut)}
+  .welcome h2{color:var(--dim);font-size:20px;margin-bottom:6px}
+  .bubble{max-width:76%;background:var(--bg3);border:1px solid var(--line);border-radius:14px;padding:12px 14px;white-space:pre-wrap;word-break:break-word}
+  .msg.user{align-self:flex-end}
+  .msg.user .bubble{background:var(--acc);border-color:var(--acc);color:#fff}
+  .msg.assistant{align-self:flex-start}
+  .msg.assistant .bubble{width:fit-content;min-width:200px}
+  .meta{font-size:11px;color:var(--mut);margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .chip{background:rgba(79,124,255,.12);color:#9fb6ff;border:1px solid rgba(79,124,255,.3);border-radius:6px;padding:1px 7px;font-size:11px}
+  .chip.hint{background:rgba(251,191,36,.12);color:#fcd34d;border-color:rgba(251,191,36,.3)}
+  .chip.fail{background:rgba(248,113,113,.12);color:#fca5a5;border-color:rgba(248,113,113,.3)}
+  .stageTrack{display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap}
+  .stagechip{pointer-events:none;flex:1;min-width:0;text-align:center;font-size:11px;line-height:1.3;padding:4px 2px;border-radius:6px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:var(--mut)}
+  .stagechip.active{border-color:rgba(79,124,255,.55);background:rgba(79,124,255,.16);color:#9fb6ff;font-weight:700}
+  .stagechip.done{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.12);color:#6ee7b7}
+  .warn{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);color:#fecaca;border-radius:8px;padding:6px 10px;font-size:12px;margin-top:8px;white-space:pre-wrap}
+  .kv{font-size:12px;color:var(--dim);border-top:1px dashed var(--line);margin-top:8px;padding-top:6px}
+  .kv b{color:var(--fg)}
+  /* 教学模式引导卡 */
+  details.guide{margin-top:8px}
+  details.guide summary{cursor:pointer;font-size:12px;color:var(--dim)}
+  details.guide summary:hover{color:var(--fg)}
+  details.guide .guide-body{font-size:12px;color:var(--dim);margin-top:6px;border:1px solid var(--line);background:var(--bg3);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:6px}
+  details.guide .guide-body p{margin:0}
+  details.guide .guide-body .tip{color:#9fb6ff}
+  /* mode_advice 推荐卡 */
+  .advice{margin-top:10px;border:1px solid rgba(79,124,255,.45);background:rgba(79,124,255,.10);border-radius:10px;padding:9px 12px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+  .advice .a-tag{font-size:11px;font-weight:700;color:#9fb6ff;letter-spacing:.04em}
+  .advice .a-reason{font-size:13px;color:var(--fg)}
+  .advice .a-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .advice .a-actions button.btn{padding:6px 12px;font-size:12px}
+  .advice .a-next{font-size:11px;color:var(--mut)}
+  .fb{display:inline-flex;gap:4px;margin-left:8px;align-items:center}
+  .fb button{background:transparent;border:1px solid var(--line);color:var(--dim);border-radius:6px;width:22px;height:22px;cursor:pointer;font-size:12px;line-height:1}
+  .fb button:hover{border-color:var(--acc);color:var(--acc)}
+  .fb button.on{background:rgba(79,124,255,.2);border-color:var(--acc);color:#fff}
+  .stats-mini{font-size:11px;color:var(--dim)}
+  .stats-mini b{color:var(--fg)}
+  .loading{display:inline-flex;gap:4px;align-items:center;color:var(--mut)}
+  .loading i{width:6px;height:6px;border-radius:50%;background:var(--acc);animation:b 1.1s infinite}
+  .loading i:nth-child(2){animation-delay:.15s}.loading i:nth-child(3){animation-delay:.3s}
+  @keyframes b{0%,60%,100%{opacity:.25;transform:scale(.8)}30%{opacity:1;transform:scale(1)}}
+  .composer{border-top:1px solid var(--line);padding:12px 16px;background:var(--bg2);
+    display:flex;gap:10px;align-items:flex-end}
+  .composer textarea{flex:1;min-height:44px;max-height:140px}
+  .send{flex:0 0 auto}
+  .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#2a2110;border:1px solid var(--yellow);color:#fde68a;padding:9px 16px;border-radius:9px;font-size:13px;z-index:99;max-width:80%;display:none}
+  @media(max-width:760px){#app{flex-direction:column}aside{width:100%;min-width:0;max-height:44vh;border-right:0;border-bottom:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<div id="app">
+  <aside>
+    <h1><span class="dot"></span>AI 教学引擎 · 测试台</h1>
+
+    <div class="group">
+      <label>API Key（BYOK · 仅存本机）</label>
+      <div class="key-row">
+        <input id="apiKey" type="password" placeholder="sk-..." autocomplete="off">
+        <button class="btn ghost" id="showKey" title="显示/隐藏">👁</button>
+      </div>
+      <div class="status" id="keyStatus"></div>
+    </div>
+
+    <div class="group">
+      <label>模型</label>
+      <select id="model"></select>
+    </div>
+
+    <div class="group">
+      <label>教学任务</label>
+      <div class="stageTrack" id="stageTrack"></div>
+      <select id="task"></select>
+      <div class="hintbar" id="taskHint"></div>
+    </div>
+
+    <div class="group">
+      <label>GitHub 仓库（可选 · 代码证据）</label>
+      <input id="repoUrl" type="url" placeholder="https://github.com/owner/repo" autocomplete="off">
+      <div class="hintbar">Debugger / Reviewer 模式会拉取仓库结构与关键文件来审真实代码</div>
+    </div>
+
+    <details class="guide" id="reviewPanel">
+      <summary>⚖ 评审链（Review · 独立验收）</summary>
+      <div class="guide-body">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <label style="font-size:12px;color:var(--dim)">部署地址（运行证据）</label>
+          <input id="depUrl" type="url" placeholder="https://your-app.example" autocomplete="off">
+          <label style="font-size:12px;color:var(--dim)">关键代码片段</label>
+          <textarea id="codeBlock" style="min-height:50px"></textarea>
+          <label style="font-size:12px;color:var(--dim)">自述说明（做了什么 / 怎么跑的）</label>
+          <textarea id="descr" style="min-height:50px"></textarea>
+          <button class="btn" id="doReview">⚖ 对照验收标准评审</button>
+          <div class="hintbar">无充分证据时按 NEED_REVIEW 处理，不凭空 PASS。建议填 GitHub 仓库以自动读取代码。</div>
+        </div>
+      </div>
+    </details>
+
+    <div class="group">
+      <label>辅导模式</label>
+      <div class="mode-grid" id="modeGrid"></div>
+      <details class="guide" id="modeGuide">
+        <summary>📘 四个模式怎么选？（教学模式）</summary>
+        <div class="guide-body">
+          <p><b>刚拿到任务、不知道怎么下手</b> → 用 <b>Tutor</b>，让 AI 把任务拆成可执行步骤。</p>
+          <p><b>开始动手做、需要推进度</b> → 用 <b>Coach</b>，AI 会追问进度、推你执行。</p>
+          <p><b>遇到报错卡住</b> → 用 <b>Debugger</b>，AI 帮你定位原因、给排查步骤。</p>
+          <p><b>做完了要验收</b> → 用 <b>Reviewer</b>，AI 对照验收标准打分。</p>
+          <p class="tip">💡 不用自己纠结：AI 每次回答后会在下方提示「建议切到哪个模式」，点一下就能切换。</p>
+        </div>
+      </details>
+    </div>
+
+    <div id="studentBox" style="display:none;flex-direction:column;gap:6px">
+      <label>学生状态（localStorage）</label>
+      <div class="badge" id="studentBadge"></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn ghost" id="resetStudent" style="flex:1">重置学生进度</button>
+        <button class="btn ghost" id="clearChat" style="flex:1">清空对话</button>
+      </div>
+    </div>
+
+    <button class="btn ghost" id="showStats" style="width:100%">📊 查看教学统计（AI Evaluation）</button>
+    <div id="statsBox" style="display:none;flex-direction:column;gap:6px"></div>
+
+    <div class="hintbar" style="margin-top:auto">接口：<span id="apiHost"></span></div>
+  </aside>
+
+  <main>
+    <div class="chat-head">
+      <p class="task" id="taskTitle">选择任务开始</p>
+      <div style="display:flex;gap:8px">
+        <span class="meta-chip" id="modeChip"></span>
+        <span class="meta-chip" id="sessChip"></span>
+      </div>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="welcome">
+        <h2>👨‍🏫 AI 教学引擎</h2>
+        <p>选择上方任务与模式，输入你的进展 / 代码 / 报错，AI 会按 Hint Level 渐进辅导。</p>
+      </div>
+    </div>
+
+    <div class="composer">
+      <textarea id="input" placeholder="描述你当前的进展、粘贴代码或报错…（Enter 发送，Shift+Enter 换行）"></textarea>
+      <button class="btn send" id="send">发送</button>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const API = "http://127.0.0.1:8099";
+const LS_KEY_STATUS = "xkz_ai_student";   // 学生状态
+const LS_KEY_API = "xkz_ai_api_key";      // API key
+const LS_KEY_REPO = "xkz_ai_repo";        // GitHub 仓库
+
+// ---------- 模式定义 ----------
+const MODES = [
+  {id:"tutor",   t:"Tutor 教练",   d:"拆解任务 · 引导方向"},
+  {id:"coach",   t:"Coach 督学",   d:"追问进度 · 推动执行"},
+  {id:"debugger",t:"Debugger 调错", d:"定位报错 · 逐步修复"},
+  {id:"reviewer",t:"Reviewer 评审", d:"对照验收标准评估"},
+];
+const MODES_FULL = MODES.reduce((o,m)=>(o[m.id]=m.t,o),{});
+
+const $ = id => document.getElementById(id);
+let CFG = null;                 // /api/ai/config 缓存
+let currentMode = "tutor";
+let messages = [];              // 对话历史（含结构化字段）
+let student = loadStudent();
+let session_id = student.session_id;
+
+// ---------- localStorage 学生状态 ----------
+function loadStudent(){
+  try{
+    const raw = localStorage.getItem(LS_KEY_STATUS);
+    if(raw){ const s = JSON.parse(raw); if(s && s.session_id) return s; }
+  }catch(e){}
+  return { session_id:"s_"+Math.random().toString(16).slice(2,10), name:"匿名学生", skills:{}, completed_tasks:[], attempt_count:{}, timestamp:new Date().toISOString() };
+}
+function saveStudent(){
+  student.timestamp = new Date().toISOString();
+  localStorage.setItem(LS_KEY_STATUS, JSON.stringify(student));
+  renderStudentBadge();
+}
+function renderStudentBadge(){
+  $("studentBox").style.display = "flex";
+  const done = (student.completed_tasks||[]).length;
+  const att = Object.keys(student.attempt_count||{}).length;
+  $("studentBadge").textContent = `进度：完成任务 ${done} · 已尝试 ${att} 个任务`;
+}
+
+// ---------- 配置加载 ----------
+async function loadConfig(){
+  try{
+    const r = await fetch(API+"/api/ai/config");
+    const j = await r.json();
+    if(!j.ok) throw new Error(j.error?.message||"config 加载失败");
+    CFG = j.data;
+
+    // 模型
+    const ms = CFG.models || [];
+    $("model").innerHTML = ms.map(m=>`<option value="${m.model}">${m.label}</option>`).join("");
+
+    // 任务：合并成 1 个项目入口，按阶段分组展示推进路径
+    const firstProj = (CFG.projects||[])[0] || null;
+    const byStage = {};
+    (CFG.projects||[]).forEach(p=>{
+      (p.stages||[]).forEach(sg=>{
+        (sg.tasks||[]).forEach(t=>{
+          const rec = {...t, project_id:p.project_id,
+            stage_id: sg.stage_id, stage_title: sg.title, project_title:p.title};
+          (byStage[rec.stage_id] = byStage[rec.stage_id]||[]).push(rec);
+        });
+      });
+    });
+    // 填充全局阶段进度结构（1 个项目 × n 阶段 × 任务）
+    STAGES = (firstProj?.stages||[]).map(sg=>({
+      stage_id: sg.stage_id, title: sg.title,
+      tasks: (byStage[sg.stage_id]||[]).map(t=>t.task_id)
+    }));
+    // 任务下拉：按阶段分组，选项仅显示任务名
+    $("task").innerHTML = (firstProj?.stages||[]).map(sg=>{
+      const opts = (byStage[sg.stage_id]||[]).map(t=>
+        `<option value="${t.task_id}" data-objective="${esc(t.objective)}" data-source="${esc(t.source_url||"")}" data-stage="${esc(sg.stage_id)}">${esc(t.title)}</option>`
+      ).join("");
+      return opts ? `<optgroup label="${esc(sg.title)}">${opts}</optgroup>` : "";
+    }).join("");
+    // 默认选第一个阶段（拆解与准备）的第一个任务
+    const groups = Object.values(byStage);
+    if(groups.length){
+      $("task").value = groups[0][0].task_id;
+    } else {
+      $("task").innerHTML = `<option value="">（无任务）</option>`;
+    }
+    renderStages();
+    onTaskChange();
+
+    // 模式按钮
+    $("modeGrid").innerHTML = MODES.map(m=>
+      `<button class="mode-btn ${m.id===currentMode?"active":""}" data-mode="${m.id}">
+         <div class="t">${m.t}</div><div class="d">${m.d}</div>
+       </button>`).join("");
+    $("modeGrid").querySelectorAll(".mode-btn").forEach(b=>{
+      b.onclick = ()=>{ currentMode=b.dataset.mode; setModeUI(); };
+    });
+    setModeUI();
+    $("sessChip").textContent = "会话 " + session_id;
+  }catch(e){
+    toast("无法连接引擎：" + e.message + "（请确认 8099 后端已启动）");
+  }
+}
+
+// 全局：阶段推进路径（1 个项目 × n 阶段 × 任务）
+let STAGES = [];
+function renderStages(){
+  const track=$("stageTrack"); if(!track) return;
+  track.innerHTML = STAGES.map(sg=>`<div class="stagechip" data-stage="${sg.stage_id}">${esc(sg.title)}</div>`).join("");
+}
+// 根据当前任务所属阶段高亮进度条；阶段内全部任务完成则标记 done
+function syncStage(){
+  const sel = $("task").selectedOptions[0];
+  const cur = sel ? sel.dataset.stage : "";
+  const doneSet = new Set((student.completed_tasks||[]));
+  $("stageTrack").querySelectorAll(".stagechip").forEach(b=>{
+    const sg = STAGES.find(s=>s.stage_id===b.dataset.stage);
+    const allDone = sg && sg.tasks.length>0 && sg.tasks.every(id=>doneSet.has(id));
+    b.classList.toggle("active", b.dataset.stage===cur);
+    b.classList.toggle("done", !!allDone);
+  });
+}
+
+function sgTitle(t){ return t.stage_title || ""; }
+function onTaskChange(){
+  const sel = $("task").selectedOptions[0];
+  $("taskHint").textContent = sel ? (sel.dataset.objective||"") : "";
+  $("taskTitle").textContent = sel ? (sel.textContent + " — " + sel.dataset.objective) : "选择任务开始";
+  if(typeof syncStage==="function") syncStage();
+}
+function setModeUI(){
+  $("modeGrid").querySelectorAll(".mode-btn").forEach(b=>b.classList.toggle("active", b.dataset.mode===currentMode));
+  $("modeChip").textContent = MODES.find(m=>m.id===currentMode).t;
+}
+
+// ---------- API Key ----------
+$("apiKey").value = localStorage.getItem(LS_KEY_API) || "";
+$("showKey").onclick = ()=> { const i=$("apiKey"); i.type = i.type==="password"?"text":"password"; };
+$("apiKey").addEventListener("input", ()=>{
+  localStorage.setItem(LS_KEY_API, $("apiKey").value.trim());
+  $("keyStatus").innerHTML = $("apiKey").value.trim() ? "已保存到本机" : "未配置 Key（访问将返回 400）";
+});
+$("keyStatus").innerHTML = $("apiKey").value.trim() ? "已保存到本机" : "未配置 Key";
+
+// ---------- GitHub 仓库（代码证据）----------
+$("repoUrl").value = localStorage.getItem(LS_KEY_REPO) || "";
+$("repoUrl").addEventListener("input", ()=>{
+  localStorage.setItem(LS_KEY_REPO, $("repoUrl").value.trim());
+});
+
+// ---------- 评审链（/api/ai/review）----------
+const ST_REVIEW = {PASS:["✓","#34d399"],FAIL:["✕","#f87171"],NEED_REVIEW:["?","#fbbf24"]};
+function renderReviewCard(d){
+  const ev = d.evaluation||{};
+  const [mark,color] = ST_REVIEW[ev.status]||ST_REVIEW.NEED_REVIEW;
+  const card = document.createElement("div");
+  card.className="msg assistant";
+  let rows = (ev.criteria||[]).map(c=>{
+    const [m,c2] = ST_REVIEW[c.status]||ST_REVIEW.NEED_REVIEW;
+    return `<div style="display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--line)">
+      <span style="color:${c2};font-weight:700">${m}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600">${esc(c.rubric_id)} · ${esc(c.reason)}</div>
+        ${c.evidence?`<div style="color:var(--dim);font-size:12px">依据：${esc(c.evidence)}</div>`:""}
+      </div>
+    </div>`;
+  }).join("");
+  card.innerHTML = `<div class="bubble" style="min-width:340px;max-width:90%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+      <b style="font-size:15px">⚖ 评审结论 · ${esc(ev.status)} <span style="color:${color}">${mark}</span></b>
+      <span class="chip" style="font-size:16px">${ev.score??"–"} / 100</span>
+    </div>
+    ${evidLine(d)}
+    ${ciLine(d)}
+    ${rows}
+    ${ev.next_step?`<div style="margin-top:8px;color:var(--dim)"><b>下一步：</b>${esc(ev.next_step)}</div>`:""}
+  </div>`;
+  $("messages").appendChild(card);
+  $("messages").scrollTop=$("messages").scrollHeight;
+}
+function evidLine(d){
+  const ev = d.evidence||{};
+  if(!ev || ev.status==="none") return "";
+  let s;
+  if(ev.status==="ok"){
+    s = `代码证据 ✓ 已读取仓库 ${esc(ev.repo||"")}（${ev.file_count||0} 个文件）`;
+  } else if(ev.status==="error"){
+    s = `代码证据 ✕ 未能读取：${ev.error?esc(ev.error):"未知原因"}${ev.code?`（${esc(ev.code)}）`:""}`;
+  } else { return ""; }
+  return `<div style="font-size:11px;color:var(--dim);margin:2px 0 6px">${s}</div>`;
+}
+function ciLine(d){
+  const ci = d.ci||{};
+  if(!ci || ci.status!=="ok") return "";
+  if(!Array.isArray(ci.workflows) || !ci.workflows.length) return `<div style="font-size:11px;color:var(--dim);margin:2px 0 6px">CI：仓库无 GitHub Actions 工作流（运行/测试类需学生提交真实运行证据）</div>`;
+  const map={success:["✓","#34d399"],failure:["✕","#f87171"],"None":["·","#fbbf24"]};
+  const chips = ci.workflows.map(w=>{
+    const c=(w.conclusion||w.status).toLowerCase();
+    const [m,cc] = (c==="success")?map.success:(c==="failure"?map.failure:map["None"]);
+    return `<span class="chip">CI[${esc(w.dimension)}] ${esc(w.name)} <span style="color:${cc};font-weight:700">${m}</span></span>`;
+  }).join(" ");
+  return `<div style="font-size:11px;color:var(--dim);margin:2px 0 6px">CI 自动验收：${chips}</div>`;
+}
+$("doReview").onclick = async ()=>{
+  const apiKey = $("apiKey").value.trim();
+  const task_id = $("task").value;
+  if(!task_id){ toast("请先选择一个任务"); return; }
+  if(!apiKey){ toast("请先填写 DeepSeek API Key"); return; }
+  const submission = {
+    github_url: $("repoUrl").value.trim() || "",
+    deployment_url: $("depUrl").value.trim() || "",
+    code: $("codeBlock").value.trim() || "",
+    description: $("descr").value.trim() || "",
+  };
+  const body = { session_id, task_id, submission, api_key:apiKey, model:$("model").value };
+  showLoading();
+  try{
+    const r = await fetch(API+"/api/ai/review",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    const j = await r.json();
+    if(!j.ok){ hideLoading(); toast(j.error?.message||"评审失败"); return; }
+    removeWelcome();
+    renderReviewCard(j.data);
+    if(j.data.passed && !student.completed_tasks.includes(task_id)){
+      student.completed_tasks.push(task_id); saveStudent(); toast("🎉 评审判定通过，任务完成！");
+    } else { saveStudent(); }
+  }catch(e){ toast("网络请求失败："+e.message); }
+  hideLoading();
+};
+function removeWelcome(){ const w=$("messages").querySelector(".welcome"); if(w) w.remove(); }
+
+function sendFb(sessionId, taskId, accepted, fbEl){
+  fetch(API+"/api/ai/feedback",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({session_id:sessionId, task_id:taskId, accepted})}).then(r=>r.json()).then(j=>{
+    if(j.ok){ fbEl.querySelector(".fbu").classList.toggle("on", accepted); fbEl.querySelector(".fbd").classList.toggle("on", !accepted); toast(accepted?"已记录：有帮助":"已记录：没帮助"); }
+  }).catch(()=>{});
+}
+
+// ---------- 统计（AI Evaluation）----------
+async function showStats(){
+  try{
+    const j = await (await fetch(API+"/api/ai/stats")).json();
+    const d = j.data; const $s=$("statsBox");
+    $s.innerHTML = `<div class="stats-mini">
+      <div>辅导调用 <b>${d.total_teach_calls}</b> · 评审 <b>${d.total_reviews}</b> · 完成率 <b>${Math.round(d.task_completion_rate*100)}%</b></div>
+      <div>已完成：<b>${esc((d.completed_tasks||[]).join(", ")||"（暂无）")}</b></div>
+      ${d.probably_blocked_tasks && Object.keys(d.probably_blocked_tasks).length?`<div style="color:var(--red)">可能卡住：<b>${esc(Object.keys(d.probably_blocked_tasks).join(", "))}</b>（尝试≥3未通过）</div>`:""}
+      <div>Hint 分布：${Object.entries(d.hint_distribution||{}).map(([k,v])=>`L${k}:${v}`).join(" · ")||"（无）"}</div>
+      ${d.early_answer_warnings?`<div style="color:var(--yellow)">过早给答案 ${d.early_answer_warnings} 次已拦截</div>`:"<div>当前无过早给答案告警</div>"}
+    </div>`;
+  }catch(e){ toast("统计加载失败："+e.message); }
+}
+$("showStats").onclick = async ()=>{ $("statsBox").style.display=$("statsBox").style.display==="block"?"none":"block"; if($("statsBox").style.display==="block") await showStats(); };
+
+// ---------- 对话 ----------
+function addMessage(role, payload){
+  const wrap = document.createElement("div");
+  wrap.className = "msg " + role;
+  const b = document.createElement("div");
+  b.className = "bubble";
+  b.textContent = (role==="user") ? payload : (payload.message || "(空回复)");
+  wrap.appendChild(b);
+
+  // AI 结构化附加信息
+  if(role==="assistant"){
+    const meta = document.createElement("div"); meta.className="meta";
+    const chips = [];
+    if(payload.hint_level!=null) chips.push(`<span class="chip hint">提示 L${payload.hint_level}</span>`);
+    if(payload.hints_used!=null) chips.push(`<span class="chip">提示档 ${payload.hints_used}/5</span>`);
+    if(payload.material_sources!=null) chips.push(`<span class="chip">参考源 ${payload.material_sources}</span>`);
+    if(payload.latency_ms!=null) chips.push(`<span class="chip">${payload.latency_ms} ms</span>`);
+    if(payload.passed!=null) chips.push(`<span class="chip ${payload.passed?"":"fail"}">${payload.passed?"✓ 通过":"未通过"}</span>`);
+    if(payload.score!=null) chips.push(`<span class="chip">评分 ${payload.score}</span>`);
+    if(payload.debug_state && payload.debug_state.rounds) chips.push(`<span class="chip">调试 ${payload.debug_state.rounds}轮 · ${esc(payload.debug_state.phase_desc)}</span>`);
+    meta.innerHTML = chips.join(" ") || "";
+    const fb = document.createElement("span"); fb.className="fb";
+    fb.innerHTML = `<button title="有帮助" class="fbu">👍</button><button title="没帮助" class="fbd">👎</button>`;
+    const sid = student.session_id;
+    fb.querySelector(".fbu").onclick = ()=>sendFb(sid, $("task").value, true, fb);
+    fb.querySelector(".fbd").onclick = ()=>sendFb(sid, $("task").value, false, fb);
+    meta.appendChild(fb);
+    wrap.appendChild(meta);
+
+    // 分模式结构字段
+    const detail = document.createElement("div"); detail.className="kv";
+    let lines=[];
+    if(payload.leading_question) lines.push(`<b>引导问题：</b>${esc(payload.leading_question)}`);
+    if(payload.current_step) lines.push(`<b>当前只需做：</b>${esc(payload.current_step)}`);
+    if(payload.suspected_cause) lines.push(`<b>疑似原因：</b>${esc(payload.suspected_cause)}`);
+    if(payload.verify_steps && payload.verify_steps.length) lines.push(`<b>排查步骤：</b>${payload.verify_steps.map(esc).join(" → ")}`);
+    if(payload.diagnostic_question) lines.push(`<b>诊断反问：</b>${esc(payload.diagnostic_question)}`);
+    if(payload.evaluation) lines.push(`<b>评审意见：</b>${esc(payload.evaluation)}`);
+    if(payload.next_action) lines.push(`<b>下一步：</b>${esc(payload.next_action)}`);
+    if(payload.hint_level_desc) lines.push(`<b>提示档：</b>${esc(payload.hint_level_desc)}`);
+    if(payload.quality_warnings && payload.quality_warnings.length) detail.innerHTML = `<div class="warn">⚠ ${payload.quality_warnings.map(esc).join("<br>")}</div>`;
+    if(lines.length) detail.innerHTML = lines.map(l=>`<div>${l}</div>`).join("") + detail.innerHTML;
+    if(detail.innerHTML) wrap.appendChild(detail);
+
+    // mode_advice：AI 推荐下一个模式 + 一键切换
+    if(payload.mode_advice){
+      const adv = payload.mode_advice;
+      const card = document.createElement("div");
+      card.className="advice";
+      card.innerHTML=`
+        <div class="a-tag">▶ 建议下一步</div>
+        <div class="a-reason">${esc(adv.reason)}</div>
+        <div class="a-actions">
+          <button class="btn" data-target="${esc(adv.mode)}" data-task="${esc(adv.task_id||"")}">切到 ${esc(MODES_FULL[adv.mode]||adv.mode)}</button>
+        </div>
+        ${adv.task_id?`<div class="a-next">目标任务：${esc(adv.task_title)}${adv.task_stage_title?`（${esc(adv.task_stage_title)}）`:""}</div>`:""}`;
+      card.querySelector("button[data-target]").onclick = (ev)=>{
+        const m = ev.target.dataset.target;
+        const t = ev.target.dataset.task;
+        if(t){ const taskEl=$("task"); taskEl.value=t; onTaskChange(); }
+        currentMode = m; setModeUI();
+        toast("已切换到 "+(MODES_FULL[m]||m));
+      };
+      wrap.appendChild(card);
+    }
+  }
+  $("messages").appendChild(wrap);
+  $("messages").scrollTop = $("messages").scrollHeight;
+  return b;
+}
+
+// ---------- 发送 ----------
+let loading=false;
+async function send(){
+  const text = $("input").value.trim();
+  if(!text || loading) return;
+  const apiKey = $("apiKey").value.trim();
+  const task_id = $("task").value;
+
+  if(!task_id){ toast("请先选择一个任务"); return; }
+  if(!apiKey){ toast("请先填写 DeepSeek API Key"); return; }
+
+  $("input").value="";
+  addMessage("user", text);
+  showLoading();
+
+  // 尝试次数推进（同一任务每问一次 +1）
+  student.attempt_count = student.attempt_count||{};
+  const cur = (student.attempt_count[task_id]||0)+1;
+  student.attempt_count[task_id] = cur;
+
+  const body = {
+    session_id, student, course_id: CFG?.course_id||"course_001",
+    project_id: CFG?.projects?.[0]?.project_id || "project_xie_xiu",
+    task_id, mode:currentMode, user_input:text,
+    api_key:apiKey, model:$("model").value, history:messages.slice(-6)
+  };
+
+  try{
+    const r = await fetch(API+"/api/ai/teach",{
+      method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)
+    });
+    const j = await r.json();
+    if(!j.ok){
+      const code = j.error?.code||"";
+      const msg = j.error?.message||"未知错误";
+      if(code==="KEY_INVALID") toast("API Key 无效或已过期");
+      else if(code==="RATE_LIMITED") toast("服务商限流，请稍后重试");
+      else if(code==="PROVIDER_DOWN") toast("模型服务连接失败");
+      else toast(msg);
+      addMessage("assistant", {message:"出错："+msg, next_action:null});
+      hideLoading();
+      return;
+    }
+    const d = j.data;
+    addMessage("assistant", d);
+    // 完成任务的标记（reviewer passed=true 时）
+    if(d.passed && !student.completed_tasks.includes(task_id)){
+      student.completed_tasks.push(task_id); toast("🎉 Reviewer 判定通过，任务完成！");
+    }
+    saveStudent();
+  }catch(e){
+    addMessage("assistant", {message:"请求失败："+e.message});
+    toast("网络请求失败："+e.message);
+  }
+  hideLoading();
+}
+
+function showLoading(){
+  loading=true; $("send").disabled=true;
+  const d=document.createElement("div"); d.className="msg assistant"; d.id="loadingMsg";
+  d.innerHTML=`<div class="bubble loading"><i></i><i></i><i></i> AI 思考中…</div>`;
+  $("messages").appendChild(d); $("messages").scrollTop=$("messages").scrollHeight;
+}
+function hideLoading(){ loading=false; $("send").disabled=false; const el=$("loadingMsg"); if(el) el.remove(); }
+
+// ---------- 快捷键 / 动作 ----------
+$("input").addEventListener("keydown", e=>{
+  if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); send(); }
+});
+$("send").onclick = send;
+$("task").onchange = onTaskChange;
+$("clearChat").onclick = ()=>{ $("messages").innerHTML=`<div class="welcome"><h2>👨‍🏫 AI 教学引擎</h2><p>选择上方任务与模式开始。</p></div>`; messages=[]; };
+$("resetStudent").onclick = ()=>{ student = { session_id:"s_"+Math.random().toString(16).slice(2,10), name:"匿名学生", skills:{}, completed_tasks:[], attempt_count:{}, timestamp:new Date().toISOString() }; session_id=student.session_id; saveStudent(); $("sessChip").textContent="会话 "+session_id; toast("已重置学生进度，新会话 "+session_id); };
+
+// 记录历史（供 history 字段）
+const _origAdd = addMessage;
+addMessage = function(role,p){
+  _origAdd(role,p);
+  if(role==="user") messages.push({role:"user", content: typeof p==="string"?p:p.message});
+  else messages.push({role:"assistant", content:(p && p.message)||""});
+  if(messages.length>40) messages=messages.slice(-40);
+  return null;
+};
+
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.style.display="block"; clearTimeout(t._t); t._t=setTimeout(()=>t.style.display="none",3200); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+$("apiHost").textContent = API;
+
+renderStudentBadge();
+// 首次访问自动展开教学模式教程
+if(!localStorage.getItem("xkz_ai_guide_seen")){ $("modeGuide").open = true; localStorage.setItem("xkz_ai_guide_seen","1"); }
+loadConfig();
+</script>
+</body>
+</html>
