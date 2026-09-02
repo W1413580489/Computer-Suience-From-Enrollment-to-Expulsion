@@ -44,7 +44,7 @@
         </div>
 
         <div class="teach__group">
-          <label>辅导模式</label>
+          <label>模式</label>
           <div class="teach__modes">
             <button
               v-for="m in MODES"
@@ -58,13 +58,11 @@
             </button>
           </div>
           <details class="teach__guide">
-            <summary>📘 四个模式怎么选？（教学模式）</summary>
+            <summary>📘 两个模式怎么用？</summary>
             <div class="teach__guide-body">
-              <p><b>刚拿到任务、不知道怎么下手</b> → 用 <b>Tutor</b>，让 AI 把任务拆成可执行步骤。</p>
-              <p><b>开始动手做、需要推进度</b> → 用 <b>Coach</b>，AI 会追问进度、推你执行。</p>
-              <p><b>遇到报错卡住</b> → 用 <b>Debugger</b>，AI 帮你定位原因、给排查步骤。</p>
-              <p><b>做完了要验收</b> → 用 <b>Reviewer</b>，AI 对照验收标准打分。</p>
-              <p class="tip">💡 AI 每次回答后会在下方提示「建议切到哪个模式」，点一下就能切换。</p>
+              <p><b>指导</b> → 拆任务、推进度、帮调试，全在一个对话里。遇到报错直接把报错贴进来，AI 会自动进入调试模式帮你定位；修好后自动回到推进节奏。</p>
+              <p><b>验收</b> → 做完后提交，AI 对照验收标准逐条评审打分。有未通过项就切回「指导」按意见修改，改完重新提交。</p>
+              <p class="tip">💡 切换模式不会丢失对话记录；AI 当前行为（拆解中/推进中/调试中）会显示在回复下方。</p>
             </div>
           </details>
         </div>
@@ -119,10 +117,9 @@
               <div class="teach__meta">
                 <span v-if="msg.payload.hint_level != null" class="teach__chip hint">提示 L{{ msg.payload.hint_level }}</span>
                 <span v-if="msg.payload.hints_used != null" class="teach__chip">提示档 {{ msg.payload.hints_used }}/5</span>
+                <span v-if="msg.payload.behavior_label" class="teach__chip behavior">{{ msg.payload.behavior_label }}</span>
                 <span v-if="msg.payload.material_sources != null" class="teach__chip">参考源 {{ msg.payload.material_sources }}</span>
                 <span v-if="msg.payload.latency_ms != null" class="teach__chip">{{ msg.payload.latency_ms }} ms</span>
-                <span v-if="msg.payload.passed != null" class="teach__chip" :class="{ fail: !msg.payload.passed }">{{ msg.payload.passed ? '✓ 通过' : '未通过' }}</span>
-                <span v-if="msg.payload.score != null" class="teach__chip">评分 {{ msg.payload.score }}</span>
                 <span v-if="msg.payload.debug_state && msg.payload.debug_state.rounds" class="teach__chip">调试 {{ msg.payload.debug_state.rounds }}轮 · {{ msg.payload.debug_state.phase_desc }}</span>
                 <span class="teach__fb">
                   <button title="有帮助" :class="{ on: msg.feedback === true }" @click="sendFb(msg, true)">👍</button>
@@ -197,10 +194,8 @@ import { useAchievementStore } from '@/stores/achievementStore';
 const theme = useThemeStore();
 
 const MODES = [
-  { id: 'tutor', t: 'Tutor 教练', d: '拆解任务 · 引导方向' },
-  { id: 'coach', t: 'Coach 督学', d: '追问进度 · 推动执行' },
-  { id: 'debugger', t: 'Debugger 调错', d: '定位报错 · 逐步修复' },
-  { id: 'reviewer', t: 'Reviewer 评审', d: '对照验收标准评估' },
+  { id: 'tutor', t: '指导', d: '拆任务 · 推进度 · 帮调试' },
+  { id: 'reviewer', t: '验收', d: '对照标准逐条评审' },
 ] as const;
 const MODE_NAMES = MODES.reduce<Record<string, string>>((o, m) => { o[m.id] = m.t; return o; }, {});
 
@@ -241,7 +236,7 @@ const messagesEl = ref<HTMLElement | null>(null);
 const toastMsg = ref('');
 let toastTimer: ReturnType<typeof setTimeout> | null = null;
 
-interface ChatMsg { role: 'user' | 'assistant'; payload: any; review?: any; feedback?: boolean }
+interface ChatMsg { role: 'user' | 'assistant' | 'system'; payload?: any; text?: string; review?: any; feedback?: boolean }
 const chat = ref<ChatMsg[]>([]);
 const history = ref<{ role: string; content: string }[]>([]);
 const student = ref<StudentState>(loadStudent());
@@ -251,11 +246,9 @@ watch(repoUrl, v => localStorage.setItem(LS_REPO, v.trim()));
 
 // 成就：首次配置 API Key
 watch(apiKey, v => { if (v.trim()) useAchievementStore().unlock('green_fruit_2'); });
-// 成就：辅导模式切换
+// 成就：进入验收模式
 watch(mode, m => {
-  if (m === 'coach') useAchievementStore().unlock('trust_me');
-  else if (m === 'debugger') useAchievementStore().unlock('power_home_ideal');
-  else if (m === 'reviewer') useAchievementStore().unlock('why_birds_fly');
+  if (m === 'reviewer') useAchievementStore().unlock('why_birds_fly');
 });
 
 // ---------- 计算属性 ----------
@@ -332,7 +325,11 @@ function onProjectChange() {
   toast(p ? `已切换到课程：${p.title}` : '');
 }
 
-function onTaskChange() { /* objective 通过 computed 自动更新 */ }
+function onTaskChange() {
+  // 换任务 = 新会话：清空对话，避免上一个任务的上下文串味
+  chat.value = [];
+  history.value = [];
+}
 
 // ---------- 发送 ----------
 function saveStudent() {
@@ -382,10 +379,6 @@ async function send() {
     }
     const d = j.data;
     pushMsg('assistant', d);
-    if (d.passed && !student.value.completed_tasks.includes(taskId.value)) {
-      student.value.completed_tasks.push(taskId.value);
-      toast('🎉 Reviewer 判定通过，任务完成！');
-    }
     saveStudent();
   } catch (e: any) {
     pushSystem('网络请求失败：' + e.message + '\n（网络/系统故障，与你提交的项目无关，请稍后重试）');
@@ -452,7 +445,10 @@ async function doReview() {
       student.value.completed_tasks.push(taskId.value);
       saveStudent();
       toast('🎉 评审判定通过，任务完成！');
-    } else { saveStudent(); }
+    } else {
+      saveStudent();
+      pushSystem('评审有未通过项：切回「指导」按评审意见逐条修改，改好后重新提交验收。（对话记录已保留，可直接继续讨论未通过的原因）');
+    }
   } catch (e: any) {
     toast('网络请求失败：' + e.message);
   } finally {
@@ -537,7 +533,6 @@ function qualityLines(p: any): string[] {
   if (p.suspected_cause) lines.push(`<b>疑似原因：</b>${esc(p.suspected_cause)}`);
   if (p.verify_steps && p.verify_steps.length) lines.push(`<b>排查步骤：</b>${p.verify_steps.map(esc).join(' → ')}`);
   if (p.diagnostic_question) lines.push(`<b>诊断反问：</b>${esc(p.diagnostic_question)}`);
-  if (p.evaluation) lines.push(`<b>评审意见：</b>${esc(p.evaluation)}`);
   if (p.next_action) lines.push(`<b>下一步：</b>${esc(p.next_action)}`);
   if (p.hint_level_desc) lines.push(`<b>提示档：</b>${esc(p.hint_level_desc)}`);
   return lines;
@@ -694,6 +689,10 @@ function toast(msg: string) {
 .teach__chip.hint {
   background: color-mix(in srgb, var(--t-yellow) 14%, transparent); color: var(--t-yellow);
   border-color: color-mix(in srgb, var(--t-yellow) 35%, transparent);
+}
+.teach__chip.behavior {
+  background: color-mix(in srgb, var(--t-green) 14%, transparent); color: var(--t-green);
+  border-color: color-mix(in srgb, var(--t-green) 35%, transparent);
 }
 .teach__chip.fail {
   background: color-mix(in srgb, var(--t-red) 14%, transparent); color: var(--t-red);

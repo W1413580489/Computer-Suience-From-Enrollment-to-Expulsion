@@ -23,7 +23,7 @@ from pydantic import BaseModel
 from schemas import (AISession, DebuggerState, DebugPhase, Evidence, EvidenceType, Mode, ReviewRequest, TeachRequest)
 from course_data import get_project, list_projects, get_task, get_rubrics
 from context_builder import build_context
-from prompts import build_system_prompt
+from prompts import build_system_prompt, route_behavior, BEHAVIOR_LABELS
 from llm_client import LLMClient, DEFAULT_MODEL, DEFAULT_BASE_URL, EngineError, ProviderError
 from response_validator import validate
 from code_evidence import build_code_evidence
@@ -148,56 +148,32 @@ def update_debugger_state(ds: "DebuggerState", resp) -> "DebuggerState":
 
 
 # ---------------------------------------------------------------------------
-# 模式链建议：根据当前模式与对话状态，推荐下一个辅导模式与下一任务
+# 模式链建议：指导中发现完成信号 → 建议提交验收（两模式闭环，切换不删对话）
 # ---------------------------------------------------------------------------
-def compute_mode_advice(mode: str, resp, req, task) -> dict | None:
-    """确定性规则：Tutor 拆解完→Coach；Debugger 定位后→Coach；
-    Coach 完成→Reviewer 验收；Reviewer 未通过→回 Coach；
-    Reviewer 验收通过→进入下一任务（跨阶段时明确给出下一阶段）。"""
+_COMPLETION_SIGNALS = ["完成", "做好", "做完了", "提交", "验收", "跑通", "跑通了", "可以通过", "通过了"]
+
+
+def compute_mode_advice(mode: str, req, task) -> dict | None:
+    """确定性规则：仅指导模式触发——学生表达完成信号时建议提交验收。
+    验收未通过 → 回指导，由前端在评审卡后给出提示，不在此重复。"""
+    if mode != "tutor":
+        return None
     ui = req.user_input or ""
-    finished = bool(resp.passed) or any(k in ui for k in
-        ["完成", "做好", "做完了", "提交", "验收", "跑通", "跑通了", "可以通过", "通过了"])
+    if not any(k in ui for k in _COMPLETION_SIGNALS):
+        return None
 
     proj = get_project()
     stage_title = {s.id: s.title for s in proj.stages}
-    seq, seen = [], set()
-    for s in sorted(proj.stages, key=lambda x: x.order):
-        for t in sorted(proj.tasks, key=lambda x: x.order):
-            if t.stage_id == s.id and t.id not in seen:
-                seen.add(t.id)
-                seq.append(t)
-    idx = next((i for i, t in enumerate(seq) if t.id == task.id), None)
-    nxt = seq[idx + 1] if (idx is not None and idx + 1 < len(seq)) else None
 
     def adv(m, reason, t):
         d = {"mode": m, "reason": reason,
              "task_id": t.id if t else None, "task_title": t.title if t else None}
         if t:
             d["task_stage_title"] = stage_title.get(t.stage_id, "")
-            d["moving_task"] = (t.id != task.id)   # 是否换到下一个任务
+            d["moving_task"] = False
         return d
 
-    if mode == "tutor":
-        if nxt:
-            return adv("coach",
-                       f"任务已拆解清楚。接下来进入「{nxt.title}」（{stage_title.get(nxt.stage_id, '')}），"
-                       "切到 Coach（督学）陪你一步步推进", nxt)
-        return adv("coach", "任务已经拆解清楚，接下来开始动手做。切到 Coach（督学）我陪你一条条推进", task)
-    if mode == "debugger":
-        return adv("coach", "问题已经定位，切回 Coach 继续推进；遇到新报错随时再切 Debugger", task)
-    if mode == "reviewer":
-        if resp.passed:
-            # 当前任务验收通过 → 明确引导进入下一任务 / 下一阶段
-            if nxt:
-                return adv("coach",
-                           f"任务「{task.title}」已验收通过。进入下一项「{nxt.title}」"
-                           f"（{stage_title.get(nxt.stage_id, '')}），切到 Coach 开始。", nxt)
-            return None  # 全部任务完成，不再推荐
-        return adv("coach", "这次评审还有未通过项，切回 Coach 按评审意见修改后重新提交", task)
-    # mode == coach
-    if finished:
-        return adv("reviewer", "看起来完成了，切 Reviewer 对照验收标准给当前任务评审打分", task)
-    return None
+    return adv("reviewer", "看起来完成了，切到「验收」对照标准逐条评审打分", task)
 
 
 # ---------------------------------------------------------------------------
@@ -253,20 +229,28 @@ async def teach(req: TeachRequest, request: Request):
         from schemas import Student
         student = Student(session_id=req.session_id or "anon")
 
-    # 会话（提前创建，供 Debugger 状态机跨轮读取）
+    # 会话（单一连续对话流：会话身份 = 学生 + 任务；模式只是请求参数，切换不丢历史）
     sid = student.session_id or "anon"
-    sess = _sessions.get(sid)
-    if not sess or sess.task_id != req.task_id or sess.mode.value != mode:
+    skey = f"{sid}:{req.task_id}"
+    sess = _sessions.get(skey)
+    if not sess or sess.task_id != req.task_id:
         sess = AISession(session_id=sid, student_id=sid,
                          task_id=req.task_id, mode=req.mode,
                          attempt_count=student.attempt_count.get(req.task_id, 0))
-        _sessions[sid] = sess
+        _sessions[skey] = sess
+    sess.mode = req.mode  # 记录最近一次使用的模式（不影响会话身份）
+
+    # 指导模式内部行为路由（拆解/推进/调试，用户无感；调试状态机挂在行为上）
+    behavior = ""
+    if mode == "tutor":
+        behavior = route_behavior(req.user_input, sess)
 
     # 组装上下文
     ctx = build_context(req, student)
+    ctx.behavior = behavior
 
-    # Sprint 4：Debugger 多轮取证状态注入（跨轮避免重复提问、逐步收敛）
-    if mode == "debugger":
+    # 调试行为：多轮取证状态注入（跨轮避免重复提问、逐步收敛）
+    if behavior == "debug":
         if sess.debug_state is None:
             sess.debug_state = DebuggerState()
         ctx.debug_progress = render_debug_progress(sess.debug_state)
@@ -333,22 +317,14 @@ async def teach(req: TeachRequest, request: Request):
         except Exception:
             break
 
-    # Reviewer 归因护栏兜底：重试后评审意见仍引用系统错误 → 强制降级，
-    # 不作为学生项目判定依据（passed 置空，前端不显示通过/未通过徽标）
-    if mode == "reviewer" and any("system_error_isolation" in i for i in issues):
-        resp.passed = None
-        resp.message = (resp.message or "") + (
-            "\n\n[系统提示] 本次评审内容引用了系统内部错误，按平台规则已隔离："
-            "以上内容不作为学生项目的判定依据，请稍后重新提交评审。")
-
     # 记录会话 & 更新 hint level
     sess.hint_level = ctx.hint_level
     sess.history.append({"role": "user", "content": req.user_input})
     sess.history.append({"role": "assistant", "content": resp.message})
 
-    # Sprint 4：更新 Debugger 取证状态机
+    # 调试行为：更新取证状态机
     debug_state_info = {}
-    if mode == "debugger" and sess.debug_state is not None:
+    if behavior == "debug" and sess.debug_state is not None:
         sess.debug_state = update_debugger_state(sess.debug_state, resp)
         debug_state_info = {
             "rounds": sess.debug_state.rounds,
@@ -357,8 +333,8 @@ async def teach(req: TeachRequest, request: Request):
             "last_diagnostic_question": sess.debug_state.last_diagnostic_question,
         }
 
-    # Sprint 6：结构化为日志（AI Evaluation 的数据基础）
-    mode_advice = compute_mode_advice(mode, resp, req, task)
+    # 结构化为日志（AI Evaluation 的数据基础）
+    mode_advice = compute_mode_advice(mode, req, task)
     logs_mod.log_event(
         type="teach",
         session_id=sid,
@@ -366,14 +342,14 @@ async def teach(req: TeachRequest, request: Request):
         project_id=req.project_id,
         task_id=req.task_id,
         mode=mode,
+        behavior=behavior or None,
         attempt_count=student.attempt_count.get(req.task_id, 0),
         hint_level=ctx.hint_level,
         user_message=req.user_input[:500],
         ai_response=resp.message[:800],
         next_action=(resp.next_action or (mode_advice.get("mode") if mode_advice else None)),
         accepted_by_user=None,
-        task_completed=bool(resp.passed),
-        review_status=resp.evaluation if mode == "reviewer" else None,
+        task_completed=False,  # 完成判定只来自验收链（/api/ai/review）
         quality_warnings=issues,
         repo_used=bool(req.repo_url),
     )
@@ -393,9 +369,9 @@ async def teach(req: TeachRequest, request: Request):
             "suspected_cause": resp.suspected_cause,
             "verify_steps": resp.verify_steps,
             "diagnostic_question": resp.diagnostic_question,
-            "evaluation": resp.evaluation,
-            "score": resp.score,
-            "passed": resp.passed,
+            # 指导模式内部行为标签（用户无感，仅展示）
+            "behavior": behavior,
+            "behavior_label": BEHAVIOR_LABELS.get(behavior, ""),
             # 代码证据状态（V2）
             "evidence": evidence_status,
             # Sprint 4：Debugger 取证状态机（前端展示轮次/阶段）

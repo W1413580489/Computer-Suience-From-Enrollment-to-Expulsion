@@ -246,30 +246,26 @@ class AiResponse(BaseModel):
     """AI 结构化输出（DeepSeek JSON 模式返回，经 Pydantic 校验）。
 
     无条件字段：
-      mode / message / next_action / requires_input
-    条件字段（按 mode）：
-      tutor   -> hint_level, hint, leading_question
-      debugger-> suspected_cause, verify_steps, diagnostic_question
-      reviewer-> evaluation, score, passed
+      mode / message / next_action
+    条件字段（按指导模式内部行为 behavior，见 prompts.BEHAVIOR_PROMPTS）：
+      decompose -> hint_level, hint, leading_question
+      advance   -> current_step
+      debug     -> suspected_cause, verify_steps, diagnostic_question
     """
     mode: Mode
     message: str                       # 给学生的回复
     next_action: str = ""              # 建议学生下一步做什么
     hints_used: int = 0                # 本次启用的提示等级
-    # tutor / coach
+    # 拆解行为
     hint_level: Optional[int] = None
     hint: Optional[str] = None
     leading_question: Optional[str] = None
-    # coach
+    # 推进行为
     current_step: Optional[str] = None    # 明确学生当前只需做哪一步（任务规划）
-    # debugger
+    # 调试行为
     suspected_cause: Optional[str] = None
     verify_steps: Optional[list[str]] = None
     diagnostic_question: Optional[str] = None   # 反问学生确认报错位置的诊断问题
-    # reviewer
-    evaluation: Optional[str] = None
-    score: Optional[int] = None
-    passed: Optional[bool] = None
 
 
 class TeachRequest(BaseModel):
@@ -314,6 +310,7 @@ class TeachContext(BaseModel):
     material: list[str] = Field(default_factory=list)   # 检索到的参考 chunk 文本
     code_evidence: str = ""         # V2：学员 GitHub 仓库的代码证据文本（注入 Prompt）
     debug_progress: str = ""        # Sprint 4：Debugger 上一轮取证进度（避免重复提问）
+    behavior: str = ""              # 指导模式内部行为（decompose/advance/debug，系统路由）
     hint_level: int = 0
     skill: Optional[str] = None
     source_url: str = ""
