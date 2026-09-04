@@ -109,8 +109,10 @@
           <div v-for="(msg, i) in chat" :key="i" class="teach__msg" :class="msg.role">
             <!-- 系统状态条（服务异常提示，不进入 AI 对话上下文） -->
             <div v-if="msg.role === 'system'" class="teach__sysmsg">{{ msg.text }}</div>
-            <!-- 用户/AI 气泡 -->
-            <div v-else class="teach__bubble">{{ msg.role === 'user' ? msg.payload : msg.payload.message || '(空回复)' }}</div>
+            <!-- 学生消息：纯文本 -->
+            <div v-else-if="msg.role === 'user'" class="teach__bubble">{{ msg.payload }}</div>
+            <!-- AI 消息：Markdown 渲染（marked → DOMPurify 消毒 → highlight.js） -->
+            <div v-else class="teach__bubble md-body" v-html="renderAiMarkdown(msg.payload?.message || '(空回复)')"></div>
 
             <!-- AI 结构化附加信息 -->
             <template v-if="msg.role === 'assistant' && !msg.review">
@@ -190,6 +192,7 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import PageShell from '@/components/common/PageShell.vue';
 import { useThemeStore } from '@/stores/themeStore';
 import { useAchievementStore } from '@/stores/achievementStore';
+import { renderAiMarkdown } from '@/composables/useAiMarkdown';
 
 const theme = useThemeStore();
 
@@ -673,6 +676,35 @@ function toast(msg: string) {
   border-radius: 14px; padding: 11px 13px; white-space: pre-wrap; word-break: break-word; color: var(--t-fg);
 }
 .teach__msg.user .teach__bubble { background: var(--t-acc); border-color: var(--t-acc); color: #fff; }
+/* AI 消息 Markdown 正文 */
+.teach__bubble.md-body { white-space: normal; }
+.md-body > :first-child { margin-top: 0; }
+.md-body > :last-child { margin-bottom: 0; }
+.md-body p { margin: 6px 0; }
+.md-body ul, .md-body ol { margin: 6px 0; padding-left: 20px; }
+.md-body li { margin: 3px 0; }
+.md-body h1, .md-body h2, .md-body h3, .md-body h4 { margin: 10px 0 6px; font-size: 15px; }
+.md-body blockquote { margin: 6px 0; padding: 4px 10px; border-left: 3px solid var(--t-acc-dim); color: var(--t-dim); }
+.md-body code:not(.hljs) {
+  background: rgba(128, 128, 128, 0.18); border-radius: 4px; padding: 1px 5px;
+  font-family: ui-monospace, Consolas, monospace; font-size: 12.5px;
+}
+.md-body pre {
+  background: #14161a; color: #e6e6e6; border-radius: 8px; padding: 10px 12px;
+  overflow-x: auto; margin: 8px 0; font-size: 12.5px; line-height: 1.55;
+}
+.md-body pre code { font-family: ui-monospace, Consolas, monospace; background: none; padding: 0; white-space: pre; }
+.md-body table { border-collapse: collapse; margin: 8px 0; font-size: 12.5px; }
+.md-body th, .md-body td { border: 1px solid var(--t-line); padding: 4px 8px; text-align: left; }
+.md-body th { background: rgba(128, 128, 128, 0.12); }
+.md-body a { color: var(--t-acc); }
+/* highlight.js 令牌配色（代码块固定深底，两主题通用） */
+.md-body .hljs-keyword, .md-body .hljs-built_in { color: #c792ea; }
+.md-body .hljs-string, .md-body .hljs-attr { color: #a5e075; }
+.md-body .hljs-comment { color: #6a737d; font-style: italic; }
+.md-body .hljs-number, .md-body .hljs-literal { color: #f78c6c; }
+.md-body .hljs-title, .md-body .hljs-function, .md-body .hljs-name { color: #82aaff; }
+.md-body .hljs-type, .md-body .hljs-class { color: #ffcb6b; }
 .teach__msg.system { align-self: center; max-width: 92%; }
 .teach__sysmsg {
   background: color-mix(in srgb, var(--t-yellow) 12%, transparent);
