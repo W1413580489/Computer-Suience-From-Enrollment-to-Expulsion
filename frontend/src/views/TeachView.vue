@@ -660,8 +660,16 @@ function toast(msg: string) {
 .teach__main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 /* 侧栏收起：对话区占满 */
 .teach--noside .teach__side { display: none; }
-.teach__sidetoggle { cursor: pointer; border: 0; font: inherit; padding: 0; background: color-mix(in srgb, var(--t-acc) 14%, transparent); color: var(--t-acc); }
-.teach__sidetoggle:hover { background: color-mix(in srgb, var(--t-acc) 26%, transparent); }
+/* 侧栏开关：实心强调色按钮，醒目 */
+.teach__sidetoggle {
+  cursor: pointer; border: 1px solid var(--t-acc);
+  background: var(--t-acc); color: var(--t-bg);
+  font: inherit; font-size: 12px; font-weight: 700; letter-spacing: .02em;
+  padding: 3px 14px; border-radius: 999px;
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--t-acc) 45%, transparent);
+}
+.teach__sidetoggle:hover { filter: brightness(1.12); transform: translateY(-1px); }
+.teach__sidetoggle:active { transform: translateY(0); }
 .teach__chathead {
   padding: 10px 18px; border-bottom: 1px solid var(--t-line); background: var(--t-bg2);
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
