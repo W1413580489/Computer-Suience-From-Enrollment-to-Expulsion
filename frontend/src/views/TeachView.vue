@@ -1,6 +1,6 @@
 <template>
   <PageShell title="" subtitle="" active-key="teach" :wide="true">
-    <div class="teach" :data-theme="theme.isZzz ? 'zzz' : 'ak'">
+    <div class="teach" :data-theme="theme.isZzz ? 'zzz' : 'ak'" :class="{ 'teach--noside': !sideOpen }">
       <!-- 左侧配置栏 -->
       <aside class="teach__side">
         <div class="teach__group">
@@ -96,6 +96,7 @@
         <div class="teach__chathead">
           <p class="teach__task">{{ currentTaskTitle }}</p>
           <div class="teach__chips">
+            <button class="teach__metachip teach__sidetoggle" :title="sideOpen ? '收起侧栏，放大对话区' : '展开侧栏'" @click="toggleSide">{{ sideOpen ? '⇤ 收起' : '⇥ 设置' }}</button>
             <span class="teach__metachip">{{ modeLabel }}</span>
             <span class="teach__metachip">会话 {{ student.session_id }}</span>
           </div>
@@ -234,6 +235,12 @@ const input = ref('');
 const loading = ref(false);
 const showKey = ref(false);
 const statsOpen = ref(false);
+// 侧栏收起状态（localStorage 持久化：'0' = 收起）
+const sideOpen = ref(localStorage.getItem('xkz_teach_side') !== '0');
+function toggleSide() {
+  sideOpen.value = !sideOpen.value;
+  localStorage.setItem('xkz_teach_side', sideOpen.value ? '1' : '0');
+}
 const stats = ref<Record<string, unknown> | null>(null);
 const messagesEl = ref<HTMLElement | null>(null);
 const toastMsg = ref('');
@@ -651,6 +658,10 @@ function toast(msg: string) {
 
 /* 右侧对话区 */
 .teach__main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+/* 侧栏收起：对话区占满 */
+.teach--noside .teach__side { display: none; }
+.teach__sidetoggle { cursor: pointer; border: 0; font: inherit; padding: 0; background: color-mix(in srgb, var(--t-acc) 14%, transparent); color: var(--t-acc); }
+.teach__sidetoggle:hover { background: color-mix(in srgb, var(--t-acc) 26%, transparent); }
 .teach__chathead {
   padding: 10px 18px; border-bottom: 1px solid var(--t-line); background: var(--t-bg2);
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
