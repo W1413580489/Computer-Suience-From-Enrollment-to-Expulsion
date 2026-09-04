@@ -1,0 +1,1130 @@
+0 verbose cli C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node.exe C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\bin\npm-cli.js
+1 info using npm@10.9.7
+2 info using node@v22.22.2
+3 silly config load:file:C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\npmrc
+4 silly config load:file:D:\Assistant\tralis\xkz-agent\frontend\.npmrc
+5 silly config load:file:D:\tmp_home\.npmrc
+6 silly config load:file:C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\etc\npmrc
+7 verbose title npm i fake-indexeddb
+8 verbose argv "i" "--save-dev" "fake-indexeddb" "--cache" ".npm-cache"
+9 verbose logfile logs-max:10 dir:D:\Assistant\tralis\xkz-agent\frontend\.npm-cache\_logs\2026-09-04T16_36_28_216Z-
+10 verbose logfile D:\Assistant\tralis\xkz-agent\frontend\.npm-cache\_logs\2026-09-04T16_36_28_216Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4345298944 maxSize:1086324736 maxEntrySize:543162368
+13 silly idealTree buildDeps
+14 silly fetch manifest fake-indexeddb@*
+15 silly packumentCache full:https://registry.npmjs.org/fake-indexeddb cache-miss
+16 verbose shrinkwrap failed to load node_modules/.package-lock.json out of date, updated: node_modules
+17 http fetch GET 200 https://registry.npmjs.org/npm 7444ms
+18 http fetch GET 200 https://registry.npmjs.org/fake-indexeddb 22581ms (cache miss)
+19 silly packumentCache full:https://registry.npmjs.org/fake-indexeddb set size:undefined disposed:false
+20 silly placeDep ROOT fake-indexeddb@6.2.5 OK for: xkz-agent-frontend@1.0.0 want: *
+21 silly reify moves {}
+22 silly audit bulk request {
+22 silly audit   '@asamuzakjp/css-color': [ '6.0.7' ],
+22 silly audit   '@asamuzakjp/dom-selector': [ '8.3.2' ],
+22 silly audit   '@babel/helper-string-parser': [ '7.29.7' ],
+22 silly audit   '@babel/helper-validator-identifier': [ '7.29.7' ],
+22 silly audit   '@babel/parser': [ '7.29.8' ],
+22 silly audit   '@babel/types': [ '7.29.8' ],
+22 silly audit   '@bramus/specificity': [ '2.4.2' ],
+22 silly audit   '@csstools/color-helpers': [ '6.1.1' ],
+22 silly audit   '@csstools/css-calc': [ '3.3.0' ],
+22 silly audit   '@csstools/css-color-parser': [ '4.2.2' ],
+22 silly audit   '@csstools/css-parser-algorithms': [ '4.0.0' ],
+22 silly audit   '@csstools/css-syntax-patches-for-csstree': [ '1.1.12' ],
+22 silly audit   '@csstools/css-tokenizer': [ '4.0.0' ],
+22 silly audit   '@esbuild/aix-ppc64': [ '0.21.5' ],
+22 silly audit   '@esbuild/android-arm': [ '0.21.5' ],
+22 silly audit   '@esbuild/android-arm64': [ '0.21.5' ],
+22 silly audit   '@esbuild/android-x64': [ '0.21.5' ],
+22 silly audit   '@esbuild/darwin-arm64': [ '0.21.5' ],
+22 silly audit   '@esbuild/darwin-x64': [ '0.21.5' ],
+22 silly audit   '@esbuild/freebsd-arm64': [ '0.21.5' ],
+22 silly audit   '@esbuild/freebsd-x64': [ '0.21.5' ],
+22 silly audit   '@esbuild/linux-arm': [ '0.21.5' ],
+22 silly audit   '@esbuild/linux-arm64': [ '0.21.5' ],
+22 silly audit   '@esbuild/linux-ia32': [ '0.21.5' ],
+22 silly audit   '@esbuild/linux-loong64': [ '0.21.5' ],
+22 silly audit   '@esbuild/linux-mips64el': [ '0.21.5' ],
+22 silly audit   '@esbuild/linux-ppc64': [ '0.21.5' ],
+22 silly audit   '@esbuild/linux-riscv64': [ '0.21.5' ],
+22 silly audit   '@esbuild/linux-s390x': [ '0.21.5' ],
+22 silly audit   '@esbuild/linux-x64': [ '0.21.5' ],
+22 silly audit   '@esbuild/netbsd-x64': [ '0.21.5' ],
+22 silly audit   '@esbuild/openbsd-x64': [ '0.21.5' ],
+22 silly audit   '@esbuild/sunos-x64': [ '0.21.5' ],
+22 silly audit   '@esbuild/win32-arm64': [ '0.21.5' ],
+22 silly audit   '@esbuild/win32-ia32': [ '0.21.5' ],
+22 silly audit   '@esbuild/win32-x64': [ '0.21.5' ],
+22 silly audit   '@exodus/bytes': [ '1.15.1' ],
+22 silly audit   '@jridgewell/sourcemap-codec': [ '1.5.5' ],
+22 silly audit   '@napi-rs/lzma-linux-x64-gnu': [ '1.5.1' ],
+22 silly audit   '@rollup/rollup-android-arm-eabi': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-android-arm64': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-darwin-arm64': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-darwin-x64': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-freebsd-arm64': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-freebsd-x64': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-linux-arm-gnueabihf': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-linux-arm-musleabihf': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-linux-arm64-gnu': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-linux-arm64-musl': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-linux-loong64-gnu': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-linux-loong64-musl': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-linux-ppc64-gnu': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-linux-ppc64-musl': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-linux-riscv64-gnu': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-linux-riscv64-musl': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-linux-s390x-gnu': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-linux-x64-gnu': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-linux-x64-musl': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-openbsd-x64': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-openharmony-arm64': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-win32-arm64-msvc': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-win32-ia32-msvc': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-win32-x64-gnu': [ '4.62.4' ],
+22 silly audit   '@rollup/rollup-win32-x64-msvc': [ '4.62.4' ],
+22 silly audit   '@types/estree': [ '1.0.9' ],
+22 silly audit   '@types/trusted-types': [ '2.0.7' ],
+22 silly audit   '@vitejs/plugin-vue': [ '5.2.4' ],
+22 silly audit   '@vue/compiler-core': [ '3.5.40' ],
+22 silly audit   '@vue/compiler-dom': [ '3.5.40' ],
+22 silly audit   '@vue/compiler-sfc': [ '3.5.40' ],
+22 silly audit   '@vue/compiler-ssr': [ '3.5.40' ],
+22 silly audit   '@vue/devtools-api': [ '6.6.4' ],
+22 silly audit   '@vue/reactivity': [ '3.5.40' ],
+22 silly audit   '@vue/runtime-core': [ '3.5.40' ],
+22 silly audit   '@vue/runtime-dom': [ '3.5.40' ],
+22 silly audit   '@vue/server-renderer': [ '3.5.40' ],
+22 silly audit   '@vue/shared': [ '3.5.40' ],
+22 silly audit   'bidi-js': [ '1.0.3' ],
+22 silly audit   'css-tree': [ '3.2.1' ],
+22 silly audit   csstype: [ '3.2.3' ],
+22 silly audit   'data-urls': [ '7.0.0' ],
+22 silly audit   'whatwg-url': [ '16.0.1', '17.1.0' ],
+22 silly audit   'decimal.js': [ '10.6.0' ],
+22 silly audit   dompurify: [ '3.4.14' ],
+22 silly audit   entities: [ '7.0.1', '8.0.0' ],
+22 silly audit   esbuild: [ '0.21.5' ],
+22 silly audit   'estree-walker': [ '2.0.2' ],
+22 silly audit   fsevents: [ '2.3.3' ],
+22 silly audit   'highlight.js': [ '11.12.0' ],
+22 silly audit   'html-encoding-sniffer': [ '6.0.0' ],
+22 silly audit   'is-potential-custom-element-name': [ '1.0.1' ],
+22 silly audit   jsdom: [ '30.0.1' ],
+22 silly audit   'lru-cache': [ '11.5.2' ],
+22 silly audit   'magic-string': [ '0.30.21' ],
+22 silly audit   marked: [ '18.0.11' ],
+22 silly audit   'mdn-data': [ '2.27.1' ],
+22 silly audit   nanoid: [ '3.3.17' ],
+22 silly audit   parse5: [ '8.0.1' ],
+22 silly audit   picocolors: [ '1.1.1' ],
+22 silly audit   pinia: [ '2.3.1' ],
+22 silly audit   postcss: [ '8.5.25' ],
+22 silly audit   punycode: [ '2.3.1' ],
+22 silly audit   'require-from-string': [ '2.0.2' ],
+22 silly audit   rollup: [ '4.62.4' ],
+22 silly audit   saxes: [ '6.0.0' ],
+22 silly audit   'source-map-js': [ '1.2.1' ],
+22 silly audit   'symbol-tree': [ '3.2.4' ],
+22 silly audit   'throttle-debounce': [ '5.0.2' ],
+22 silly audit   tldts: [ '7.4.11' ],
+22 silly audit   'tldts-core': [ '7.4.11' ],
+22 silly audit   'tough-cookie': [ '6.0.2' ],
+22 silly audit   tr46: [ '6.0.0' ],
+22 silly audit   typescript: [ '5.9.3' ],
+22 silly audit   undici: [ '8.10.2' ],
+22 silly audit   vite: [ '5.4.21' ],
+22 silly audit   vue: [ '3.5.40' ],
+22 silly audit   'vue-demi': [ '0.14.10' ],
+22 silly audit   'vue-router': [ '4.5.1' ],
+22 silly audit   'w3c-xmlserializer': [ '5.0.0' ],
+22 silly audit   'webidl-conversions': [ '8.0.1' ],
+22 silly audit   'whatwg-mimetype': [ '5.0.0' ],
+22 silly audit   'xml-name-validator': [ '5.0.0' ],
+22 silly audit   xmlchars: [ '2.2.0' ],
+22 silly audit   'zenless-ui': [ '1.0.7' ],
+22 silly audit   'fake-indexeddb': [ '6.2.5' ]
+22 silly audit }
+23 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\fsevents
+24 silly reify mark deleted [
+24 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\fsevents'
+24 silly reify ]
+25 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-win32-ia32-msvc
+26 silly reify mark deleted [
+26 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-win32-ia32-msvc'
+26 silly reify ]
+27 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-win32-arm64-msvc
+28 silly reify mark deleted [
+28 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-win32-arm64-msvc'
+28 silly reify ]
+29 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-openharmony-arm64
+30 silly reify mark deleted [
+30 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-openharmony-arm64'
+30 silly reify ]
+31 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-openbsd-x64
+32 silly reify mark deleted [
+32 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-openbsd-x64'
+32 silly reify ]
+33 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-x64-musl
+34 silly reify mark deleted [
+34 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-x64-musl'
+34 silly reify ]
+35 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-x64-gnu
+36 silly reify mark deleted [
+36 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-x64-gnu'
+36 silly reify ]
+37 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-s390x-gnu
+38 silly reify mark deleted [
+38 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-s390x-gnu'
+38 silly reify ]
+39 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-riscv64-musl
+40 silly reify mark deleted [
+40 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-riscv64-musl'
+40 silly reify ]
+41 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-riscv64-gnu
+42 silly reify mark deleted [
+42 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-riscv64-gnu'
+42 silly reify ]
+43 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-ppc64-musl
+44 silly reify mark deleted [
+44 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-ppc64-musl'
+44 silly reify ]
+45 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-ppc64-gnu
+46 silly reify mark deleted [
+46 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-ppc64-gnu'
+46 silly reify ]
+47 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-loong64-musl
+48 silly reify mark deleted [
+48 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-loong64-musl'
+48 silly reify ]
+49 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-loong64-gnu
+50 silly reify mark deleted [
+50 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-loong64-gnu'
+50 silly reify ]
+51 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-arm64-musl
+52 silly reify mark deleted [
+52 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-arm64-musl'
+52 silly reify ]
+53 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-arm64-gnu
+54 silly reify mark deleted [
+54 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-arm64-gnu'
+54 silly reify ]
+55 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-arm-musleabihf
+56 silly reify mark deleted [
+56 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-arm-musleabihf'
+56 silly reify ]
+57 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-arm-gnueabihf
+58 silly reify mark deleted [
+58 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-arm-gnueabihf'
+58 silly reify ]
+59 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-freebsd-x64
+60 silly reify mark deleted [
+60 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-freebsd-x64'
+60 silly reify ]
+61 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-freebsd-arm64
+62 silly reify mark deleted [
+62 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-freebsd-arm64'
+62 silly reify ]
+63 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-darwin-x64
+64 silly reify mark deleted [
+64 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-darwin-x64'
+64 silly reify ]
+65 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-darwin-arm64
+66 silly reify mark deleted [
+66 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-darwin-arm64'
+66 silly reify ]
+67 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-android-arm64
+68 silly reify mark deleted [
+68 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-android-arm64'
+68 silly reify ]
+69 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-android-arm-eabi
+70 silly reify mark deleted [
+70 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-android-arm-eabi'
+70 silly reify ]
+71 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@napi-rs\lzma-linux-x64-gnu
+72 silly reify mark deleted [
+72 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@napi-rs\\lzma-linux-x64-gnu'
+72 silly reify ]
+73 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\win32-ia32
+74 silly reify mark deleted [
+74 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\win32-ia32'
+74 silly reify ]
+75 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\win32-arm64
+76 silly reify mark deleted [
+76 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\win32-arm64'
+76 silly reify ]
+77 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\sunos-x64
+78 silly reify mark deleted [
+78 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\sunos-x64'
+78 silly reify ]
+79 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\openbsd-x64
+80 silly reify mark deleted [
+80 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\openbsd-x64'
+80 silly reify ]
+81 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\netbsd-x64
+82 silly reify mark deleted [
+82 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\netbsd-x64'
+82 silly reify ]
+83 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\linux-x64
+84 silly reify mark deleted [
+84 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\linux-x64'
+84 silly reify ]
+85 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\linux-s390x
+86 silly reify mark deleted [
+86 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\linux-s390x'
+86 silly reify ]
+87 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\linux-riscv64
+88 silly reify mark deleted [
+88 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\linux-riscv64'
+88 silly reify ]
+89 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\linux-ppc64
+90 silly reify mark deleted [
+90 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\linux-ppc64'
+90 silly reify ]
+91 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\linux-mips64el
+92 silly reify mark deleted [
+92 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\linux-mips64el'
+92 silly reify ]
+93 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\linux-loong64
+94 silly reify mark deleted [
+94 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\linux-loong64'
+94 silly reify ]
+95 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\linux-ia32
+96 silly reify mark deleted [
+96 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\linux-ia32'
+96 silly reify ]
+97 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\linux-arm64
+98 silly reify mark deleted [
+98 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\linux-arm64'
+98 silly reify ]
+99 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\linux-arm
+100 silly reify mark deleted [
+100 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\linux-arm'
+100 silly reify ]
+101 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\freebsd-x64
+102 silly reify mark deleted [
+102 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\freebsd-x64'
+102 silly reify ]
+103 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\freebsd-arm64
+104 silly reify mark deleted [
+104 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\freebsd-arm64'
+104 silly reify ]
+105 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\darwin-x64
+106 silly reify mark deleted [
+106 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\darwin-x64'
+106 silly reify ]
+107 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\darwin-arm64
+108 silly reify mark deleted [
+108 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\darwin-arm64'
+108 silly reify ]
+109 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\android-x64
+110 silly reify mark deleted [
+110 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\android-x64'
+110 silly reify ]
+111 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\android-arm64
+112 silly reify mark deleted [
+112 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\android-arm64'
+112 silly reify ]
+113 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\android-arm
+114 silly reify mark deleted [
+114 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\android-arm'
+114 silly reify ]
+115 verbose reify failed optional dependency D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\aix-ppc64
+116 silly reify mark deleted [
+116 silly reify   'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\aix-ppc64'
+116 silly reify ]
+117 http cache fake-indexeddb@https://registry.npmjs.org/fake-indexeddb/-/fake-indexeddb-6.2.5.tgz 0ms (cache hit)
+118 silly tarball no local data for fake-indexeddb@https://registry.npmjs.org/fake-indexeddb/-/fake-indexeddb-6.2.5.tgz. Extracting by manifest.
+119 http fetch POST 200 https://registry.npmjs.org/-/npm/v1/security/advisories/bulk 823ms
+120 silly audit report {
+120 silly audit report   esbuild: [
+120 silly audit report     {
+120 silly audit report       id: 1102341,
+120 silly audit report       url: 'https://github.com/advisories/GHSA-67mh-4wv8-2f99',
+120 silly audit report       title: 'esbuild enables any website to send any requests to the development server and read the response',
+120 silly audit report       severity: 'moderate',
+120 silly audit report       vulnerable_versions: '<=0.24.2',
+120 silly audit report       cwe: [Array],
+120 silly audit report       cvss: [Object]
+120 silly audit report     }
+120 silly audit report   ],
+120 silly audit report   nanoid: [
+120 silly audit report     {
+120 silly audit report       id: 1139427,
+120 silly audit report       url: 'https://github.com/advisories/GHSA-2v37-7h3g-55p8',
+120 silly audit report       title: 'nanoid: custom generators can loop indefinitely when size is zero',
+120 silly audit report       severity: 'high',
+120 silly audit report       vulnerable_versions: '<3.3.18',
+120 silly audit report       cwe: [Array],
+120 silly audit report       cvss: [Object]
+120 silly audit report     }
+120 silly audit report   ],
+120 silly audit report   vite: [
+120 silly audit report     {
+120 silly audit report       id: 1120784,
+120 silly audit report       url: 'https://github.com/advisories/GHSA-v6wh-96g9-6wx3',
+120 silly audit report       title: 'launch-editor: NTLMv2 hash disclosure via UNC path handling on Windows',
+120 silly audit report       severity: 'moderate',
+120 silly audit report       vulnerable_versions: '<=6.4.2',
+120 silly audit report       cwe: [Array],
+120 silly audit report       cvss: [Object]
+120 silly audit report     },
+120 silly audit report     {
+120 silly audit report       id: 1116229,
+120 silly audit report       url: 'https://github.com/advisories/GHSA-4w7w-66w2-5vf9',
+120 silly audit report       title: 'Vite Vulnerable to Path Traversal in Optimized Deps `.map` Handling',
+120 silly audit report       severity: 'moderate',
+120 silly audit report       vulnerable_versions: '<=6.4.1',
+120 silly audit report       cwe: [Array],
+120 silly audit report       cvss: [Object]
+120 silly audit report     },
+120 silly audit report     {
+120 silly audit report       id: 1123525,
+120 silly audit report       url: 'https://github.com/advisories/GHSA-fx2h-pf6j-xcff',
+120 silly audit report       title: 'vite: `server.fs.deny` bypass on Windows alternate paths',
+120 silly audit report       severity: 'high',
+120 silly audit report       vulnerable_versions: '<=6.4.2',
+120 silly audit report       cwe: [Array],
+120 silly audit report       cvss: [Object]
+120 silly audit report     }
+120 silly audit report   ]
+120 silly audit report }
+121 silly packumentCache corgi:https://registry.npmjs.org/esbuild cache-miss
+122 silly packumentCache corgi:https://registry.npmjs.org/nanoid cache-miss
+123 silly packumentCache corgi:https://registry.npmjs.org/vite cache-miss
+124 http fetch GET 200 https://registry.npmjs.org/fake-indexeddb/-/fake-indexeddb-6.2.5.tgz 1601ms (cache miss)
+125 warn cleanup Failed to remove some directories [
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\fsevents',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\fsevents: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-win32-ia32-msvc',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-win32-ia32-msvc: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-win32-arm64-msvc',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-win32-arm64-msvc: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-openharmony-arm64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-openharmony-arm64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-openbsd-x64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-openbsd-x64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-x64-musl',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-x64-musl: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-x64-gnu',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-x64-gnu: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-s390x-gnu',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-s390x-gnu: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-riscv64-musl',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-riscv64-musl: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-riscv64-gnu',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-riscv64-gnu: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-ppc64-musl',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-ppc64-musl: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-ppc64-gnu',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-ppc64-gnu: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-loong64-musl',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-loong64-musl: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-loong64-gnu',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-loong64-gnu: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-arm64-musl',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-arm64-musl: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-arm64-gnu',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-arm64-gnu: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-arm-musleabihf',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-arm-musleabihf: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-linux-arm-gnueabihf',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-linux-arm-gnueabihf: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-freebsd-x64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-freebsd-x64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-freebsd-arm64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-freebsd-arm64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-darwin-x64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-darwin-x64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-darwin-arm64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-darwin-arm64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-android-arm64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-android-arm64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@rollup\\rollup-android-arm-eabi',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@rollup\rollup-android-arm-eabi: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@napi-rs\\lzma-linux-x64-gnu',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@napi-rs\lzma-linux-x64-gnu: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\win32-ia32',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\win32-ia32: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\win32-arm64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\win32-arm64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\sunos-x64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\sunos-x64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\openbsd-x64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\openbsd-x64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\netbsd-x64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\netbsd-x64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\linux-x64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\linux-x64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\linux-s390x',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\linux-s390x: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\linux-riscv64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\linux-riscv64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\linux-ppc64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\linux-ppc64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\linux-mips64el',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\linux-mips64el: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\linux-loong64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\linux-loong64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\linux-ia32',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\linux-ia32: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\linux-arm64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\linux-arm64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\linux-arm',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\linux-arm: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\freebsd-x64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\freebsd-x64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\freebsd-arm64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\freebsd-arm64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\darwin-x64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\darwin-x64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\darwin-arm64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\darwin-arm64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\android-x64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\android-x64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\android-arm64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\android-arm64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\android-arm',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\android-arm: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ],
+125 warn cleanup   [
+125 warn cleanup     'D:\\Assistant\\tralis\\xkz-agent\\frontend\\node_modules\\@esbuild\\aix-ppc64',
+125 warn cleanup     Error: [safe-delete] 操作失败: ERROR D:\Assistant\tralis\xkz-agent\frontend\node_modules\@esbuild\aix-ppc64: Error during a `trash` operation: Unknown { description: "Some operations were aborted" }
+125 warn cleanup         at trashViaBinary (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:270:15)
+125 warn cleanup         at trashItem (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:283:9)
+125 warn cleanup         at tryTrash (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:547:5)
+125 warn cleanup         at tryRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:722:5)
+125 warn cleanup         at wrappedPromisesRm (D:\gitt\WorkBuddy\resources\app.asar.unpacked\cli\vendor\shim\genie-safe-delete.cjs:766:15)
+125 warn cleanup         at _rm (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1352:25)
+125 warn cleanup         at [removeTrash] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:1355:21)
+125 warn cleanup         at [reifyPackages] (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:349:29)
+125 warn cleanup         at async Arborist.reify (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:149:5)
+125 warn cleanup         at async Install.exec (C:\Users\王凌骏\.workbuddy\binaries\node\versions\22.22.2\node_modules\npm\lib\commands\install.js:150:5)
+125 warn cleanup   ]
+125 warn cleanup ]
+126 http fetch GET https://registry.npmjs.org/nanoid attempt 1 failed with ECONNRESET
+127 http fetch GET https://registry.npmjs.org/vite attempt 1 failed with ECONNRESET
+128 http fetch GET 200 https://registry.npmjs.org/esbuild 45267ms (cache miss)
+129 silly packumentCache corgi:https://registry.npmjs.org/esbuild set size:undefined disposed:false
+130 http fetch GET 200 https://registry.npmjs.org/nanoid 51177ms attempt #2 (cache miss)
+131 silly packumentCache corgi:https://registry.npmjs.org/nanoid set size:undefined disposed:false
+132 http fetch GET 200 https://registry.npmjs.org/vite 61291ms attempt #2 (cache miss)
+133 silly packumentCache corgi:https://registry.npmjs.org/vite set size:undefined disposed:false
+134 silly packumentCache corgi:https://registry.npmjs.org/postcss cache-miss
+135 http fetch GET 200 https://registry.npmjs.org/postcss 1201ms (cache miss)
+136 silly packumentCache corgi:https://registry.npmjs.org/postcss set size:undefined disposed:false
+137 silly packumentCache corgi:https://registry.npmjs.org/@vitejs%2fplugin-vue cache-miss
+138 http fetch GET 200 https://registry.npmjs.org/@vitejs%2fplugin-vue 5204ms (cache miss)
+139 silly packumentCache corgi:https://registry.npmjs.org/@vitejs%2fplugin-vue set size:undefined disposed:false
+140 silly ADD node_modules/fake-indexeddb
+141 silly ADD
+142 silly ADD
+143 silly ADD
+144 silly ADD
+145 silly ADD
+146 silly ADD
+147 silly ADD
+148 silly ADD
+149 silly ADD
+150 silly ADD
+151 silly ADD
+152 silly ADD
+153 silly ADD
+154 silly ADD
+155 silly ADD
+156 silly ADD
+157 silly ADD
+158 silly ADD
+159 silly ADD
+160 silly ADD
+161 silly ADD
+162 silly ADD
+163 silly ADD
+164 silly ADD
+165 silly ADD
+166 silly ADD
+167 silly ADD
+168 silly ADD
+169 silly ADD
+170 silly ADD
+171 silly ADD
+172 silly ADD
+173 silly ADD
+174 silly ADD
+175 silly ADD
+176 silly ADD
+177 silly ADD
+178 silly ADD
+179 silly ADD
+180 silly ADD
+181 silly ADD
+182 silly ADD
+183 silly ADD
+184 silly ADD
+185 silly ADD
+186 silly ADD
+187 silly ADD
+188 verbose cwd D:\Assistant\tralis\xkz-agent\frontend
+189 verbose os Windows_NT 10.0.26100
+190 verbose node v22.22.2
+191 verbose npm  v10.9.7
+192 notice
+192 notice New major version of npm available! 10.9.7 -> 12.0.2
+192 notice Changelog: https://github.com/npm/cli/releases/tag/v12.0.2
+192 notice To update run: npm install -g npm@12.0.2
+192 notice  { force: true, [Symbol(proc-log.meta)]: true }
+193 verbose exit 0
+194 info ok

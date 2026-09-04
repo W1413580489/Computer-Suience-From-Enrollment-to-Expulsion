@@ -15,9 +15,61 @@ const error = ref<string | null>(null);
 const bgX = ref(50);
 const bgY = ref(50);
 
-function load() {
+// IndexedDB 存取：背景图是图片，localStorage 配额太小（~5MB）会导致
+// "当次能显示、刷新后丢失"；IndexedDB 配额数百 MB，是图片的正确归宿。
+const IDB_NAME = 'xkz-bg';
+const IDB_STORE = 'kv';
+
+function idbOpen(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = () => { if (!req.result.objectStoreNames.contains(IDB_STORE)) req.result.createObjectStore(IDB_STORE); };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function idbGet(key: string): Promise<string | null> {
+  const db = await idbOpen();
+  return new Promise((resolve, reject) => {
+    const req = db.transaction(IDB_STORE).objectStore(IDB_STORE).get(key);
+    req.onsuccess = () => resolve((req.result as string) ?? null);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function idbSet(key: string, val: string): Promise<void> {
+  const db = await idbOpen();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).put(val, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function idbDel(key: string): Promise<void> {
+  const db = await idbOpen();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).delete(key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+// 启动初始化：从 IndexedDB 读背景图；旧版 localStorage 里的数据自动迁移
+async function init() {
   try {
-    const saved = localStorage.getItem(LS_KEY);
+    let saved = await idbGet(LS_KEY);
+    if (!saved) {
+      const legacy = localStorage.getItem(LS_KEY);
+      if (legacy) {
+        saved = legacy;
+        await idbSet(LS_KEY, legacy);       // 迁移到 IndexedDB
+        localStorage.removeItem(LS_KEY);    // 清掉旧的，防再次超配额
+      }
+    }
     if (saved) {
       dataUrl.value = saved;
       applyCss(saved);
@@ -112,16 +164,16 @@ async function previewImage(file: File): Promise<void> {
   }
 }
 
-function applyPending() {
+async function applyPending() {
   if (!pendingUrl.value) return;
   dataUrl.value = pendingUrl.value;
-  try {
-    localStorage.setItem(LS_KEY, pendingUrl.value);
-  } catch {
-    error.value = '图片过大，无法持久保存（刷新后会丢失），但当前会话可正常显示';
-  }
   applyCss(pendingUrl.value);
   pendingUrl.value = null;
+  try {
+    await idbSet(LS_KEY, dataUrl.value);
+  } catch {
+    error.value = '背景图持久化失败，本次会话仍可显示，刷新后会丢失';
+  }
 }
 
 function cancelPending() {
@@ -139,6 +191,7 @@ function removeImage() {
     localStorage.removeItem(LS_KEY);
     localStorage.removeItem(LS_POS_KEY);
   } catch { /* 忽略 */ }
+  idbDel(LS_KEY).catch(() => { /* 忽略 */ });
   applyCss(null);
   applyPos();
 }
@@ -163,7 +216,7 @@ function resetPos() {
   savePos();
 }
 
-load();
+init();
 
 export function useBgImage() {
   return {
