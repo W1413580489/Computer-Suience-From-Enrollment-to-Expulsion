@@ -344,8 +344,11 @@ if config.FRONTEND_DIST.exists():
             return JSONResponse({"ok": False, "error": {"code": "NOT_FOUND", "message": "接口不存在"}}, status_code=404)
         file = config.FRONTEND_DIST / full_path
         if full_path and file.is_file():
-            return FileResponse(file)
-        return FileResponse(config.FRONTEND_DIST / "index.html")
+            # dist 根下的非哈希文件（manifest.json 等）：允许短缓存
+            return FileResponse(file, headers={"Cache-Control": "no-cache"})
+        # SPA 入口：必须禁止缓存——发版后浏览器要立刻拿到新壳，
+        # 否则旧 index.html 引用已被删除的旧 JS，或继续跑旧逻辑
+        return FileResponse(config.FRONTEND_DIST / "index.html", headers={"Cache-Control": "no-cache"})
 
 
 if __name__ == "__main__":
