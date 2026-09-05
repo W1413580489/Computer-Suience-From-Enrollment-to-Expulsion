@@ -397,7 +397,8 @@ function enterCourse(i: number) {
 }
 
 function onWheelKey(e: KeyboardEvent) {
-  if (view.value !== 'select') return;
+  // 自守卫：转盘不在 DOM（侧栏视图/已卸载）时忽略按键，免去卸载清理
+  if (!document.querySelector('.teach__wheel')) return;
   if (e.key === 'ArrowLeft') moveWheel(-1);
   if (e.key === 'ArrowRight') moveWheel(1);
   if (e.key === 'Enter') enterCourse(wheelIndex.value);
@@ -457,7 +458,7 @@ onMounted(async () => {
     toast('无法连接引擎：' + e.message);
   }
 });
-onBeforeUnmount(() => window.removeEventListener('keydown', onWheelKey));
+
 
 function onCourseChange() {
   const c = courses.value.find(x => x.course_id === courseId.value);
