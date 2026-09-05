@@ -21,7 +21,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from schemas import (AISession, DebuggerState, DebugPhase, Evidence, EvidenceType, Mode, ReviewRequest, TeachRequest)
-from course_data import get_project, list_projects, get_task, get_rubrics
+from course_data import get_project, list_projects, get_task, get_rubrics, list_courses
 from context_builder import build_context
 from prompts import build_system_prompt, route_behavior, BEHAVIOR_LABELS
 from llm_client import LLMClient, DEFAULT_MODEL, DEFAULT_BASE_URL, EngineError, ProviderError
@@ -162,7 +162,7 @@ def compute_mode_advice(mode: str, req, task) -> dict | None:
     if not any(k in ui for k in _COMPLETION_SIGNALS):
         return None
 
-    proj = get_project()
+    proj = get_project(req.project_id)
     stage_title = {s.id: s.title for s in proj.stages}
 
     def adv(m, reason, t):
@@ -201,6 +201,7 @@ async def config():
             0: "仅引导", 1: "提示方向", 2: "思路步骤",
             3: "具体做法", 4: "答案片段", 5: "完整方案",
         }.items()},
+        "courses": list_courses(),
         "projects": list_projects(),
     }}
 

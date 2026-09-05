@@ -271,56 +271,381 @@ def _chatbot_project() -> Project:
     )
 
 
-def default_course() -> Course:
-    proj = _chatbot_project()
-    return Course(
-        id="course_001",
-        title="AI 微项目实战（套壳聊天机器人）",
-        description="十几分钟完成一个套壳聊天机器人，体验'前端→后端→大模型 API'最小闭环。",
-        projects=[proj.id],
+# ---------------------------------------------------------------------------
+# 课程 02：GitHub 项目分析 Agent（第一份标准样板，数据驱动）
+# ---------------------------------------------------------------------------
+def _agent_project() -> Project:
+    # ---- Stage 1：认识 Agent ----
+    task_intro = Task(
+        id="c2t01",
+        title="认识 Agent 与项目骨架",
+        stage_id="c2_stage1",
+        order=1,
+        objective="说清 Agent 与普通聊天机器人的区别（是否调用工具/是否多步/是否自主决策），搭好课程项目骨架（agent.py、tools.py、.env、requirements.txt），CLI 能运行并打印问候。开始前先完成前置教程：申请 GitHub Token（教程见攻略页与飞书链接：https://tralis2671.feishu.cn/wiki/Urq6w7wOiiAFe4kzGnmciPxYnCd）。",
+        steps=[
+            "读前置教程（飞书链接见上），申请 GitHub Token 并放入 .env（课程第一天完成）",
+            "建项目文件夹与虚拟环境，安装 openai、httpx、python-dotenv",
+            "在 .env 放置所选 LLM API 的 Key（沿用上一课 BYOK 习惯）",
+            "写 agent.py：读入用户问题 → 调用所选 LLM API → 打印回答",
+        ],
+        evidence_required="code",
+        rubric_ids=["rb_c2t01_1", "rb_c2t01_2", "rb_c2t01_3"],
+        skill=SkillKey.ai_assisted,
+        chunk_key="GitHub 项目分析 Agent > T01 认识 Agent 与项目骨架",
+        code_context=CodeContext(
+            keywords=["agent", "openai", "deepseek", "dotenv", "cli"],
+            likelyFiles=["agent", "main"],
+            searchPatterns=["OpenAI\\(", "chat\\.completions"],
+        ),
+    )
+    task_min_loop = Task(
+        id="c2t02",
+        title="最小 Agent Loop（单工具）",
+        stage_id="c2_stage1",
+        order=2,
+        objective="给 Agent 一个内置工具（如 get_current_time），用 tools 参数声明 JSON Schema，实现'模型决定调用 → 执行 → 结果回传 → 模型回答'的最小闭环，并开始用 --trace 输出执行轨迹。",
+        steps=[
+            "用 tools 参数向所选 LLM API 声明工具的 JSON Schema",
+            "检查响应中的 tool_calls：没有就直接回答并结束",
+            "有则本地执行工具，把结果以 role=tool 消息回传",
+            "再次调用模型拿到最终回答；加 --trace 参数输出 agent_trace.json",
+        ],
+        evidence_required="code",
+        rubric_ids=["rb_c2t02_1", "rb_c2t02_2", "rb_c2t02_3", "rb_c2t02_4"],
+        skill=SkillKey.workflow,
+        chunk_key="GitHub 项目分析 Agent > T02 最小 Agent Loop",
+        code_context=CodeContext(
+            keywords=["tool_calls", "tools", "function", "loop", "role"],
+            likelyFiles=["agent"],
+            searchPatterns=["tool_calls", "tools\\s*=", "role.*tool"],
+        ),
+    )
+
+    # ---- Stage 2：接入 GitHub 工具 ----
+    task_client = Task(
+        id="c2t03",
+        title="GitHub API Client 与 Token 限流",
+        stage_id="c2_stage2",
+        order=1,
+        objective="封装 GitHubClient：自动带 Token 请求头；区分 401/403+限流/404 三种错误；限流按 Retry-After 退避一次重试；错误以结构化形式返回，不静默吞掉。",
+        steps=[
+            "建 github_client.py，封装 get(url)：自动加 Authorization: Bearer 头",
+            "区分处理 401（Token 无效）、403+X-RateLimit-Remaining:0（限流，退避一次重试）、404（不存在）",
+            "错误以 {ok:false, code:..., error:...} 结构返回给调用方",
+            "写 3 个单元测试（mock HTTP 响应）覆盖三种分支",
+        ],
+        evidence_required="code",
+        rubric_ids=["rb_c2t03_1", "rb_c2t03_2", "rb_c2t03_3", "rb_c2t03_4"],
+        skill=SkillKey.project_dev,
+        chunk_key="GitHub 项目分析 Agent > T03 GitHub API Client 与 Token 限流",
+        code_context=CodeContext(
+            keywords=["github", "token", "rate", "403", "authorization", "retry"],
+            likelyFiles=["github_client", "api_client", "github"],
+            searchPatterns=["Authorization", "X-RateLimit", "403", "retry"],
+        ),
+    )
+    task_repo_tools = Task(
+        id="c2t04",
+        title="仓库信息与文件树工具",
+        stage_id="c2_stage2",
+        order=2,
+        objective="基于 GitHubClient 实现两个只读工具：get_repo_info（语言/star/描述/默认分支）与 get_file_tree（递归文件树，只留文件、前 200 项截断并注明），各配单元测试。",
+        steps=[
+            "get_repo_info：调 /repos/{owner}/{repo}，抽取关键字段为紧凑文本",
+            "get_file_tree：调 /git/trees/{branch}?recursive=1，过滤目录只留文件，超 200 项截断",
+            "各写 1-2 个单测（mock 响应）",
+        ],
+        evidence_required="code",
+        rubric_ids=["rb_c2t04_1", "rb_c2t04_2", "rb_c2t04_3"],
+        skill=SkillKey.project_dev,
+        chunk_key="GitHub 项目分析 Agent > T04 仓库信息与文件树工具",
+        code_context=CodeContext(
+            keywords=["repos", "git/trees", "file tree", "repo info"],
+            likelyFiles=["tools", "github_client"],
+            searchPatterns=["repos/", "git/trees", "def get_repo", "def get_file_tree"],
+        ),
+    )
+    task_content_tool = Task(
+        id="c2t05",
+        title="文件内容工具与大小保护",
+        stage_id="c2_stage2",
+        order=3,
+        objective="实现 get_file_content(owner/repo, path)：Contents API 拉取并 base64 解码，超 200 行截断标注；对不存在/二进制/空文件给出友好返回；单测覆盖三条路径。",
+        steps=[
+            "调 Contents API 拉取文件，base64 解码",
+            "行数超 200 截断，追加'已截断'标注",
+            "异常路径：文件不存在、二进制文件、空文件",
+            "单测覆盖 正常/截断/不存在 三条路径",
+        ],
+        evidence_required="code",
+        rubric_ids=["rb_c2t05_1", "rb_c2t05_2", "rb_c2t05_3"],
+        skill=SkillKey.project_dev,
+        chunk_key="GitHub 项目分析 Agent > T05 文件内容工具与大小保护",
+        code_context=CodeContext(
+            keywords=["contents", "base64", "truncate", "file content"],
+            likelyFiles=["tools"],
+            searchPatterns=["contents/", "b64decode", "truncat"],
+        ),
+    )
+
+    # ---- Stage 3：工具驱动执行 ----
+    task_registry = Task(
+        id="c2t06",
+        title="工具注册与 Schema 设计",
+        stage_id="c2_stage3",
+        order=1,
+        objective="建立统一工具注册表（TOOL_MAP + JSON Schema 列表），让 T02 的 Loop 能看到全部三个 GitHub 工具，并用三类提问验证模型选对工具。",
+        steps=[
+            "每个工具写规范 Schema：名称、用途描述（描述是写给模型看的！）、参数类型",
+            "建注册表：名字 → (函数, Schema)，Loop 只认注册表",
+            "用三类提问（'这个仓库是什么语言'/'列出文件结构'/'看看 main.py 内容'）验证模型选对工具，Trace 留档",
+        ],
+        evidence_required="code",
+        rubric_ids=["rb_c2t06_1", "rb_c2t06_2", "rb_c2t06_3"],
+        skill=SkillKey.workflow,
+        chunk_key="GitHub 项目分析 Agent > T06 工具注册与 Schema",
+        code_context=CodeContext(
+            keywords=["tool map", "schema", "register", "description"],
+            likelyFiles=["tools", "agent"],
+            searchPatterns=["TOOL_MAP", "\"type\": \"function\"", "description"],
+        ),
+    )
+    task_multi_loop = Task(
+        id="c2t07",
+        title="多步 Agent Loop（结果驱动决策）",
+        stage_id="c2_stage3",
+        order=2,
+        objective="把单次调用升级为 while 循环：工具结果回传后模型可继续要求调用其他工具，直到认为信息足够才输出最终回答；每步写入 trace。演示'分析一个仓库'出现至少 2 次连续工具调用。",
+        steps=[
+            "把单次调用改成 while 循环：有 tool_calls 就执行回传并继续",
+            "每一步写入 trace（step/tool_name/arguments/result_summary/timestamp）",
+            "用'分析某个公开仓库的项目结构'类任务演示多步行为",
+        ],
+        evidence_required="code",
+        rubric_ids=["rb_c2t07_1", "rb_c2t07_2", "rb_c2t07_3", "rb_c2t07_4"],
+        skill=SkillKey.workflow,
+        chunk_key="GitHub 项目分析 Agent > T07 多步 Agent Loop",
+        code_context=CodeContext(
+            keywords=["while", "multi step", "trace", "tool_calls"],
+            likelyFiles=["agent"],
+            searchPatterns=["while", "tool_calls", "trace"],
+        ),
+    )
+    task_safety = Task(
+        id="c2t08",
+        title="max_steps 与安全退出",
+        stage_id="c2_stage3",
+        order=3,
+        objective="给 Loop 加 max_steps 上限（默认 10）、工具执行异常捕获（错误回传模型让它自行调整）与步数耗尽后的安全退出，trace 记录 stop_reason；单测证明不会死循环。",
+        steps=[
+            "用 for step in range(max_steps) 替代裸 while",
+            "工具执行包 try/except：异常以文本回传模型，trace 记录失败",
+            "步数耗尽 → 写入 stop_reason:max_steps_reached，输出已收集的部分结果",
+            "单测：mock 连续失败的工具，验证不会死循环",
+        ],
+        evidence_required="code",
+        rubric_ids=["rb_c2t08_1", "rb_c2t08_2", "rb_c2t08_3", "rb_c2t08_4"],
+        skill=SkillKey.workflow,
+        chunk_key="GitHub 项目分析 Agent > T08 max_steps 与安全退出",
+        code_context=CodeContext(
+            keywords=["max_steps", "stop_reason", "exception", "safety"],
+            likelyFiles=["agent"],
+            searchPatterns=["max_steps", "stop_reason", "except"],
+        ),
+    )
+
+    # ---- Stage 4：完成项目 ----
+    task_report = Task(
+        id="c2t09",
+        title="带证据的项目分析报告",
+        stage_id="c2_stage4",
+        order=1,
+        objective="CLI 输入仓库地址与分析需求，Agent 自主调用工具收集信息，生成 report.md（概况/结构/关键文件/结论建议），每个结论引用实际工具调用结果（[见 trace step N]），全程 --trace 运行。",
+        steps=[
+            "设计报告结构：概况 / 结构分析 / 关键文件解读 / 结论与建议",
+            "报告中的事实必须来自工具调用结果，引用 step 编号",
+            "全程 --trace 运行，agent_trace.json 与 report.md 一并提交",
+        ],
+        evidence_required="code",
+        rubric_ids=["rb_c2t09_1", "rb_c2t09_2", "rb_c2t09_3", "rb_c2t09_4"],
+        skill=SkillKey.project_dev,
+        chunk_key="GitHub 项目分析 Agent > T09 带证据的分析报告",
+        code_context=CodeContext(
+            keywords=["report", "markdown", "evidence", "引用"],
+            likelyFiles=["agent", "report"],
+            searchPatterns=["report\\.md", "trace", "step"],
+        ),
+    )
+
+    # ---- Rubrics（判据全部可客观判定；不出现具体厂商名，统一'所选 LLM API'）----
+    rubric_c2t01 = [
+        Rubric(id="rb_c2t01_1", task_id="c2t01", criterion="项目骨架齐全且 CLI 可运行",
+               description="agent.py/tools.py/.env/requirements.txt 齐备，CLI 运行打印回答",
+               required_evidence=["code"], pass_condition="文件齐全且能运行", weight=2),
+        Rubric(id="rb_c2t01_2", task_id="c2t01", criterion="能说清 Agent 与聊天机器人至少两条区别",
+               description="区别围绕：是否调用工具/是否多步/是否自主决策",
+               required_evidence=["description"], pass_condition="自述含至少两条要点", weight=1),
+        Rubric(id="rb_c2t01_3", task_id="c2t01", criterion="GitHub Token 已配置且源码无硬编码",
+               description=".env 存在，.gitignore 包含 .env，源码无 ghp_ 明文",
+               required_evidence=["code"], pass_condition="grep 无明文 Token 且 .env 存在", weight=2),
+    ]
+    rubric_c2t02 = [
+        Rubric(id="rb_c2t02_1", task_id="c2t02", criterion="工具以 JSON Schema 声明且被模型接收",
+               description="tools 参数存在且结构正确",
+               required_evidence=["code"], pass_condition="代码含规范的 tools 声明", weight=2),
+        Rubric(id="rb_c2t02_2", task_id="c2t02", criterion="存在工具结果回传逻辑（role=tool）",
+               description="工具结果作为消息回传给模型",
+               required_evidence=["code"], pass_condition="代码含回传逻辑", weight=2),
+        Rubric(id="rb_c2t02_3", task_id="c2t02", criterion="能演示一次完整闭环运行",
+               description="问时间类问题得到正确回答",
+               required_evidence=["code", "runtime"], pass_condition="有运行演示或输出截图/文本", weight=2),
+        Rubric(id="rb_c2t02_4", task_id="c2t02", criterion="能解释'为什么结果要回传给模型而不是直接打印'",
+               description="理解回传后模型才能基于结果作答",
+               required_evidence=["description"], pass_condition="自述正确", weight=1),
+    ]
+    rubric_c2t03 = [
+        Rubric(id="rb_c2t03_1", task_id="c2t03", criterion="Token 从环境变量读取，源码与提交记录无硬编码",
+               description="os.getenv 读取，.gitignore 包含 .env",
+               required_evidence=["code"], pass_condition="grep 无明文 Token", weight=2),
+        Rubric(id="rb_c2t03_2", task_id="c2t03", criterion="401/403/404 三种错误有区分处理且信息可读",
+               description="分支齐全，错误信息结构化",
+               required_evidence=["code"], pass_condition="单测覆盖三分支", weight=2),
+        Rubric(id="rb_c2t03_3", task_id="c2t03", criterion="限流时有退避重试且不会无限重试",
+               description="读 Retry-After/X-RateLimit 头，退避一次",
+               required_evidence=["code"], pass_condition="单测 mock 限流响应验证", weight=2),
+        Rubric(id="rb_c2t03_4", task_id="c2t03", criterion="能解释 Token 泄露的风险与处理方式",
+               description="风险：他人可冒充身份操作；处理：Revoke 并重新生成",
+               required_evidence=["description"], pass_condition="自述含 Revoke", weight=1),
+    ]
+    rubric_c2t04 = [
+        Rubric(id="rb_c2t04_1", task_id="c2t04", criterion="两个工具存在且经统一的 GitHubClient",
+               description="不直接裸调 httpx",
+               required_evidence=["code"], pass_condition="统一走 Client", weight=2),
+        Rubric(id="rb_c2t04_2", task_id="c2t04", criterion="文件树有截断保护（超 200 项）",
+               description="截断并注明总数",
+               required_evidence=["code"], pass_condition="单测覆盖超长列表", weight=2),
+        Rubric(id="rb_c2t04_3", task_id="c2t04", criterion="对真实公开仓库能取回数据",
+               description="演示输出仓库元信息与文件树",
+               required_evidence=["code", "runtime"], pass_condition="有真实运行输出", weight=1),
+    ]
+    rubric_c2t05 = [
+        Rubric(id="rb_c2t05_1", task_id="c2t05", criterion="文件内容工具可用且经统一 Client",
+               description="Contents API 拉取并 base64 解码",
+               required_evidence=["code"], pass_condition="实现正确", weight=2),
+        Rubric(id="rb_c2t05_2", task_id="c2t05", criterion="截断与异常路径齐全（超行/不存在/二进制/空）",
+               description="三条异常路径都有友好返回",
+               required_evidence=["code"], pass_condition="单测覆盖", weight=2),
+        Rubric(id="rb_c2t05_3", task_id="c2t05", criterion="能说清'为什么要截断'",
+               description="上下文是有限资源",
+               required_evidence=["description"], pass_condition="自述提到上下文限制", weight=1),
+    ]
+    rubric_c2t06 = [
+        Rubric(id="rb_c2t06_1", task_id="c2t06", criterion="三个工具全部经注册表暴露给模型",
+               description="无散落的硬编码工具调用",
+               required_evidence=["code"], pass_condition="注册表统一管理", weight=2),
+        Rubric(id="rb_c2t06_2", task_id="c2t06", criterion="工具描述清晰，三类提问均选中正确工具",
+               description="描述是写给模型看的",
+               required_evidence=["code", "runtime"], pass_condition="Trace 显示选对工具", weight=2),
+        Rubric(id="rb_c2t06_3", task_id="c2t06", criterion="能说清新增一个工具需要做几步",
+               description="写函数→写 Schema→注册",
+               required_evidence=["description"], pass_condition="自述完整", weight=1),
+    ]
+    rubric_c2t07 = [
+        Rubric(id="rb_c2t07_1", task_id="c2t07", criterion="复杂分析任务中出现 ≥2 次连续工具调用",
+               description="多步行为真实发生",
+               required_evidence=["code", "trace"], pass_condition="Trace 可见多步", weight=2),
+        Rubric(id="rb_c2t07_2", task_id="c2t07", criterion="后续调用依赖前序结果",
+               description="参数与上一步结果相关",
+               required_evidence=["trace"], pass_condition="Trace 参数体现关联", weight=2),
+        Rubric(id="rb_c2t07_3", task_id="c2t07", criterion="trace 文件结构符合约定字段",
+               description="step/tool_name/arguments/result_summary/timestamp",
+               required_evidence=["code", "trace"], pass_condition="agent_trace.json 字段齐全", weight=2),
+        Rubric(id="rb_c2t07_4", task_id="c2t07", criterion="能讲清'多步'与'一问一答'的本质区别",
+               description="状态在循环中累积",
+               required_evidence=["description"], pass_condition="自述正确", weight=1),
+    ]
+    rubric_c2t08 = [
+        Rubric(id="rb_c2t08_1", task_id="c2t08", criterion="存在可配置的 max_steps 上限",
+               description="默认 10，可调",
+               required_evidence=["code"], pass_condition="代码含上限逻辑", weight=2),
+        Rubric(id="rb_c2t08_2", task_id="c2t08", criterion="工具异常不终止 Agent，错误回传模型",
+               description="try/except 后错误信息回传",
+               required_evidence=["code"], pass_condition="单测 mock 失败验证", weight=2),
+        Rubric(id="rb_c2t08_3", task_id="c2t08", criterion="超限安全退出且 trace 记录 stop_reason",
+               description="max_steps_reached",
+               required_evidence=["code", "trace"], pass_condition="CI 或 Trace 验证", weight=2),
+        Rubric(id="rb_c2t08_4", task_id="c2t08", criterion="能说出不设上限的两个后果",
+               description="token 消耗失控 + 死循环",
+               required_evidence=["description"], pass_condition="自述完整", weight=1),
+    ]
+    rubric_c2t09 = [
+        Rubric(id="rb_c2t09_1", task_id="c2t09", criterion="report.md 存在且结构完整（概况/结构/关键文件/结论）",
+               description="Markdown 报告",
+               required_evidence=["code", "runtime"], pass_condition="结构四部分齐全", weight=2),
+        Rubric(id="rb_c2t09_2", task_id="c2t09", criterion="关键结论可追溯到 trace 步骤",
+               description="引用格式 [见 trace step N]，抽查 3 条",
+               required_evidence=["trace"], pass_condition="引用与 trace 一致", weight=2),
+        Rubric(id="rb_c2t09_3", task_id="c2t09", criterion="trace 显示 Agent 自主完成 ≥3 步且含多种工具",
+               description="多工具组合调用",
+               required_evidence=["trace"], pass_condition="Trace 满足", weight=2),
+        Rubric(id="rb_c2t09_4", task_id="c2t09", criterion="报告内容与所选仓库真实对应",
+               description="抽查仓库实际信息与报告结论一致",
+               required_evidence=["trace", "description"], pass_condition="抽查无捏造", weight=1),
+    ]
+
+    stage1 = Stage(id="c2_stage1", title="① 认识 Agent", order=1,
+                   objective="理解 Agent 与聊天机器人的差别，完成第一个最小工具调用闭环", tasks=["c2t01", "c2t02"])
+    stage2 = Stage(id="c2_stage2", title="② 接入 GitHub 工具", order=2,
+                   objective="实现 GitHub Client 与三个只读工具，处理好 Token 与限流", tasks=["c2t03", "c2t04", "c2t05"])
+    stage3 = Stage(id="c2_stage3", title="③ 工具驱动执行", order=3,
+                   objective="注册工具、建立多步 Loop、加上安全退出", tasks=["c2t06", "c2t07", "c2t08"])
+    stage4 = Stage(id="c2_stage4", title="④ 完成项目", order=4,
+                   objective="综合调用工具，生成带证据的项目分析报告", tasks=["c2t09"])
+
+    return Project(
+        id="project_agent",
+        title="GitHub 项目分析 Agent",
+        description="做一个会读 GitHub 仓库、自主选择工具、多步执行并输出带证据分析报告的 CLI 智能体。前置：已完成《套壳聊天机器人》。",
+        stages=[stage1, stage2, stage3, stage4],
+        tasks=[task_intro, task_min_loop, task_client, task_repo_tools, task_content_tool,
+               task_registry, task_multi_loop, task_safety, task_report],
+        rubrics=[*rubric_c2t01, *rubric_c2t02, *rubric_c2t03, *rubric_c2t04, *rubric_c2t05,
+                 *rubric_c2t06, *rubric_c2t07, *rubric_c2t08, *rubric_c2t09],
     )
 
 
 # ---------------------------------------------------------------------------
-# 快速查找
+# 课程注册表与快速查找（多课程数据驱动，task_id 全局唯一）
 # ---------------------------------------------------------------------------
-_project_cache: Project | None = None
+_PROJECT_BUILDERS = {
+    "project_chatbot": _chatbot_project,
+    "project_agent": _agent_project,
+}
+_COURSES: dict[str, dict] = {
+    "course_001": {
+        "title": "AI 微项目实战（套壳聊天机器人）",
+        "description": "十几分钟完成一个套壳聊天机器人，体验'前端→后端→大模型 API'最小闭环。",
+        "projects": ["project_chatbot"],
+    },
+    "course_002": {
+        "title": "Agent 实战（GitHub 项目分析）",
+        "description": "做一个会调用工具、多步执行、输出带证据报告的 CLI Agent。前置：已完成套壳聊天机器人。",
+        "projects": ["project_agent"],
+    },
+}
+_project_cache: dict[str, Project] = {}
 
 
-def get_course(course_id: str = "course_001") -> Course:
-    course = default_course()
-    return course
+def get_course(course_id: str = "course_001") -> Course | None:
+    info = _COURSES.get(course_id)
+    if not info:
+        return None
+    return Course(id=course_id, title=info["title"],
+                  description=info["description"], projects=list(info["projects"]))
 
 
-def get_project(project_id: str = "project_chatbot") -> Project:
-    global _project_cache
-    if _project_cache is None:
-        _project_cache = _chatbot_project()
-    return _project_cache
-
-
-def get_task(task_id: str) -> Task | None:
-    proj = get_project()
-    return next((t for t in proj.tasks if t.id == task_id), None)
-
-
-def get_stage(stage_id: str) -> Stage | None:
-    proj = get_project()
-    return next((s for s in proj.stages if s.id == stage_id), None)
-
-
-def get_rubrics(task_id: str) -> list[Rubric]:
-    proj = get_project()
-    task = get_task(task_id)
-    if not task:
-        return []
-    return [r for r in proj.rubrics if r.id in task.rubric_ids]
-
-
-def list_projects() -> list[dict]:
-    """供测试页面前端选择项目。"""
-    proj = get_project()
-    return [{
+def _project_summary(proj: Project) -> dict:
+    return {
         "project_id": proj.id,
         "title": proj.title,
         "description": proj.description,
@@ -331,4 +656,65 @@ def list_projects() -> list[dict]:
                 "skill": t.skill.value if t.skill else None,
             } for t in proj.tasks if t.stage_id == s.id],
         } for s in proj.stages],
-    }]
+    }
+
+
+def list_courses() -> list[dict]:
+    """供前端课程选择器：课程列表 + 每门课的项目（含完整 stage/task 结构）。"""
+    out = []
+    for cid, info in _COURSES.items():
+        projs = []
+        for pid in info["projects"]:
+            p = get_project(pid)
+            if p:
+                projs.append(_project_summary(p))
+        out.append({"course_id": cid, "title": info["title"],
+                    "description": info["description"], "projects": projs})
+    return out
+
+
+def get_project(project_id: str = "project_chatbot") -> Project | None:
+    if project_id not in _PROJECT_BUILDERS:
+        return None
+    if project_id not in _project_cache:
+        _project_cache[project_id] = _PROJECT_BUILDERS[project_id]()
+    return _project_cache[project_id]
+
+
+def get_task(task_id: str) -> Task | None:
+    for pid in _PROJECT_BUILDERS:
+        proj = get_project(pid)
+        t = next((t for t in proj.tasks if t.id == task_id), None)
+        if t:
+            return t
+    return None
+
+
+def get_stage(stage_id: str) -> Stage | None:
+    for pid in _PROJECT_BUILDERS:
+        proj = get_project(pid)
+        s = next((s for s in proj.stages if s.id == stage_id), None)
+        if s:
+            return s
+    return None
+
+
+def get_rubrics(task_id: str) -> list[Rubric]:
+    for pid in _PROJECT_BUILDERS:
+        proj = get_project(pid)
+        if any(t.id == task_id for t in proj.tasks):
+            return [r for r in proj.rubrics if r.id in
+                    next(t.rubric_ids for t in proj.tasks if t.id == task_id)]
+    return []
+
+
+def list_projects(project_id: str | None = None) -> list[dict]:
+    """供测试页面前端选择项目。project_id 为空时返回全部课程的项目。"""
+    pids = [project_id] if project_id else list(_PROJECT_BUILDERS.keys())
+    out = []
+    for pid in pids:
+        proj = get_project(pid)
+        if not proj:
+            continue
+        out.append(_project_summary(proj))
+    return out

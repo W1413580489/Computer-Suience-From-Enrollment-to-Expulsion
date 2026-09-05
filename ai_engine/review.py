@@ -25,6 +25,9 @@ def collect_evidence(submission: Submission | None, repo_code_text: str = "") ->
 
     if repo_code_text:
         ev["code"] = f"GitHub 代码证据（已拉取结构与关键文件内容）：\n{repo_code_text}"
+        # 课程 02+：仓库含 agent_trace.json 时登记 Trace 证据（Agent 执行轨迹）
+        if "agent_trace.json" in repo_code_text:
+            ev["trace"] = "仓库中包含 agent_trace.json（Agent 执行轨迹），可验证工具调用与多步行为"
     elif sub.github_url:
         ev["url"] = f"GitHub 仓库地址：{sub.github_url}（尚未拉取，仅链路可访问）"
         ev["code"] = f"GitHub 仓库地址已提供：{sub.github_url}"

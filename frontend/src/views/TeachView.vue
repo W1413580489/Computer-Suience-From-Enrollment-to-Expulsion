@@ -22,7 +22,11 @@
         </div>
 
         <div class="teach__group">
-          <label>教学任务</label>
+          <label>课程</label>
+          <select v-model="courseId" @change="onCourseChange">
+            <option v-for="c in courses" :key="c.course_id" :value="c.course_id">{{ c.title }}</option>
+          </select>
+          <label style="margin-top:6px">教学任务</label>
           <select v-model="projectId" @change="onProjectChange">
             <option v-for="p in projects" :key="p.project_id" :value="p.project_id">{{ p.title }}</option>
           </select>
@@ -219,6 +223,9 @@ function loadStudent(): StudentState {
 
 interface Project { project_id: string; title: string; description: string; stages: Stage[] }
 interface Stage { stage_id: string; title: string; tasks: { task_id: string; title: string; objective: string }[] }
+interface CourseInfo { course_id: string; title: string; description: string; projects: Project[] }
+const courses = ref<CourseInfo[]>([]);
+const courseId = ref('course_001');
 const projects = ref<Project[]>([]);
 const projectId = ref('');
 const stages = ref<Stage[]>([]);
@@ -306,6 +313,9 @@ function loadProject(p: Project | undefined) {
   }));
   const first = stages.value[0]?.tasks[0];
   taskId.value = first ? first.task_id : '';
+  // 换项目 = 换学习路径：清空对话（会话按 任务 隔离）
+  chat.value = [];
+  history.value = [];
 }
 
 onMounted(async () => {
@@ -317,9 +327,17 @@ onMounted(async () => {
     const cfg = j.data;
     models.value = cfg.models || [];
     if (models.value.length) model.value = models.value[0].model;
-    projects.value = (cfg.projects || []).map((p: any) => ({
-      project_id: p.project_id, title: p.title, description: p.description || '', stages: p.stages || [],
+    // 多课程：courses[].projects 携带各自的 stage/task 结构
+    courses.value = (cfg.courses || []).map((c: any) => ({
+      course_id: c.course_id, title: c.title, description: c.description || '',
+      projects: (c.projects || []).map((p: any) => ({ project_id: p.project_id, title: p.title, description: p.description || '', stages: [] })),
     }));
+    if (!courses.value.length) {
+      // 兼容旧引擎：只有扁平 projects
+      courses.value = [{ course_id: 'course_001', title: '默认课程', description: '', projects: (cfg.projects || []).map((p: any) => ({ project_id: p.project_id, title: p.title, description: p.description || '', stages: p.stages || [] })) }];
+    }
+    courseId.value = courses.value[0].course_id;
+    projects.value = courses.value[0].projects;
     if (projects.value.length) {
       projectId.value = projects.value[0].project_id;
       loadProject(projects.value[0]);
@@ -329,10 +347,25 @@ onMounted(async () => {
   }
 });
 
+function onCourseChange() {
+  const c = courses.value.find(x => x.course_id === courseId.value);
+  projects.value = c ? c.projects : [];
+  if (projects.value.length) {
+    projectId.value = projects.value[0].project_id;
+    loadProject(projects.value[0]);
+  } else {
+    projectId.value = '';
+    stages.value = [];
+    chat.value = [];
+    history.value = [];
+  }
+  toast(c ? `已切换到课程：${c.title}` : '');
+}
+
 function onProjectChange() {
   const p = projects.value.find(x => x.project_id === projectId.value);
   loadProject(p);
-  toast(p ? `已切换到课程：${p.title}` : '');
+  toast(p ? `已切换到项目：${p.title}` : '');
 }
 
 function onTaskChange() {
@@ -365,7 +398,7 @@ async function send() {
 
   const body = {
     session_id: student.value.session_id, student: student.value,
-    course_id: 'course_001', project_id: 'project_chatbot',
+    course_id: courseId.value, project_id: projectId.value,
     task_id: taskId.value, mode: mode.value, user_input: text,
     repo_url: repoUrl.value.trim() || null,
     api_key: apiKey.value.trim(), model: model.value, history: history.value.slice(-6),

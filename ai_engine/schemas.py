@@ -161,6 +161,7 @@ class EvidenceType(str, Enum):
     GITHUB = "github"
     DESCRIPTION = "description"
     MANUAL = "manual"
+    TRACE = "trace"   # Agent 执行轨迹（agent_trace.json，课程 02+）
 
 
 class Evidence(BaseModel):
