@@ -21,7 +21,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from schemas import (AISession, DebuggerState, DebugPhase, Evidence, EvidenceType, Mode, ReviewRequest, TeachRequest)
-from course_data import get_project, list_projects, get_task, get_rubrics, list_courses
+from course_data import get_project, list_projects, get_task, get_rubrics, list_courses, get_next_task, get_stage
 from context_builder import build_context
 from prompts import build_system_prompt, route_behavior, BEHAVIOR_LABELS
 from llm_client import LLMClient, DEFAULT_MODEL, DEFAULT_BASE_URL, EngineError, ProviderError
@@ -554,6 +554,13 @@ async def review(req: ReviewRequest, request: Request):
             "score": score,
             "status": status,
             "passed": status == "PASS",
+            # PASS 时的下一任务建议（按课程编排顺序；选 B：前端高亮+提示卡，不自动切换）
+            "next_task": (
+                (lambda nt: {"task_id": nt.id, "title": nt.title,
+                             "stage_title": (get_stage(nt.stage_id).title if get_stage(nt.stage_id) else "")}
+                 )(get_next_task(req.task_id))
+                if status == "PASS" and get_next_task(req.task_id) else None
+            ),
             "latency_ms": int((time.time() - start_ts) * 1000),
             "session_id": req.session_id or "review",
         },

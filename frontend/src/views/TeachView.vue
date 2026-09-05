@@ -1,6 +1,43 @@
 <template>
   <PageShell title="" subtitle="" active-key="teach" :wide="true">
     <div class="teach" :data-theme="theme.isZzz ? 'zzz' : 'ak'" :class="{ 'teach--noside': !sideOpen }">
+      <!-- 课程选择屏（ZZZ 转盘） -->
+      <div v-if="view === 'select'" class="teach__wheel">
+        <div class="tw-stripe"></div>
+        <div class="tw-tag">
+          <div class="t1">课程选择</div>
+          <div class="t2">COURSE SELECT</div>
+          <div class="num">{{ String(wheelIndex + 1).padStart(2, '0') }}</div>
+        </div>
+        <button class="tw-arrow left" title="上一个" @click="moveWheel(-1)">
+          <svg viewBox="0 0 24 24"><path d="M4 12 L13 4 L13 9 L21 9 L21 15 L13 15 L13 20 Z"/></svg>
+        </button>
+        <button class="tw-arrow right" title="下一个" @click="moveWheel(1)">
+          <svg viewBox="0 0 24 24"><path d="M20 12 L11 4 L11 9 L3 9 L3 15 L11 15 L11 20 Z"/></svg>
+        </button>
+        <div class="tw-hint">← → 方向键 / 点击卡片直接进入 · 回车进入当前课程</div>
+        <div class="tw-ring">
+          <div
+            v-for="(w, i) in wheelList"
+            :key="w.c.course_id"
+            class="tw-card"
+            :class="{ front: w.front }"
+            :style="{ transform: `translate(${w.x}px, ${w.y}px) scale(${w.scale})`, zIndex: Math.round((1 - Number(w.gray)) * 100), filter: `grayscale(${w.gray}) brightness(${w.bright})` }"
+            @click="enterCourse(i)"
+          >
+            <div class="tw-deco"></div>
+            <div class="tw-zz">ZZ·课</div>
+            <div class="tw-bignum">{{ String(i + 1).padStart(2, '0') }}</div>
+            <h2>{{ w.c.title }}</h2>
+            <div class="tw-cn">{{ w.c.description }}</div>
+            <div class="tw-prog">{{ w.doneCount }} / {{ w.total }} {{ w.done ? '· 已完成' : '' }}</div>
+            <div class="tw-bar"><i :style="{ width: w.pct + '%' }"></i></div>
+            <button class="tw-btn" @click.stop="enterCourse(i)">{{ w.progBtn }}</button>
+          </div>
+        </div>
+        <div class="tw-foot">CHOOSE YOUR COURSE · 转动选择你的课程</div>
+      </div>
+      <template v-else>
       <!-- 左侧配置栏 -->
       <aside class="teach__side">
         <div class="teach__group">
@@ -29,22 +66,21 @@
           <label style="margin-top:6px">教学任务</label>
           <select v-model="projectId" @change="onProjectChange">
             <option v-for="p in projects" :key="p.project_id" :value="p.project_id">{{ p.title }}</option>
-          </select>
-          <div class="teach__stages">
-            <div
-              v-for="sg in stages"
-              :key="sg.stage_id"
-              class="teach__stagechip"
-              :class="{ active: currentStage === sg.stage_id, done: isStageDone(sg) }"
-            >{{ sg.title }}</div>
+        </select>
+        <div class="teach__progress">
+          <div class="teach__progress-row">
+            <span>总进度</span>
+            <span>{{ progStats.done }} / {{ progStats.total }}</span>
           </div>
-          <select v-model="taskId" @change="onTaskChange">
-            <template v-for="sg in stages" :key="sg.stage_id">
-              <optgroup :label="sg.title">
-                <option v-for="t in sg.tasks" :key="t.task_id" :value="t.task_id">{{ t.title }}</option>
-              </optgroup>
-            </template>
-          </select>
+          <div class="teach__progress-bar"><i :style="{ width: progStats.pct + '%' }"></i></div>
+        </div>
+        <select v-model="taskId" @change="onTaskChange">
+          <template v-for="sg in stages" :key="sg.stage_id">
+            <optgroup :label="sg.title">
+              <option v-for="t in sg.tasks" :key="t.task_id" :value="t.task_id">{{ taskPrefix(t.task_id) }}{{ t.title }}</option>
+            </optgroup>
+          </template>
+        </select>
         </div>
 
         <div class="teach__group">
@@ -102,7 +138,7 @@
           <div class="teach__chips">
             <button class="teach__metachip teach__sidetoggle" :title="sideOpen ? '收起侧栏，放大对话区' : '展开侧栏'" @click="toggleSide">{{ sideOpen ? '⇤ 收起' : '⇥ 设置' }}</button>
             <span class="teach__metachip">{{ modeLabel }}</span>
-            <span class="teach__metachip">会话 {{ student.session_id }}</span>
+            <span class="teach__metachip">总进度 {{ progStats.done }}/{{ progStats.total }}</span>
           </div>
         </div>
 
@@ -187,6 +223,7 @@
           <button class="teach__btn" :disabled="loading" @click="send">发送</button>
         </div>
       </main>
+      </template>
     </div>
     <div v-if="toastMsg" class="teach__toast">{{ toastMsg }}</div>
   </PageShell>
@@ -225,7 +262,17 @@ interface Project { project_id: string; title: string; description: string; stag
 interface Stage { stage_id: string; title: string; tasks: { task_id: string; title: string; objective: string }[] }
 interface CourseInfo { course_id: string; title: string; description: string; projects: Project[] }
 const courses = ref<CourseInfo[]>([]);
-const courseId = ref('course_001');
+const courseId = ref('');
+const view = ref<'select' | 'tutor'>('select');
+const wheelIndex = ref(0);
+const suggestedNext = ref<{ task_id: string; title: string; stage_title: string } | null>(null);
+const LS_SEL = 'xkz_teach_sel';
+function loadSel(): any { try { return JSON.parse(localStorage.getItem(LS_SEL) || '{}'); } catch { return {}; } }
+function saveSel() {
+  const s = loadSel(); const by = s.task_by_course || {};
+  if (courseId.value) by[courseId.value] = taskId.value;
+  localStorage.setItem(LS_SEL, JSON.stringify({ course_id: courseId.value, task_by_course: by }));
+}
 const projects = ref<Project[]>([]);
 const projectId = ref('');
 const stages = ref<Stage[]>([]);
@@ -306,6 +353,70 @@ function isStageDone(sg: Stage) {
   return sg.tasks.length > 0 && sg.tasks.every(t => done.has(t.task_id));
 }
 
+// ---------- 选课屏（ZZZ 转盘）与进度 ----------
+const wheelList = computed(() => courses.value.map((c, i) => {
+  const tasks = c.projects.flatMap(p => (p.stages || []).flatMap(sg => sg.tasks));
+  const doneCount = tasks.filter(t => (student.value.completed_tasks || []).includes(t.task_id)).length;
+  const total = tasks.length;
+  const angle = ((i - wheelIndex.value) * (360 / Math.max(courses.value.length, 1)));
+  const rad = angle * Math.PI / 180;
+  const RX = Math.min(window.innerWidth * 0.30, 480);
+  const x = Math.round(Math.sin(rad) * RX);
+  const y = Math.round((1 - Math.cos(rad)) * 110);
+  const depth = (Math.cos(rad) + 1) / 2;
+  return {
+    c, i, x, y,
+    scale: +(0.62 + depth * 0.5).toFixed(3),
+    gray: (1 - depth).toFixed(2),
+    bright: (0.45 + depth * 0.55).toFixed(2),
+    front: angle % 360 === 0,
+    doneCount, total, pct: total ? Math.round(doneCount / total * 100) : 0,
+    done: total > 0 && doneCount === total,
+    progBtn: total > 0 && doneCount === total ? '重温课程' : (doneCount > 0 ? '继续学习' : '开始学习'),
+  };
+}));
+
+function moveWheel(d: number) {
+  const n = courses.value.length;
+  if (!n) return;
+  wheelIndex.value = ((wheelIndex.value + d) % n + n) % n;
+}
+
+function enterCourse(i: number) {
+  const c = courses.value[i];
+  if (!c || !c.projects.length) return;
+  courseId.value = c.course_id;
+  projects.value = c.projects;
+  const saved = loadSel().task_by_course?.[c.course_id];
+  loadProject(c.projects[0]);
+  if (saved && stages.value.some(sg => sg.tasks.some(t => t.task_id === saved))) {
+    taskId.value = saved;   // 恢复上次学到的任务
+  }
+  saveSel();
+  view.value = 'tutor';
+}
+
+function onWheelKey(e: KeyboardEvent) {
+  if (view.value !== 'select') return;
+  if (e.key === 'ArrowLeft') moveWheel(-1);
+  if (e.key === 'ArrowRight') moveWheel(1);
+  if (e.key === 'Enter') enterCourse(wheelIndex.value);
+}
+
+const progStats = computed(() => {
+  const tasks = stages.value.flatMap(sg => sg.tasks);
+  const done = tasks.filter(t => (student.value.completed_tasks || []).includes(t.task_id)).length;
+  const total = tasks.length;
+  return { done, total, pct: total ? Math.round(done / total * 100) : 0 };
+});
+
+function taskPrefix(task_id: string) {
+  if (task_id === taskId.value) return '● ';
+  if (suggestedNext.value?.task_id === task_id) return '▶ ';
+  if ((student.value.completed_tasks || []).includes(task_id)) return '✓ ';
+  return '○ ';
+}
+
 // ---------- 配置加载 ----------
 function loadProject(p: Project | undefined) {
   stages.value = (p?.stages || []).map(sg => ({
@@ -316,10 +427,12 @@ function loadProject(p: Project | undefined) {
   // 换项目 = 换学习路径：清空对话（会话按 任务 隔离）
   chat.value = [];
   history.value = [];
+  saveSel();
 }
 
 onMounted(async () => {
   useAchievementStore().unlock('green_fruit_1');
+  window.addEventListener('keydown', onWheelKey);
   try {
     const r = await fetch(`/api/ai/config`);
     const j = await r.json();
@@ -336,16 +449,15 @@ onMounted(async () => {
       // 兼容旧引擎：只有扁平 projects
       courses.value = [{ course_id: 'course_001', title: '默认课程', description: '', projects: (cfg.projects || []).map((p: any) => ({ project_id: p.project_id, title: p.title, description: p.description || '', stages: p.stages || [] })) }];
     }
-    courseId.value = courses.value[0].course_id;
-    projects.value = courses.value[0].projects;
-    if (projects.value.length) {
-      projectId.value = projects.value[0].project_id;
-      loadProject(projects.value[0]);
-    }
+    // 转盘默认停在学生上次学的课程；停在选课屏等待选择
+    const sel = loadSel();
+    const idx = courses.value.findIndex(c => c.course_id === sel.course_id);
+    wheelIndex.value = idx >= 0 ? idx : 0;
   } catch (e: any) {
     toast('无法连接引擎：' + e.message);
   }
 });
+onBeforeUnmount(() => window.removeEventListener('keydown', onWheelKey));
 
 function onCourseChange() {
   const c = courses.value.find(x => x.course_id === courseId.value);
@@ -372,6 +484,8 @@ function onTaskChange() {
   // 换任务 = 新会话：清空对话，避免上一个任务的上下文串味
   chat.value = [];
   history.value = [];
+  suggestedNext.value = null;
+  saveSel();
 }
 
 // ---------- 发送 ----------
@@ -488,6 +602,11 @@ async function doReview() {
       student.value.completed_tasks.push(taskId.value);
       saveStudent();
       toast('🎉 评审判定通过，任务完成！');
+      const nt = j.data.next_task;
+      if (nt) {
+        suggestedNext.value = nt;
+        chat.value.push({ role: 'assistant', payload: { message: `✓ 验收通过！建议进入下一任务：${nt.title}（${nt.stage_title}）。点击下方按钮切换，或从任务下拉选择。`, mode_advice: { task_id: nt.task_id, mode: mode.value, title: nt.title } } });
+      }
     } else {
       saveStudent();
       pushSystem('评审有未通过项：切回「指导」按评审意见逐条修改，改好后重新提交验收。（对话记录已保留，可直接继续讨论未通过的原因）');
@@ -564,9 +683,17 @@ function clearChat() {
   useAchievementStore().unlock('traveler');
 }
 function applyAdvice(adv: any) {
-  if (adv.task_id) taskId.value = adv.task_id;
-  mode.value = adv.mode;
-  toast('已切换到 ' + (MODE_NAMES[adv.mode] || adv.mode));
+  if (adv.task_id) {
+    if (taskId.value !== adv.task_id) {
+      taskId.value = adv.task_id;   // 触发清单/中间标题更新；对话按任务隔离
+      chat.value = [];
+      history.value = [];
+    }
+    suggestedNext.value = null;
+    saveSel();
+  }
+  if (adv.mode) mode.value = adv.mode;
+  toast(adv.title ? '已切换到任务：' + adv.title : '已切换到 ' + (MODE_NAMES[adv.mode] || adv.mode));
 }
 function qualityLines(p: any): string[] {
   const lines: string[] = [];
@@ -616,6 +743,54 @@ function toast(msg: string) {
 }
 
 .teach * { box-sizing: border-box; }
+
+/* ---------- 课程选择屏（ZZZ 转盘） ---------- */
+.teach__wheel { position: relative; flex: 1; overflow: hidden; background: #0c0c0c; }
+.tw-stripe { position: absolute; inset: -15%; background: repeating-linear-gradient(-55deg, transparent 0 180px, rgba(255,255,255,.025) 180px 183px); }
+.tw-tag { position: absolute; left: 0; top: 40px; z-index: 50; background: #FFF100; color: #111; padding: 10px 30px 10px 18px; font-weight: 900; clip-path: polygon(0 0,100% 0,calc(100% - 24px) 100%,0 100%); }
+.tw-tag .t1 { font-size: 17px; letter-spacing: 2px; }
+.tw-tag .t2 { font-size: 10px; font-weight: 400; letter-spacing: 3px; opacity: .7; }
+.tw-tag .num { font-size: 38px; line-height: 1.1; }
+.tw-arrow { position: absolute; top: 46%; z-index: 60; width: 72px; height: 62px; background: #0a0a0a; border: 2px solid #4a4a4a; border-radius: 42% 58% 52% 48% / 58% 42% 58% 42%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .18s; }
+.tw-arrow svg { width: 32px; height: 32px; fill: #fff; transition: fill .18s; }
+.tw-arrow:hover { background: #FFF100; border-color: #FFF100; transform: scale(1.08); }
+.tw-arrow:hover svg { fill: #111; }
+.tw-arrow.right { right: 30px; transform: rotate(-8deg); }
+.tw-arrow.right:hover { transform: rotate(-8deg) scale(1.08); }
+.tw-arrow.left { left: 30px; transform: rotate(8deg); }
+.tw-arrow.left:hover { transform: rotate(8deg) scale(1.08); }
+.tw-hint { position: absolute; top: 18px; right: 20px; z-index: 60; font-size: 12px; color: #555; }
+.tw-ring { position: absolute; inset: 0; }
+.tw-card { position: absolute; left: 50%; top: 50%; width: 300px; height: 470px; margin: -235px 0 0 -150px; background: #141414; border: 1px solid #2b2b2b; border-radius: 10px; overflow: hidden; cursor: pointer; transition: transform .55s cubic-bezier(.25,.8,.3,1), filter .55s, border-color .3s; will-change: transform; }
+.tw-card.front { cursor: pointer; border-color: #3f3f3f; }
+.tw-card.front:hover { border-color: #FFF100; }
+.tw-deco { position: absolute; inset: 0; background: linear-gradient(165deg, #202020 0%, #151515 55%, #111 100%); }
+.tw-deco::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(-55deg, transparent 0 30px, rgba(255,255,255,.045) 30px 34px); clip-path: polygon(52% 0,100% 0,100% 100%,14% 100%); }
+.tw-zz { position: absolute; top: 16px; left: 16px; z-index: 2; font-weight: 900; font-size: 14px; letter-spacing: 1px; color: #999; }
+.tw-bignum { position: absolute; right: -8px; bottom: -34px; z-index: 1; font-size: 150px; font-weight: 900; color: rgba(255,255,255,.05); line-height: 1; }
+.tw-card h2 { position: absolute; left: 20px; top: 70px; z-index: 2; font-size: 22px; line-height: 1.3; font-weight: 900; letter-spacing: 1px; color: #ccc; padding-right: 18px; }
+.tw-cn { position: absolute; left: 20px; top: 168px; z-index: 2; font-size: 13px; color: #888; right: 18px; }
+.tw-prog { position: absolute; left: 20px; bottom: 96px; z-index: 2; font-size: 12px; color: #666; }
+.tw-bar { position: absolute; left: 20px; bottom: 84px; z-index: 2; width: 150px; height: 3px; background: #2c2c2c; border-radius: 2px; }
+.tw-bar i { display: block; height: 3px; background: #FFF100; border-radius: 2px; }
+.tw-btn { position: absolute; left: 20px; bottom: 24px; z-index: 2; padding: 10px 26px; font-size: 13px; font-weight: 700; letter-spacing: 2px; border: 0; border-radius: 4px; cursor: pointer; background: #2a2a2a; color: #666; }
+.tw-card.front .tw-zz { color: #FFF100; }
+.tw-card.front h2 { font-size: 26px; color: #fff; }
+.tw-card.front .tw-cn { font-size: 13px; color: #999; top: 196px; }
+.tw-card.front .tw-prog { color: #FFF100; font-weight: 700; font-size: 13px; }
+.tw-card.front .tw-bar { width: 240px; }
+.tw-card.front .tw-deco::after { background: repeating-linear-gradient(-55deg, transparent 0 30px, rgba(255,241,0,.07) 30px 34px); }
+.tw-card.front .tw-btn { background: #FFF100; color: #111; }
+.tw-card.front .tw-btn:hover { transform: scale(1.04); }
+.tw-foot { position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; font-size: 12px; color: #666; letter-spacing: 4px; z-index: 60; }
+
+/* ---------- 任务进度条 ---------- */
+.teach__progress { margin-bottom: 6px; }
+.teach__progress-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--t-dim); margin-bottom: 4px; }
+.teach__progress-row span:last-child { color: var(--t-acc); font-weight: 700; }
+.teach__progress-bar { height: 4px; background: var(--t-bg3); border-radius: 2px; overflow: hidden; }
+.teach__progress-bar i { display: block; height: 4px; background: var(--t-acc); border-radius: 2px; transition: width .3s; }
+.teach__stagechip { display: none; }
 
 .teach__side {
   width: 320px; min-width: 320px; border-right: 1px solid var(--t-line);

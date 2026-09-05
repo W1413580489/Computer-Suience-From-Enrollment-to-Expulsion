@@ -699,6 +699,21 @@ def get_stage(stage_id: str) -> Stage | None:
     return None
 
 
+def get_next_task(task_id: str) -> Task | None:
+    """按课程编排顺序（阶段 order → 任务 order）返回任务的下一个任务；最后一个是 None。"""
+    for pid in _PROJECT_BUILDERS:
+        proj = get_project(pid)
+        if not any(t.id == task_id for t in proj.tasks):
+            continue
+        seq: list[str] = []
+        for s in sorted(proj.stages, key=lambda x: x.order):
+            for t in sorted((t for t in proj.tasks if t.stage_id == s.id), key=lambda x: x.order):
+                seq.append(t.id)
+        i = seq.index(task_id)
+        return get_task(seq[i + 1]) if i + 1 < len(seq) else None
+    return None
+
+
 def get_rubrics(task_id: str) -> list[Rubric]:
     for pid in _PROJECT_BUILDERS:
         proj = get_project(pid)
