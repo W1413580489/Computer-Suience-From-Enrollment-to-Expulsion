@@ -330,7 +330,7 @@ onMounted(async () => {
     // 多课程：courses[].projects 携带各自的 stage/task 结构
     courses.value = (cfg.courses || []).map((c: any) => ({
       course_id: c.course_id, title: c.title, description: c.description || '',
-      projects: (c.projects || []).map((p: any) => ({ project_id: p.project_id, title: p.title, description: p.description || '', stages: [] })),
+      projects: (c.projects || []).map((p: any) => ({ project_id: p.project_id, title: p.title, description: p.description || '', stages: p.stages || [] })),
     }));
     if (!courses.value.length) {
       // 兼容旧引擎：只有扁平 projects
