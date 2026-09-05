@@ -19,19 +19,19 @@
         <div class="tw-ring">
           <div
             v-for="(w, i) in wheelList"
-            :key="w.c.course_id"
+            :key="w.course_id"
             class="tw-card"
-            :class="{ front: w.front }"
+            :class="{ front: w.front, blank: w.blank }"
             :style="{ transform: `translate(${w.x}px, ${w.y}px) scale(${w.scale})`, zIndex: Math.round((1 - Number(w.gray)) * 100), filter: `grayscale(${w.gray}) brightness(${w.bright})` }"
             @click="enterCourse(i)"
           >
             <div class="tw-deco"></div>
             <div class="tw-zz">ZZ·课</div>
             <div class="tw-bignum">{{ String(i + 1).padStart(2, '0') }}</div>
-            <h2>{{ w.c.title }}</h2>
-            <div class="tw-cn">{{ w.c.description }}</div>
-            <div class="tw-prog">{{ w.doneCount }} / {{ w.total }} {{ w.done ? '· 已完成' : '' }}</div>
-            <div class="tw-bar"><i :style="{ width: w.pct + '%' }"></i></div>
+            <h2>{{ w.title }}</h2>
+            <div class="tw-cn">{{ w.description }}</div>
+            <div class="tw-prog" v-if="!w.blank">{{ w.doneCount }} / {{ w.total }} {{ w.done ? '· 已完成' : '' }}</div>
+            <div class="tw-bar" v-if="!w.blank"><i :style="{ width: w.pct + '%' }"></i></div>
             <button class="tw-btn" @click.stop="enterCourse(i)">{{ w.progBtn }}</button>
           </div>
         </div>
@@ -354,36 +354,48 @@ function isStageDone(sg: Stage) {
 }
 
 // ---------- 选课屏（ZZZ 转盘）与进度 ----------
-const wheelList = computed(() => courses.value.map((c, i) => {
-  const tasks = c.projects.flatMap(p => (p.stages || []).flatMap(sg => sg.tasks));
-  const doneCount = tasks.filter(t => (student.value.completed_tasks || []).includes(t.task_id)).length;
-  const total = tasks.length;
-  const angle = ((i - wheelIndex.value) * (360 / Math.max(courses.value.length, 1)));
-  const rad = angle * Math.PI / 180;
-  const RX = Math.min(window.innerWidth * 0.30, 480);
-  const x = Math.round(Math.sin(rad) * RX);
-  const y = Math.round((1 - Math.cos(rad)) * 110);
-  const depth = (Math.cos(rad) + 1) / 2;
-  return {
-    c, i, x, y,
-    scale: +(0.62 + depth * 0.5).toFixed(3),
-    gray: (1 - depth).toFixed(2),
-    bright: (0.45 + depth * 0.55).toFixed(2),
-    front: angle % 360 === 0,
-    doneCount, total, pct: total ? Math.round(doneCount / total * 100) : 0,
-    done: total > 0 && doneCount === total,
-    progBtn: total > 0 && doneCount === total ? '重温课程' : (doneCount > 0 ? '继续学习' : '开始学习'),
-  };
-}));
+const wheelList = computed(() => {
+  const real = courses.value.map((c, i) => {
+    const tasks = c.projects.flatMap(p => (p.stages || []).flatMap(sg => sg.tasks));
+    const doneCount = tasks.filter(t => (student.value.completed_tasks || []).includes(t.task_id)).length;
+    const total = tasks.length;
+    return { c, course_id: c.course_id, title: c.title, description: c.description, blank: false,
+      doneCount, total, pct: total ? Math.round(doneCount / total * 100) : 0,
+      done: total > 0 && doneCount === total,
+      progBtn: total > 0 && doneCount === total ? '重温课程' : (doneCount > 0 ? '继续学习' : '开始学习') };
+  });
+  // 少于 3 张时补空白卡垫位，保证转盘两侧始终有卡片可见
+  const blanks = [];
+  for (let k = 0; real.length + k < 3; k++) {
+    blanks.push({ course_id: `blank_${k}`, title: '更多课程', description: '后续开放 · 敬请期待', blank: true,
+      doneCount: 0, total: 0, pct: 0, done: false, progBtn: '敬请期待' });
+  }
+  const all = [...real, ...blanks];
+  const n = Math.max(all.length, 3);
+  return all.map((w, i) => {
+    const angle = ((i - wheelIndex.value) * (360 / n));
+    const rad = angle * Math.PI / 180;
+    const RX = Math.min(window.innerWidth * 0.30, 480);
+    const x = Math.round(Math.sin(rad) * RX);
+    const y = Math.round((1 - Math.cos(rad)) * 110);
+    const depth = (Math.cos(rad) + 1) / 2;
+    return { ...w, i, x, y,
+      scale: +(0.62 + depth * 0.5).toFixed(3),
+      gray: ((1 - depth) * 0.85).toFixed(2),
+      bright: (0.55 + depth * 0.45).toFixed(2),
+      front: angle % 360 === 0 };
+  });
+});
 
 function moveWheel(d: number) {
-  const n = courses.value.length;
-  if (!n) return;
+  const n = Math.max(wheelList.value.length, 3);
   wheelIndex.value = ((wheelIndex.value + d) % n + n) % n;
 }
 
 function enterCourse(i: number) {
-  const c = courses.value[i];
+  const w = wheelList.value[i];
+  if (!w || w.blank) { toast('更多课程即将开放，敬请期待'); return; }
+  const c = courses.value.find(x => x.course_id === w.course_id);
   if (!c || !c.projects.length) return;
   courseId.value = c.course_id;
   projects.value = c.projects;
@@ -783,6 +795,8 @@ function toast(msg: string) {
 .tw-card.front .tw-deco::after { background: repeating-linear-gradient(-55deg, transparent 0 30px, rgba(255,241,0,.07) 30px 34px); }
 .tw-card.front .tw-btn { background: #FFF100; color: #111; }
 .tw-card.front .tw-btn:hover { transform: scale(1.04); }
+.tw-card.blank { border-style: dashed; border-color: #333; }
+.tw-card.blank .tw-btn { cursor: default; }
 .tw-foot { position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; font-size: 12px; color: #666; letter-spacing: 4px; z-index: 60; }
 
 /* ---------- 任务进度条 ---------- */
