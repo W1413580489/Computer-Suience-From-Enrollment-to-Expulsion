@@ -1,4 +1,4 @@
-import{N as n}from"./NeonIcon-DLGYjU1m.js";import{r as a}from"./useMarkdown-ZOlDXMz4.js";import{d as c,c as r,e as p,h as e,A as m,p as u,_ as d}from"./index-BP9Li1BY.js";const i={class:"res-root"},l={class:"res-topbar"},h={class:"res-body"},_=["innerHTML"],b=`# 🔗 常用链接
+import{N as n}from"./NeonIcon-CUO3tmJm.js";import{r as a}from"./useMarkdown-ZOlDXMz4.js";import{d as c,c as r,g as e,z as p,m,p as u,_ as d}from"./index-DZHNMUEK.js";const i={class:"res-root"},l={class:"res-topbar"},h={class:"res-body"},_=["innerHTML"],b=`# 🔗 常用链接
 
 :::callout emoji="📚"
 计算机学习路线 https://github.com/kamranahmedse/developer-roadmap
@@ -28,4 +28,4 @@ https://gemini.google.com/
 https://chatgpt.com/
 https://openai.com/
 
-下载就对了，这是计算机学生的必经之路 https://www.yuanshen.com/`,w=c({__name:"ResourceView",setup(j){const s=u(()=>a(b));return(o,t)=>(r(),p("div",i,[e("header",l,[e("button",{class:"res-topbar__back",onClick:t[0]||(t[0]=g=>o.$router.push("/"))},[m(n,{name:"back",size:20}),t[1]||(t[1]=e("span",{class:"res-topbar__back-label"},"返回",-1))]),t[2]||(t[2]=e("span",{class:"res-topbar__title"},"🔗 资源中心",-1))]),e("div",h,[e("div",{class:"res-content",innerHTML:s.value},null,8,_)])]))}}),x=d(w,[["__scopeId","data-v-7256b423"]]);export{x as default};
+下载就对了，这是计算机学生的必经之路 https://www.yuanshen.com/`,w=c({__name:"ResourceView",setup(g){const s=m(()=>a(b));return(o,t)=>(u(),r("div",i,[e("header",l,[e("button",{class:"res-topbar__back",onClick:t[0]||(t[0]=j=>o.$router.push("/"))},[p(n,{name:"back",size:20}),t[1]||(t[1]=e("span",{class:"res-topbar__back-label"},"返回",-1))]),t[2]||(t[2]=e("span",{class:"res-topbar__title"},"🔗 资源中心",-1))]),e("div",h,[e("div",{class:"res-content",innerHTML:s.value},null,8,_)])]))}}),x=d(w,[["__scopeId","data-v-7256b423"]]);export{x as default};
