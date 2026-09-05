@@ -28,3 +28,4 @@ Thumbs.db
 .vscode/
 *.swp
 frontend/.npm-cache/
+frontend/vite.config.ts.timestamp-*.mjs
