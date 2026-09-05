@@ -779,7 +779,7 @@ function toast(msg: string) {
   --w-deco-line: rgba(0, 0, 0, 0.05); --w-deco-front: rgba(192, 57, 43, 0.10);
   --w-bignum: rgba(0, 0, 0, 0.05); --w-arrow-bg: rgba(255, 255, 255, 0.85);
 }
-.teach[data-theme='ak'] .teach.teach--select { background: rgba(250, 250, 250, 0.45) !important; }
+.teach[data-theme='ak'].teach--select { background: rgba(250, 250, 250, 0.45) !important; }
 .tw-stripe { position: absolute; inset: -15%; background: repeating-linear-gradient(-55deg, transparent 0 180px, var(--w-deco-line) 180px 183px); }
 .tw-tag { position: absolute; left: 0; top: 40px; z-index: 50; background: var(--w-acc); color: var(--w-btn-text); padding: 10px 30px 10px 18px; font-weight: 900; clip-path: polygon(0 0,100% 0,calc(100% - 24px) 100%,0 100%); }
 .tw-tag .t1 { font-size: 17px; letter-spacing: 2px; }
