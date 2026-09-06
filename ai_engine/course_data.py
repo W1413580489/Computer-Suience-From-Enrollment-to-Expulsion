@@ -626,11 +626,13 @@ _COURSES: dict[str, dict] = {
         "title": "AI 微项目实战（套壳聊天机器人）",
         "description": "十几分钟完成一个套壳聊天机器人，体验'前端→后端→大模型 API'最小闭环。",
         "projects": ["project_chatbot"],
+        "img": "/courses/chatbot.jpg", "img_pos": "center 25%",
     },
     "course_002": {
         "title": "Agent 实战（GitHub 项目分析）",
         "description": "做一个会调用工具、多步执行、输出带证据报告的 CLI Agent。前置：已完成套壳聊天机器人。",
         "projects": ["project_agent"],
+        "img": "/courses/agent.jpg", "img_pos": "center 30%",
     },
 }
 _project_cache: dict[str, Project] = {}
@@ -660,7 +662,7 @@ def _project_summary(proj: Project) -> dict:
 
 
 def list_courses() -> list[dict]:
-    """供前端课程选择器：课程列表 + 每门课的项目（含完整 stage/task 结构）。"""
+    """供前端课程选择器：课程列表 + 每门课的项目（含完整 stage/task 结构）+ 选课卡配图。"""
     out = []
     for cid, info in _COURSES.items():
         projs = []
@@ -669,7 +671,8 @@ def list_courses() -> list[dict]:
             if p:
                 projs.append(_project_summary(p))
         out.append({"course_id": cid, "title": info["title"],
-                    "description": info["description"], "projects": projs})
+                    "description": info["description"], "projects": projs,
+                    "img": info.get("img", ""), "img_pos": info.get("img_pos", "center 30%")})
     return out
 
 

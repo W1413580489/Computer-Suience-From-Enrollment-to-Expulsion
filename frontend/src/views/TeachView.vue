@@ -25,11 +25,14 @@
             :style="{ transform: `translate(${w.x}px, ${w.y}px) scale(${w.scale})`, zIndex: Math.round((1 - Number(w.gray)) * 100), filter: `grayscale(${w.gray}) brightness(${w.bright})` }"
             @click="enterCourse(i)"
           >
-            <div class="tw-deco"></div>
+            <div class="tw-art" :style="{ backgroundImage: 'url(' + w.img + ')', backgroundPosition: w.pos }"></div>
+            <div class="tw-lines"></div>
+            <div class="tw-mask"></div>
             <div class="tw-zz">ZZ·课</div>
             <div class="tw-bignum">{{ String(i + 1).padStart(2, '0') }}</div>
             <h2>{{ w.title }}</h2>
-            <div class="tw-cn">{{ w.description }}</div>
+            <div class="tw-cn">{{ w.sub }}</div>
+            <div class="tw-desc" v-if="!w.blank">{{ w.description }}</div>
             <div class="tw-prog" v-if="!w.blank">{{ w.doneCount }} / {{ w.total }} {{ w.done ? '· 已完成' : '' }}</div>
             <div class="tw-bar" v-if="!w.blank"><i :style="{ width: w.pct + '%' }"></i></div>
             <button class="tw-btn" @click.stop="enterCourse(i)">{{ w.progBtn }}</button>
@@ -261,7 +264,7 @@ function loadStudent(): StudentState {
 
 interface Project { project_id: string; title: string; description: string; stages: Stage[] }
 interface Stage { stage_id: string; title: string; tasks: { task_id: string; title: string; objective: string }[] }
-interface CourseInfo { course_id: string; title: string; description: string; projects: Project[] }
+interface CourseInfo { course_id: string; title: string; description: string; projects: Project[]; img: string; img_pos: string }
 const courses = ref<CourseInfo[]>([]);
 const courseId = ref('');
 const view = ref<'select' | 'tutor'>('select');
@@ -365,11 +368,14 @@ function isStageDone(sg: Stage) {
 
 // ---------- 选课屏（ZZZ 转盘）与进度 ----------
 const wheelList = computed(() => {
+  const SUBS: Record<string, string> = { course_001: 'CHATBOT', course_002: 'GITHUB AGENT' };
   const real = courses.value.map((c, i) => {
     const tasks = c.projects.flatMap(p => (p.stages || []).flatMap(sg => sg.tasks));
     const doneCount = tasks.filter(t => (student.value.completed_tasks || []).includes(t.task_id)).length;
     const total = tasks.length;
     return { c, course_id: c.course_id, title: c.title, description: c.description, blank: false,
+      img: c.img || '/courses/more.jpg', pos: c.img_pos || 'center 30%',
+      sub: SUBS[c.course_id] || 'COURSE',
       doneCount, total, pct: total ? Math.round(doneCount / total * 100) : 0,
       done: total > 0 && doneCount === total,
       progBtn: total > 0 && doneCount === total ? '重温课程' : (doneCount > 0 ? '继续学习' : '开始学习') };
@@ -378,6 +384,7 @@ const wheelList = computed(() => {
   const blanks = [];
   for (let k = 0; real.length + k < 3; k++) {
     blanks.push({ course_id: `blank_${k}`, title: '更多课程', description: '后续开放 · 敬请期待', blank: true,
+      img: '/courses/more.jpg', pos: '82% 40%', sub: 'COMING SOON',
       doneCount: 0, total: 0, pct: 0, done: false, progBtn: '敬请期待' });
   }
   const all = [...real, ...blanks];
@@ -467,11 +474,12 @@ onMounted(async () => {
     // 多课程：courses[].projects 携带各自的 stage/task 结构
     courses.value = (cfg.courses || []).map((c: any) => ({
       course_id: c.course_id, title: c.title, description: c.description || '',
+      img: c.img || '/courses/more.jpg', img_pos: c.img_pos || 'center 30%',
       projects: (c.projects || []).map((p: any) => ({ project_id: p.project_id, title: p.title, description: p.description || '', stages: p.stages || [] })),
     }));
     if (!courses.value.length) {
       // 兼容旧引擎：只有扁平 projects
-      courses.value = [{ course_id: 'course_001', title: '默认课程', description: '', projects: (cfg.projects || []).map((p: any) => ({ project_id: p.project_id, title: p.title, description: p.description || '', stages: p.stages || [] })) }];
+      courses.value = [{ course_id: 'course_001', title: '默认课程', description: '', img: '', img_pos: 'center 30%', projects: (cfg.projects || []).map((p: any) => ({ project_id: p.project_id, title: p.title, description: p.description || '', stages: p.stages || [] })) }];
     }
     // 转盘默认停在学生上次学的课程；停在选课屏等待选择
     const sel = loadSel();
@@ -768,7 +776,7 @@ function toast(msg: string) {
 
 .teach * { box-sizing: border-box; }
 
-/* ---------- 课程选择屏（ZZZ 转盘 · 双主题磨砂玻璃） ---------- */
+/* ---------- 课程选择屏（ZZZ 转盘 · 双主题磨砂玻璃 + 露图卡） ---------- */
 .teach.teach--select {
   /* 磨砂玻璃：用户背景图隐约透出（三卡区域） */
   background: rgba(12, 12, 12, 0.42) !important;
@@ -776,7 +784,7 @@ function toast(msg: string) {
   -webkit-backdrop-filter: blur(18px) saturate(1.05);
 }
 .teach__wheel {
-  --w-card: rgba(22, 22, 22, 0.88); --w-card-border: #333; --w-blank-border: #333;
+  --w-card: rgba(22, 22, 22, 0.88); --w-card-border: #333; --w-blank-border: #444;
   --w-text: #eee; --w-dim: #999; --w-mut: #666;
   --w-acc: #FFF100; --w-btn-bg: #FFF100; --w-btn-text: #111;
   --w-deco-line: rgba(255, 255, 255, 0.045); --w-deco-front: rgba(255, 241, 0, 0.07);
@@ -806,28 +814,31 @@ function toast(msg: string) {
 .tw-arrow.left:hover { transform: rotate(8deg) scale(1.08); }
 .tw-hint { position: absolute; top: 18px; right: 20px; z-index: 60; font-size: 12px; color: var(--w-mut); }
 .tw-ring { position: absolute; inset: 0; }
-.tw-card { position: absolute; left: 50%; top: 50%; width: 300px; height: 470px; margin: -235px 0 0 -150px; background: var(--w-card); border: 1px solid var(--w-card-border); border-radius: 10px; overflow: hidden; cursor: pointer; transition: transform .55s cubic-bezier(.25,.8,.3,1), filter .55s, border-color .3s; will-change: transform; }
-.tw-card.front { cursor: pointer; }
-.tw-card.front:hover { border-color: var(--w-acc); }
-.tw-deco { position: absolute; inset: 0; }
-.tw-deco::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(-55deg, transparent 0 30px, var(--w-deco-line) 30px 34px); clip-path: polygon(52% 0,100% 0,100% 100%,14% 100%); }
-.tw-zz { position: absolute; top: 16px; left: 16px; z-index: 2; font-weight: 900; font-size: 14px; letter-spacing: 1px; color: var(--w-dim); }
-.tw-bignum { position: absolute; right: -8px; bottom: -34px; z-index: 1; font-size: 150px; font-weight: 900; color: var(--w-bignum); line-height: 1; }
-.tw-card h2 { position: absolute; left: 20px; top: 70px; z-index: 2; font-size: 22px; line-height: 1.3; font-weight: 900; letter-spacing: 1px; color: var(--w-text); padding-right: 18px; }
-.tw-cn { position: absolute; left: 20px; top: 168px; z-index: 2; font-size: 13px; color: var(--w-dim); right: 18px; }
-.tw-prog { position: absolute; left: 20px; bottom: 96px; z-index: 2; font-size: 12px; color: var(--w-mut); }
-.tw-bar { position: absolute; left: 20px; bottom: 84px; z-index: 2; width: 150px; height: 3px; background: var(--w-card-border); border-radius: 2px; }
-.tw-bar i { display: block; height: 3px; background: var(--w-acc); border-radius: 2px; }
-.tw-btn { position: absolute; left: 20px; bottom: 24px; z-index: 2; padding: 10px 26px; font-size: 13px; font-weight: 700; letter-spacing: 2px; border: 0; border-radius: 4px; cursor: pointer; background: var(--w-btn-bg); color: var(--w-btn-text); }
+.tw-card { position: absolute; left: 50%; top: 50%; width: 300px; height: 470px; margin: -235px 0 0 -150px; background: #0b0b0b; border: 1px solid var(--w-card-border); border-radius: 10px; overflow: hidden; cursor: pointer; transition: transform .55s cubic-bezier(.25,.8,.3,1), filter .55s, border-color .3s; will-change: transform; }
 .tw-card.front { border-color: var(--w-acc); }
-.tw-card.front .tw-zz { color: var(--w-acc); }
-.tw-card.front h2 { font-size: 26px; color: var(--w-text); }
-.tw-card.front .tw-cn { font-size: 13px; color: var(--w-dim); top: 196px; }
-.tw-card.front .tw-prog { color: var(--w-acc); font-weight: 700; font-size: 13px; }
-.tw-card.front .tw-bar { width: 240px; }
-.tw-card.front .tw-deco::after { background: repeating-linear-gradient(-55deg, transparent 0 30px, var(--w-deco-front) 30px 34px); }
-.tw-card.blank { border-style: dashed; border-color: var(--w-blank-border); }
+.tw-card.front:hover { border-color: var(--w-acc); }
+.tw-card.blank { border-style: dashed; }
 .tw-card.blank .tw-btn { cursor: default; }
+/* 斜切露图三层：图 → 细线 → 黑遮罩（黑区盖线，露图带显线） */
+.tw-art { position: absolute; inset: 0; background: center 30% / cover no-repeat; }
+.tw-lines { position: absolute; inset: 0; z-index: 1; transition: opacity .35s; background: repeating-linear-gradient(115deg, transparent 0 110px, rgba(255,255,255,.75) 110px 113px); }
+.tw-mask { position: absolute; inset: 0; z-index: 2; transition: opacity .35s; background: linear-gradient(115deg, #0b0b0b 0 40%, transparent 40%), linear-gradient(115deg, transparent 0 74%, #0b0b0b 74%); }
+.tw-card.front:hover .tw-mask, .tw-card.front:hover .tw-lines { opacity: 0; }
+.tw-zz { position: absolute; top: 16px; left: 16px; z-index: 3; font-weight: 900; font-size: 14px; letter-spacing: 1px; color: var(--w-dim); }
+.tw-card.front .tw-zz { color: var(--w-acc); }
+.tw-bignum { position: absolute; right: -8px; bottom: -34px; z-index: 1; font-size: 150px; font-weight: 900; color: rgba(255,255,255,.06); line-height: 1; }
+.tw-card h2 { position: absolute; left: 20px; top: 24px; z-index: 3; font-size: 20px; line-height: 1.3; font-weight: 900; letter-spacing: 1px; color: #ccc; padding-right: 16px; }
+.tw-card.front h2 { font-size: 28px; color: #fff; }
+.tw-cn { position: absolute; left: 20px; top: 88px; z-index: 3; font-size: 12px; font-weight: 700; letter-spacing: 4px; color: var(--w-acc); }
+.tw-desc { position: absolute; left: 20px; right: 18px; bottom: 98px; z-index: 3; font-size: 12px; color: #f2f2f2; text-shadow: 0 1px 4px rgba(0,0,0,.95); display: none; }
+.tw-card.front .tw-desc { display: block; }
+.tw-prog { position: absolute; left: 20px; bottom: 78px; z-index: 3; font-size: 13px; font-weight: 700; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.95); display: none; }
+.tw-card.front .tw-prog { display: block; }
+.tw-bar { position: absolute; left: 20px; bottom: 64px; z-index: 3; width: 240px; height: 4px; background: rgba(255,255,255,.18); border-radius: 2px; display: none; }
+.tw-card.front .tw-bar { display: block; }
+.tw-bar i { display: block; height: 4px; background: var(--w-acc); border-radius: 2px; }
+.tw-btn { position: absolute; left: 20px; bottom: 22px; z-index: 3; padding: 10px 26px; font-size: 13px; font-weight: 700; letter-spacing: 2px; border: 0; border-radius: 4px; cursor: pointer; background: var(--w-btn-bg); color: var(--w-btn-text); }
+.tw-card.front .tw-btn:hover { transform: scale(1.04); }
 .tw-foot { position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; font-size: 12px; color: var(--w-mut); letter-spacing: 4px; z-index: 60; }
 
 /* ---------- 任务进度条 ---------- */

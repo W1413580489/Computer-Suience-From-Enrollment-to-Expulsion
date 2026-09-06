@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>ZZZ 斜切卡片 · 露图实现原理</title>
+<style>
+  body { background:#2b2b2b; min-height:100vh; display:flex; gap:40px; align-items:center; justify-content:center; padding:40px; font-family:"PingFang SC","Microsoft YaHei",sans-serif; }
+  .note { max-width:300px; color:#ddd; font-size:13px; line-height:2; }
+  .note b { color:#B6FF00; }
+  .note code { background:#111; padding:2px 6px; border-radius:4px; font-size:12px; }
+
+  /* ======== 卡片本体 ======== */
+  .zz-card {
+    position: relative;
+    width: 420px; height: 740px;
+    background: #0b0b0b;            /* 底层：整卡纯黑 */
+    border-radius: 14px;
+    overflow: hidden;               /* 关键：斜切块超出部分裁掉 */
+    flex-shrink: 0;
+  }
+
+  /* 第 1 层：真实图片。竖卡 420x740 裁横图，取景中心偏上保住脸部 */
+  .art {
+    position: absolute; inset: 0;
+    background: url('card-demo-art.jpg') center 30% / cover no-repeat;
+  }
+
+  /* 第 2 层：两块黑色斜切遮罩，把上下盖住，中间露出一条平行四边形的图。
+     核心：两个 linear-gradient 用【同一角度 + 硬停】(42% 后直接透明，无过渡)，
+     斜边自然平行；两条 gradient 的透明区重叠 = 露图带。 */
+  .band-mask {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(115deg, #0b0b0b 0 42%, transparent 42%),
+      linear-gradient(115deg, transparent 0 72%, #0b0b0b 72%);
+  }
+
+  /* 第 3 层：细斜线（同角度的 repeating 渐变，白色 3px），
+     盖在最上面，横穿全卡——黑区上它就是装饰线，图区上它是切割线 */
+  .lines {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(115deg,
+      transparent 0 150px,
+      rgba(255,255,255,.9) 150px 153px);
+  }
+
+  /* 文字层 */
+  .logo { position:absolute; top:26px; left:26px; font-size:34px; font-weight:900; font-style:italic; letter-spacing:-2px; }
+  .en   { position:absolute; top:150px; left:30px; font-size:44px; font-weight:900; letter-spacing:2px; color:#fff; margin:0; z-index:2; }
+  .zh   { position:absolute; top:212px; left:32px; font-size:16px; font-weight:700; color:#B6FF00; letter-spacing:6px; z-index:2; }
+  .caption { position:absolute; bottom:34px; left:32px; font-size:14px; color:#888; letter-spacing:2px; }
+  .side { position:absolute; right:14px; bottom:120px; writing-mode:vertical-rl; font-size:12px; letter-spacing:6px; color:#555; }
+</style>
+</head>
+<body>
+  <div class="zz-card">
+    <div class="art"></div>
+    <div class="band-mask"></div>
+    <div class="lines"></div>
+    <div class="logo">𝐙𝐙</div>
+    <h2 class="en">UPDATE</h2>
+    <div class="zh">更新姬</div>
+    <div class="side">ZENLESS ZONE ZERO</div>
+    <p class="caption">我不更新你们用什么啊？</p>
+  </div>
+
+  <div class="note">
+    <b>三层结构（从下到上）</b><br><br>
+    1️⃣ <b>.art</b> — 图片铺满整卡<br>
+    2️⃣ <b>.band-mask</b> — 两个同角度 linear-gradient，硬停（0 42% → 42% 处直接透明），斜边平行，中间夹出露图带<br>
+    3️⃣ <b>.lines</b> — 同角度 repeating 渐变画 3px 白线，横穿全卡<br><br>
+    <b>换真图</b>：<code>.art { background: url(xxx.jpg) center/cover; }</code><br><br>
+    调露图带宽窄 = 改 42% / 72% 两个停靠点；调倾斜 = 统一改三处角度 115deg。
+  </div>
+</body>
+</html>
