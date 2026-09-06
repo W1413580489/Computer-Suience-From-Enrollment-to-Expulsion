@@ -28,10 +28,8 @@
             <div class="tw-art" :style="{ backgroundImage: 'url(' + w.img + ')', backgroundPosition: w.pos }"></div>
             <div class="tw-lines"></div>
             <div class="tw-mask"></div>
-            <div class="tw-zz">ZZ·课</div>
             <div class="tw-bignum">{{ String(i + 1).padStart(2, '0') }}</div>
             <h2>{{ w.title }}</h2>
-            <div class="tw-cn">{{ w.sub }}</div>
             <div class="tw-desc" v-if="!w.blank">{{ w.description }}</div>
             <div class="tw-prog" v-if="!w.blank">{{ w.doneCount }} / {{ w.total }} {{ w.done ? '· 已完成' : '' }}</div>
             <div class="tw-bar" v-if="!w.blank"><i :style="{ width: w.pct + '%' }"></i></div>
@@ -368,14 +366,12 @@ function isStageDone(sg: Stage) {
 
 // ---------- 选课屏（ZZZ 转盘）与进度 ----------
 const wheelList = computed(() => {
-  const SUBS: Record<string, string> = { course_001: 'CHATBOT', course_002: 'GITHUB AGENT' };
   const real = courses.value.map((c, i) => {
     const tasks = c.projects.flatMap(p => (p.stages || []).flatMap(sg => sg.tasks));
     const doneCount = tasks.filter(t => (student.value.completed_tasks || []).includes(t.task_id)).length;
     const total = tasks.length;
     return { c, course_id: c.course_id, title: c.title, description: c.description, blank: false,
       img: c.img || '/courses/more.jpg', pos: c.img_pos || 'center 30%',
-      sub: SUBS[c.course_id] || 'COURSE',
       doneCount, total, pct: total ? Math.round(doneCount / total * 100) : 0,
       done: total > 0 && doneCount === total,
       progBtn: total > 0 && doneCount === total ? '重温课程' : (doneCount > 0 ? '继续学习' : '开始学习') };
@@ -384,7 +380,7 @@ const wheelList = computed(() => {
   const blanks = [];
   for (let k = 0; real.length + k < 3; k++) {
     blanks.push({ course_id: `blank_${k}`, title: '更多课程', description: '后续开放 · 敬请期待', blank: true,
-      img: '/courses/more.jpg', pos: '82% 40%', sub: 'COMING SOON',
+      img: '/courses/more.jpg', pos: '82% 40%',
       doneCount: 0, total: 0, pct: 0, done: false, progBtn: '敬请期待' });
   }
   const all = [...real, ...blanks];
@@ -784,19 +780,27 @@ function toast(msg: string) {
   -webkit-backdrop-filter: blur(18px) saturate(1.05);
 }
 .teach__wheel {
-  --w-card: rgba(22, 22, 22, 0.88); --w-card-border: #333; --w-blank-border: #444;
-  --w-text: #eee; --w-dim: #999; --w-mut: #666;
-  --w-acc: #FFF100; --w-btn-bg: #FFF100; --w-btn-text: #111;
-  --w-deco-line: rgba(255, 255, 255, 0.045); --w-deco-front: rgba(255, 241, 0, 0.07);
+  --w-card-border: #333; --w-blank-border: #444;
+  --w-mask1: #0b0b0b; --w-mask2: #0b0b0b;
+  --w-h2: #cccccc; --w-h2-front: #ffffff; --w-on-card: #f2f2f2;
+  --w-shadow: 0 1px 4px rgba(0,0,0,.95);
+  --w-bar-track: rgba(255,255,255,.18);
+  --w-mut: #666; --w-deco-line: rgba(255, 255, 255, 0.045); --w-deco-front: rgba(255, 241, 0, 0.07);
   --w-bignum: rgba(255, 255, 255, 0.05); --w-arrow-bg: rgba(10, 10, 10, 0.78);
+  --w-acc: #FFF100; --w-btn-bg: #FFF100; --w-btn-text: #111;
+  --w-text: #eee; --w-dim: #999;
   position: relative; flex: 1; overflow: hidden;
 }
 .teach[data-theme='ak'] .teach__wheel {
-  --w-card: rgba(255, 255, 255, 0.92); --w-card-border: #ddd; --w-blank-border: #ccc;
-  --w-text: #1a1a1a; --w-dim: #555; --w-mut: #888;
-  --w-acc: #c0392b; --w-btn-bg: #c0392b; --w-btn-text: #fff;
-  --w-deco-line: rgba(0, 0, 0, 0.05); --w-deco-front: rgba(192, 57, 43, 0.10);
+  --w-card-border: #ddd; --w-blank-border: #ccc;
+  --w-mask1: #fafafa; --w-mask2: #fafafa;
+  --w-h2: #555555; --w-h2-front: #1a1a1a; --w-on-card: #1a1a1a;
+  --w-shadow: 0 1px 3px rgba(0,0,0,.25);
+  --w-bar-track: rgba(0,0,0,.15);
+  --w-mut: #888; --w-deco-line: rgba(0, 0, 0, 0.05); --w-deco-front: rgba(192, 57, 43, 0.10);
   --w-bignum: rgba(0, 0, 0, 0.05); --w-arrow-bg: rgba(255, 255, 255, 0.85);
+  --w-acc: #c0392b; --w-btn-bg: #c0392b; --w-btn-text: #fff;
+  --w-text: #1a1a1a; --w-dim: #555;
 }
 .teach[data-theme='ak'].teach--select { background: rgba(250, 250, 250, 0.45) !important; }
 .tw-stripe { position: absolute; inset: -15%; background: repeating-linear-gradient(-55deg, transparent 0 180px, var(--w-deco-line) 180px 183px); }
@@ -814,7 +818,7 @@ function toast(msg: string) {
 .tw-arrow.left:hover { transform: rotate(8deg) scale(1.08); }
 .tw-hint { position: absolute; top: 18px; right: 20px; z-index: 60; font-size: 12px; color: var(--w-mut); }
 .tw-ring { position: absolute; inset: 0; }
-.tw-card { position: absolute; left: 50%; top: 50%; width: 300px; height: 470px; margin: -235px 0 0 -150px; background: #0b0b0b; border: 1px solid var(--w-card-border); border-radius: 10px; overflow: hidden; cursor: pointer; transition: transform .55s cubic-bezier(.25,.8,.3,1), filter .55s, border-color .3s; will-change: transform; }
+.tw-card { position: absolute; left: 50%; top: 50%; width: 300px; height: 470px; margin: -235px 0 0 -150px; background: var(--w-mask1); border: 1px solid var(--w-card-border); border-radius: 10px; overflow: hidden; cursor: pointer; transition: transform .55s cubic-bezier(.25,.8,.3,1), filter .55s, border-color .3s; will-change: transform; }
 .tw-card.front { border-color: var(--w-acc); }
 .tw-card.front:hover { border-color: var(--w-acc); }
 .tw-card.blank { border-style: dashed; }
@@ -822,17 +826,14 @@ function toast(msg: string) {
 /* 斜切露图三层：图 → 细线 → 黑遮罩（黑区盖线，露图带显线） */
 .tw-art { position: absolute; inset: 0; background: center 30% / cover no-repeat; }
 .tw-lines { position: absolute; inset: 0; z-index: 1; transition: opacity .35s; background: repeating-linear-gradient(115deg, transparent 0 110px, rgba(255,255,255,.75) 110px 113px); }
-.tw-mask { position: absolute; inset: 0; z-index: 2; transition: opacity .35s; background: linear-gradient(115deg, #0b0b0b 0 40%, transparent 40%), linear-gradient(115deg, transparent 0 74%, #0b0b0b 74%); }
+.tw-mask { position: absolute; inset: 0; z-index: 2; transition: opacity .35s, background .3s; background: linear-gradient(115deg, var(--w-mask1) 0 40%, transparent 40%), linear-gradient(115deg, transparent 0 74%, var(--w-mask2) 74%); }
 .tw-card.front:hover .tw-mask, .tw-card.front:hover .tw-lines { opacity: 0; }
-.tw-zz { position: absolute; top: 16px; left: 16px; z-index: 3; font-weight: 900; font-size: 14px; letter-spacing: 1px; color: var(--w-dim); }
-.tw-card.front .tw-zz { color: var(--w-acc); }
-.tw-bignum { position: absolute; right: -8px; bottom: -34px; z-index: 1; font-size: 150px; font-weight: 900; color: rgba(255,255,255,.06); line-height: 1; }
-.tw-card h2 { position: absolute; left: 20px; top: 24px; z-index: 3; font-size: 20px; line-height: 1.3; font-weight: 900; letter-spacing: 1px; color: #ccc; padding-right: 16px; }
-.tw-card.front h2 { font-size: 28px; color: #fff; }
-.tw-cn { position: absolute; left: 20px; top: 88px; z-index: 3; font-size: 12px; font-weight: 700; letter-spacing: 4px; color: var(--w-acc); }
-.tw-desc { position: absolute; left: 20px; right: 18px; bottom: 98px; z-index: 3; font-size: 12px; color: #f2f2f2; text-shadow: 0 1px 4px rgba(0,0,0,.95); display: none; }
+.tw-bignum { position: absolute; right: -8px; bottom: -34px; z-index: 1; font-size: 150px; font-weight: 900; color: var(--w-bignum); line-height: 1; }
+.tw-card h2 { position: absolute; left: 20px; top: 24px; z-index: 3; font-size: 20px; line-height: 1.3; font-weight: 900; letter-spacing: 1px; color: var(--w-h2); padding-right: 16px; }
+.tw-card.front h2 { font-size: 28px; color: var(--w-h2-front); }
+.tw-desc { position: absolute; left: 20px; right: 18px; bottom: 98px; z-index: 3; font-size: 12px; color: var(--w-on-card); text-shadow: var(--w-shadow); display: none; }
 .tw-card.front .tw-desc { display: block; }
-.tw-prog { position: absolute; left: 20px; bottom: 78px; z-index: 3; font-size: 13px; font-weight: 700; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.95); display: none; }
+.tw-prog { position: absolute; left: 20px; bottom: 78px; z-index: 3; font-size: 13px; font-weight: 700; color: var(--w-on-card); text-shadow: var(--w-shadow); display: none; }
 .tw-card.front .tw-prog { display: block; }
 .tw-bar { position: absolute; left: 20px; bottom: 64px; z-index: 3; width: 240px; height: 4px; background: rgba(255,255,255,.18); border-radius: 2px; display: none; }
 .tw-card.front .tw-bar { display: block; }
