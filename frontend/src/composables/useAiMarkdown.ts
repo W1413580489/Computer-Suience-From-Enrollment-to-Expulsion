@@ -41,5 +41,8 @@ marked.use({
 export function renderAiMarkdown(md: string): string {
   if (!md) return '';
   const html = marked.parse(md, { async: false }) as string;
-  return DOMPurify.sanitize(html);
+  // 裸 URL 自动转可点击链接（跳过已在 href 属性内的，避免重复包裹）
+  const linked = html.replace(/(?<![\"'=])(https?:\/\/[^\s<>\"')]+)/g,
+    '<a href="$1" target="_blank" rel="noopener">$1</a>');
+  return DOMPurify.sanitize(linked, { ADD_ATTR: ['target'] });
 }

@@ -134,7 +134,7 @@
       <!-- 右侧对话区 -->
       <main class="teach__main">
         <div class="teach__chathead">
-          <p class="teach__task">{{ currentTaskTitle }}</p>
+          <p class="teach__task" v-html="currentTaskTitleHtml"></p>
           <div class="teach__chips">
             <button class="teach__metachip teach__sidetoggle" :title="sideOpen ? '收起侧栏，放大对话区' : '展开侧栏'" @click="toggleSide">{{ sideOpen ? '⇤ 收起' : '⇥ 设置' }}</button>
             <span class="teach__metachip">{{ modeLabel }}</span>
@@ -144,7 +144,8 @@
 
         <div ref="messagesEl" class="teach__messages">
           <div v-if="chat.length === 0" class="teach__welcome">
-            <h2>{{ taskObjective || '👨‍🏫 AI 项目导师' }}</h2>
+            <h2 v-if="taskObjective" v-html="taskObjectiveHtml"></h2>
+            <h2 v-else>👨‍🏫 AI 项目导师</h2>
             <p>{{ taskObjective ? '请选择左侧的辅导模式，开始完成这个任务。' : '选择左侧课程与任务，输入你的进展 / 代码 / 报错，AI 会按 Hint Level 渐进辅导。' }}</p>
           </div>
           <div v-for="(msg, i) in chat" :key="i" class="teach__msg" :class="msg.role">
@@ -336,6 +337,15 @@ const currentTaskTitle = computed(() => {
   }
   return '选择任务开始';
 });
+
+// 裸 URL 自动转可点击链接（先转义再替换，防注入）
+function linkify(text: string): string {
+  const esc = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return esc.replace(/((?:https?:\/\/|www\.)[^\s<>"'）】]+)/g,
+    '<a href="$1" target="_blank" rel="noopener" class="t-link">$1</a>');
+}
+const currentTaskTitleHtml = computed(() => linkify(currentTaskTitle.value));
+const taskObjectiveHtml = computed(() => linkify(taskObjective.value));
 const modeLabel = computed(() => MODE_NAMES[mode.value] || mode.value);
 const doneCount = computed(() => (student.value.completed_tasks || []).length);
 const attemptedCount = computed(() => Object.keys(student.value.attempt_count || {}).length);
@@ -399,6 +409,7 @@ function enterCourse(i: number) {
   if (!c || !c.projects.length) return;
   courseId.value = c.course_id;
   projects.value = c.projects;
+  projectId.value = c.projects[0].project_id;   // 修复：漏设导致项目下拉空白
   const saved = loadSel().task_by_course?.[c.course_id];
   loadProject(c.projects[0]);
   if (saved && stages.value.some(sg => sg.tasks.some(t => t.task_id === saved))) {
