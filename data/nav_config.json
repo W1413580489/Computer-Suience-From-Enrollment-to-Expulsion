@@ -83,27 +83,15 @@
   ],
   "guides": [
     {
-      "label": "Agent 实战·前置教程",
-      "desc": "申请 GitHub Token（课程 02 必读）",
-      "url": "https://tralis2671.feishu.cn/wiki/Urq6w7wOiiAFe4kzGnmciPxYnCd",
+      "label": "常用链接",
+      "desc": "常用网站与系统入口汇总",
+      "url": "https://bcnjr89bg80t.feishu.cn/wiki/ZFQ4wlelJiOUkAk3L7tcn94xnKe",
       "icon": "doc"
-    },
-    {
-      "label": "黑话辞典",
-      "desc": "校园术语百科 · 绩点/综测/保研/选课黑话",
-      "url": "/glossary",
-      "icon": "book"
     },
     {
       "label": "新生指南补缺",
       "desc": "入学前准备与新生常见问题",
       "url": "https://tralis2671.feishu.cn/wiki/DYhvw9owZivrJskU5LicGl06nAg",
-      "icon": "doc"
-    },
-    {
-      "label": "常用链接",
-      "desc": "常用网站与系统入口汇总",
-      "url": "https://bcnjr89bg80t.feishu.cn/wiki/ZFQ4wlelJiOUkAk3L7tcn94xnKe",
       "icon": "doc"
     },
     {
@@ -230,6 +218,20 @@
       "desc": "流程图软件教学",
       "url": "https://tralis2671.feishu.cn/wiki/Q0dGw8AnQiNU3GkrMd2cfA2zn6b",
       "icon": "doc",
+      "restricted": false
+    },
+    {
+      "label": "Agent 实战·前置教程",
+      "desc": "申请 GitHub Token（课程 02 必读）",
+      "url": "https://tralis2671.feishu.cn/wiki/Urq6w7wOiiAFe4kzGnmciPxYnCd",
+      "icon": "doc",
+      "restricted": false
+    },
+    {
+      "label": "黑话辞典",
+      "desc": "校园术语百科 · 绩点/综测/保研/选课黑话",
+      "url": "/glossary",
+      "icon": "book",
       "restricted": false
     }
   ],

@@ -48,13 +48,13 @@
         <span class="dcard__shape dcard__shape--02" />
       </div>
 
-      <!-- 03 资源中心 — 左下 -->
+      <!-- 03 AI项目导师 — 左下 -->
       <div class="dcard dcard--03" role="button" tabindex="0" @click="go(quests[2].route)" @keydown.enter="go(quests[2].route)">
         <span class="dcard__num">03</span>
         <div class="dcard__body">
-          <span class="dcard__en">RESOURCE</span>
-          <h3 class="dcard__cn">资源中心</h3>
-          <p class="dcard__desc">网站 · 软件 · 学习资料</p>
+          <span class="dcard__en">TEACH</span>
+          <h3 class="dcard__cn">AI项目导师</h3>
+          <p class="dcard__desc">实战课程 · AI 辅导</p>
         </div>
         <z-button v-if="theme.isZzz" size="mini" class="dcard__zcta" @click.stop="go(quests[2].route)">EXPLORE</z-button>
         <span v-else class="dcard__cta">EXPLORE →</span>
@@ -92,7 +92,7 @@ const userStore = useUserStore();
 const quests = [
   { route: '/quest' },
   { route: '/guides' },
-  { route: '/resources' },
+  { route: '/teach' },
   { route: '/appendix' },
 ];
 
