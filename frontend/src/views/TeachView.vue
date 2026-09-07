@@ -425,7 +425,23 @@ function moveWheel(d: number) {
   wheelIndex.value = ((wheelIndex.value + d) % n + n) % n;
 }
 
+let enteringWheel = false;   // 防止转动动画期间重复触发进入
+
 function enterCourse(i: number) {
+  if (enteringWheel) return;
+  const w = wheelList.value[i];
+  if (!w || w.blank) { toast('更多课程即将开放，敬请期待'); return; }
+  // 侧位卡：先转到正前方（置中放大动画），走完再进入
+  if (i !== wheelIndex.value) {
+    enteringWheel = true;
+    wheelIndex.value = i;
+    setTimeout(() => { enteringWheel = false; doEnterCourse(i); }, 700);
+    return;
+  }
+  doEnterCourse(i);
+}
+
+function doEnterCourse(i: number) {
   const w = wheelList.value[i];
   if (!w || w.blank) { toast('更多课程即将开放，敬请期待'); return; }
   const c = courses.value.find(x => x.course_id === w.course_id);
