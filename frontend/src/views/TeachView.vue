@@ -289,6 +289,7 @@ const codeBlock = ref('');
 const descr = ref('');
 const input = ref('');
 const loading = ref(false);
+let failedReviewFlag = false;   // 成就【Trust me】：验收未通过后回到指导继续修改时解锁
 const showKey = ref(false);
 const statsOpen = ref(false);
 // 侧栏收起状态（localStorage 持久化：'0' = 收起）
@@ -564,6 +565,15 @@ async function send() {
     }
     const d = j.data;
     pushMsg('assistant', d);
+    // 成就【力量，归宿，理想】：首次带着报错来求助并得到 AI 帮助（badge BUG，调试场景）
+    if (/error|错误|报错|失败|traceback|exception|404|500|failed/i.test(text)) {
+      useAchievementStore().unlock('power_home_ideal');
+    }
+    // 成就【Trust me】：验收未通过后回到指导模式继续修改（出问题时 AI 兜底）
+    if (failedReviewFlag && mode.value === 'tutor') {
+      useAchievementStore().unlock('trust_me');
+      failedReviewFlag = false;
+    }
     saveStudent();
   } catch (e: any) {
     pushSystem('网络请求失败：' + e.message + '\n（网络/系统故障，与你提交的项目无关，请稍后重试）');
@@ -636,6 +646,10 @@ async function doReview() {
         chat.value.push({ role: 'assistant', payload: { message: `✓ 验收通过！建议进入下一任务：${nt.title}（${nt.stage_title}）。点击下方按钮切换，或从任务下拉选择。`, mode_advice: { task_id: nt.task_id, mode: mode.value, title: nt.title } } });
       }
     } else {
+      // 成就【Trust me】前置：真实评审未通过（回指导继续修改后解锁）
+      if (j.data.evaluation.status !== 'NEED_REVIEW' || j.data.evaluation.criteria?.length) {
+        failedReviewFlag = true;
+      }
       saveStudent();
       pushSystem('评审有未通过项：切回「指导」按评审意见逐条修改，改好后重新提交验收。（对话记录已保留，可直接继续讨论未通过的原因）');
     }
