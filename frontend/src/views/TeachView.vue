@@ -92,7 +92,7 @@
               :key="m.id"
               class="teach__mode"
               :class="{ active: mode === m.id }"
-              @click="mode = m.id"
+              @click="setMode(m.id)"
             >
               <div class="t">{{ m.t }}</div>
               <div class="d">{{ m.d }}</div>
@@ -289,7 +289,6 @@ const codeBlock = ref('');
 const descr = ref('');
 const input = ref('');
 const loading = ref(false);
-let failedReviewFlag = false;   // 成就【Trust me】：验收未通过后回到指导继续修改时解锁
 const showKey = ref(false);
 const statsOpen = ref(false);
 // 侧栏收起状态（localStorage 持久化：'0' = 收起）
@@ -313,9 +312,29 @@ watch(repoUrl, v => localStorage.setItem(LS_REPO, v.trim()));
 
 // 成就：首次配置 API Key
 watch(apiKey, v => { if (v.trim()) useAchievementStore().unlock('green_fruit_2'); });
-// 成就：进入验收模式
-watch(mode, m => {
-  if (m === 'reviewer') useAchievementStore().unlock('why_birds_fly');
+
+// 成就：切换模式（按课程范围解锁）
+function setMode(id: string) {
+  mode.value = id;
+  const c = courseId.value;
+  if (id === 'tutor') {
+    if (c === 'course_001') useAchievementStore().unlock('dont_understand');   // 我不明白（奉化口音）
+    if (c === 'course_002') useAchievementStore().unlock('feather_1');          // 希望有羽毛和翅膀Ⅰ
+  }
+  if (id === 'reviewer') {
+    if (c === 'course_001') useAchievementStore().unlock('why_birds_fly');      // 鸟为什么会飞
+    if (c === 'course_002') useAchievementStore().unlock('feather_6');          // 希望有羽毛和翅膀Ⅵ
+  }
+}
+
+// 成就：进度进入课程02的对应阶段
+watch(taskId, id => {
+  if (!id || !id.startsWith('c2')) return;
+  const sg = stages.value.find(sg => sg.tasks.some(t => t.task_id === id));
+  if (!sg) return;
+  if (sg.stage_id === 'c2_stage2') useAchievementStore().unlock('feather_3');   // 接入Github工具
+  if (sg.stage_id === 'c2_stage3') useAchievementStore().unlock('feather_4');   // 工具驱动执行
+  if (sg.stage_id === 'c2_stage4') useAchievementStore().unlock('feather_5');   // 带证据的项目分析报告
 });
 
 // ---------- 计算属性 ----------
@@ -420,6 +439,9 @@ function enterCourse(i: number) {
     taskId.value = saved;   // 恢复上次学到的任务
   }
   saveSel();
+  // 成就：首次点击对应课程
+  if (c.course_id === 'course_001') useAchievementStore().unlock('eva_unit01');       // 初号机出动
+  if (c.course_id === 'course_002') useAchievementStore().unlock('stand_in_heaven');  // 我将立于天上
   view.value = 'tutor';
 }
 
@@ -565,14 +587,10 @@ async function send() {
     }
     const d = j.data;
     pushMsg('assistant', d);
-    // 成就【力量，归宿，理想】：首次带着报错来求助并得到 AI 帮助（badge BUG，调试场景）
+    // 成就：发送含报错的消息并获得 AI 修复帮助（按课程范围解锁）
     if (/error|错误|报错|失败|traceback|exception|404|500|failed/i.test(text)) {
-      useAchievementStore().unlock('power_home_ideal');
-    }
-    // 成就【Trust me】：验收未通过后回到指导模式继续修改（出问题时 AI 兜底）
-    if (failedReviewFlag && mode.value === 'tutor') {
-      useAchievementStore().unlock('trust_me');
-      failedReviewFlag = false;
+      if (courseId.value === 'course_001') useAchievementStore().unlock('trust_me');          // Trust me
+      if (courseId.value === 'course_002') useAchievementStore().unlock('feather_2');         // 希望有羽毛和翅膀Ⅱ
     }
     saveStudent();
   } catch (e: any) {
@@ -640,16 +658,15 @@ async function doReview() {
       student.value.completed_tasks.push(taskId.value);
       saveStudent();
       toast('🎉 评审判定通过，任务完成！');
+      // 成就：首次通过验收（按课程范围解锁）
+      if (courseId.value === 'course_001') useAchievementStore().unlock('power_home_ideal');  // 力量，归宿，理想
+      if (courseId.value === 'course_002') useAchievementStore().unlock('feather_7');          // 希望有羽毛和翅膀Ⅶ
       const nt = j.data.next_task;
       if (nt) {
         suggestedNext.value = nt;
         chat.value.push({ role: 'assistant', payload: { message: `✓ 验收通过！建议进入下一任务：${nt.title}（${nt.stage_title}）。点击下方按钮切换，或从任务下拉选择。`, mode_advice: { task_id: nt.task_id, mode: mode.value, title: nt.title } } });
       }
     } else {
-      // 成就【Trust me】前置：真实评审未通过（回指导继续修改后解锁）
-      if (j.data.evaluation.status !== 'NEED_REVIEW' || j.data.evaluation.criteria?.length) {
-        failedReviewFlag = true;
-      }
       saveStudent();
       pushSystem('评审有未通过项：切回「指导」按评审意见逐条修改，改好后重新提交验收。（对话记录已保留，可直接继续讨论未通过的原因）');
     }
