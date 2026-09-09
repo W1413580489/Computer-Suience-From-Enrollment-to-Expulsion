@@ -85,27 +85,22 @@
         </div>
 
         <div class="teach__group">
-          <label>模式</label>
-          <div class="teach__modes">
-            <button
-              v-for="m in MODES"
-              :key="m.id"
-              class="teach__mode"
-              :class="{ active: mode === m.id }"
-              @click="setMode(m.id)"
-            >
-              <div class="t">{{ m.t }}</div>
-              <div class="d">{{ m.d }}</div>
-            </button>
+          <label>AI 项目导师</label>
+          <div class="teach__tutorcard">
+            <div class="t">指导模式 · 全自动行为路由</div>
+            <div class="d">拆任务、推进度、帮调试由 AI 自动识别切换，无需手动选模式；做完后点下方「提交验收」。</div>
           </div>
-          <details class="teach__guide">
-            <summary>📘 两个模式怎么用？</summary>
-            <div class="teach__guide-body">
-              <p><b>指导</b> → 拆任务、推进度、帮调试，全在一个对话里。遇到报错直接把报错贴进来，AI 会自动进入调试模式帮你定位；修好后自动回到推进节奏。</p>
-              <p><b>验收</b> → 做完后提交，AI 对照验收标准逐条评审打分。有未通过项就切回「指导」按意见修改，改完重新提交。</p>
-              <p class="tip">💡 切换模式不会丢失对话记录；AI 当前行为（拆解中/推进中/调试中）会显示在回复下方。</p>
-            </div>
+        </div>
+
+        <div class="teach__group">
+          <label>提交验收</label>
+          <details class="teach__submitbox">
+            <summary>展开验收材料（选填 · 运行说明 / 代码 / 自述）</summary>
+            <input v-model="depUrl" placeholder="在线部署地址（选填，加分项）" autocomplete="off" />
+            <textarea v-model="codeBlock" class="teach__code-area" placeholder="关键代码片段（选填）"></textarea>
+            <textarea v-model="descr" rows="3" placeholder="自述说明：怎么运行、数据流向、遇到并解决的问题（自述写明启动命令可作运行证据）"></textarea>
           </details>
+          <button class="teach__btn teach__full" :disabled="loading" @click="doReview">⚖ 提交验收</button>
         </div>
 
         <div class="teach__group">
@@ -147,7 +142,7 @@
           <div v-if="chat.length === 0" class="teach__welcome">
             <h2 v-if="taskObjective" v-html="taskObjectiveHtml"></h2>
             <h2 v-else>👨‍🏫 AI 项目导师</h2>
-            <p>{{ taskObjective ? '请选择左侧的辅导模式，开始完成这个任务。' : '选择左侧课程与任务，输入你的进展 / 代码 / 报错，AI 会按 Hint Level 渐进辅导。' }}</p>
+            <p>{{ taskObjective ? '直接描述你的进展 / 粘贴代码或报错，AI 会自动拆解任务、推进进度、帮你调试；做完后点左侧「提交验收」。' : '选择左侧课程与任务，输入你的进展 / 代码 / 报错，AI 会按 Hint Level 渐进辅导。' }}</p>
           </div>
           <div v-for="(msg, i) in chat" :key="i" class="teach__msg" :class="msg.role">
             <!-- 系统状态条（服务异常提示，不进入 AI 对话上下文） -->
@@ -177,12 +172,13 @@
               </div>
               <div v-if="(msg.payload.quality_warnings || []).length" class="teach__warn">⚠ {{ msg.payload.quality_warnings.join('<br>') }}</div>
 
-              <!-- mode_advice 推荐卡 -->
+              <!-- mode_advice 推荐卡（V2 修改 5：验收建议直接触发"提交验收"，不再切模式） -->
               <div v-if="msg.payload.mode_advice" class="teach__advice">
                 <div class="a-tag">▶ 建议下一步</div>
                 <div class="a-reason">{{ msg.payload.mode_advice.reason }}</div>
                 <div class="a-actions">
-                  <button class="teach__btn" @click="applyAdvice(msg.payload.mode_advice)">切到 {{ modeName(msg.payload.mode_advice.mode) }}</button>
+                  <button v-if="msg.payload.mode_advice.mode === 'reviewer'" class="teach__btn" @click="doReview">提交验收</button>
+                  <button v-else class="teach__btn" @click="applyAdvice(msg.payload.mode_advice)">切换任务</button>
                 </div>
                 <div v-if="msg.payload.mode_advice.task_id" class="a-next">
                   目标任务：{{ msg.payload.mode_advice.task_title }}{{ msg.payload.mode_advice.task_stage_title ? `（${msg.payload.mode_advice.task_stage_title}）` : '' }}
@@ -240,11 +236,10 @@ import { renderAiMarkdown } from '@/composables/useAiMarkdown';
 
 const theme = useThemeStore();
 
-const MODES = [
-  { id: 'tutor', t: '指导', d: '拆任务 · 推进度 · 帮调试' },
-  { id: 'reviewer', t: '验收', d: '对照标准逐条评审' },
-] as const;
-const MODE_NAMES = MODES.reduce<Record<string, string>>((o, m) => { o[m.id] = m.t; return o; }, {});
+// V2 修改 5：前端收敛为单一"AI 项目导师"入口——指导/验收不再由学生手动切换，
+// 指导模式内部行为（拆解中/推进中/调试中）由后端 route_behavior 返回并以 chip 展示；
+// 验收入口固定为侧栏「提交验收」按钮。mode 仅保留 API 兼容，恒为 tutor。
+const MODE_NAMES: Record<string, string> = { tutor: '指导', reviewer: '验收' };
 
 // ---------- 状态 ----------
 const LS_STATUS = 'xkz_ai_student';
@@ -313,18 +308,11 @@ watch(repoUrl, v => localStorage.setItem(LS_REPO, v.trim()));
 // 成就：首次配置 API Key
 watch(apiKey, v => { if (v.trim()) useAchievementStore().unlock('green_fruit_2'); });
 
-// 成就：切换模式（按课程范围解锁）
-function setMode(id: string) {
-  mode.value = id;
+// 成就：进入课程（原"切到指导模式"成就随入口收敛迁移至此）
+function unlockTutorEntry() {
   const c = courseId.value;
-  if (id === 'tutor') {
-    if (c === 'course_001') useAchievementStore().unlock('dont_understand');   // 我不明白（奉化口音）
-    if (c === 'course_002') useAchievementStore().unlock('feather_1');          // 希望有羽毛和翅膀Ⅰ
-  }
-  if (id === 'reviewer') {
-    if (c === 'course_001') useAchievementStore().unlock('why_birds_fly');      // 鸟为什么会飞
-    if (c === 'course_002') useAchievementStore().unlock('feather_6');          // 希望有羽毛和翅膀Ⅵ
-  }
+  if (c === 'course_001') useAchievementStore().unlock('dont_understand');   // 我不明白（奉化口音）
+  if (c === 'course_002') useAchievementStore().unlock('feather_1');          // 希望有羽毛和翅膀Ⅰ
 }
 
 // 成就：进度进入课程02的对应阶段
@@ -367,7 +355,7 @@ function linkify(text: string): string {
 }
 const currentTaskTitleHtml = computed(() => linkify(currentTaskTitle.value));
 const taskObjectiveHtml = computed(() => linkify(taskObjective.value));
-const modeLabel = computed(() => MODE_NAMES[mode.value] || mode.value);
+const modeLabel = computed(() => 'AI 项目导师');
 const doneCount = computed(() => (student.value.completed_tasks || []).length);
 const attemptedCount = computed(() => Object.keys(student.value.attempt_count || {}).length);
 const blockedTasks = computed(() => {
@@ -455,7 +443,8 @@ function doEnterCourse(i: number) {
     taskId.value = saved;   // 恢复上次学到的任务
   }
   saveSel();
-  // 成就：首次点击对应课程
+  // 成就：首次点击对应课程 + 进入导师对话（指导入口）
+  unlockTutorEntry();
   if (c.course_id === 'course_001') useAchievementStore().unlock('eva_unit01');       // 初号机出动
   if (c.course_id === 'course_002') useAchievementStore().unlock('stand_in_heaven');  // 我将立于天上
   view.value = 'tutor';
@@ -645,6 +634,9 @@ function stColor(s: string) { return (ST_REVIEW[s] || ST_REVIEW.NEED_REVIEW)[1];
 async function doReview() {
   if (!taskId.value) { toast('请先选择一个任务'); return; }
   if (!apiKey.value.trim()) { toast('请先填写 DeepSeek API Key'); return; }
+  // 成就：首次提交验收（按课程范围解锁；原"切到验收模式"成就随入口收敛迁移至此）
+  if (courseId.value === 'course_001') useAchievementStore().unlock('why_birds_fly');  // 鸟为什么会飞
+  if (courseId.value === 'course_002') useAchievementStore().unlock('feather_6');      // 希望有羽毛和翅膀Ⅵ
   loading.value = true;
   scrollToBottom();
   const body = {
@@ -782,8 +774,6 @@ function qualityLines(p: any): string[] {
   if (p.hint_level_desc) lines.push(`<b>提示档：</b>${esc(p.hint_level_desc)}`);
   return lines;
 }
-function modeName(m: string) { return MODE_NAMES[m] || m; }
-
 function onKeydown(e: KeyboardEvent) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
 }
@@ -925,24 +915,17 @@ function toast(msg: string) {
 .teach__stagechip.active { border-color: var(--t-acc); color: var(--t-acc); font-weight: 700; }
 .teach[data-theme='ak'] .teach__stagechip.active { background: rgba(192, 57, 43, .08); }
 .teach__stagechip.done { border-color: var(--t-green); color: var(--t-green); }
-.teach__modes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.teach__mode {
-  background: var(--t-bg3); border: 1px solid var(--t-line); color: var(--t-fg);
-  border-radius: 8px; padding: 8px; cursor: pointer; text-align: left; font-size: 12px; transition: .15s;
+.teach__tutorcard {
+  background: var(--t-bg3); border: 1px solid var(--t-line); border-left: 3px solid var(--t-acc);
+  border-radius: 8px; padding: 8px 10px;
 }
-.teach__mode .t { font-weight: 600; font-size: 13px; }
-.teach__mode .d { color: var(--t-mut); font-size: 11px; }
-.teach__mode.active { border-color: var(--t-acc); box-shadow: 0 0 0 1px var(--t-acc); }
-.teach__guide { margin-top: 6px; }
-.teach__guide summary { cursor: pointer; font-size: 12px; color: var(--t-dim); }
-.teach__guide summary:hover { color: var(--t-fg); }
-.teach__guide-body {
-  font-size: 12px; color: var(--t-dim); margin-top: 6px; border: 1px solid var(--t-line);
-  background: var(--t-bg3); border-radius: 8px; padding: 8px 10px;
-  display: flex; flex-direction: column; gap: 8px;
-}
-.teach__guide-body p { margin: 0; }
-.teach__guide-body .tip { color: var(--t-acc); }
+.teach__tutorcard .t { font-weight: 600; font-size: 13px; color: var(--t-fg); }
+.teach__tutorcard .d { color: var(--t-mut); font-size: 11px; margin-top: 3px; line-height: 1.5; }
+.teach__submitbox { font-size: 12px; }
+.teach__submitbox summary { cursor: pointer; font-size: 12px; color: var(--t-dim); }
+.teach__submitbox summary:hover { color: var(--t-fg); }
+.teach__submitbox input, .teach__submitbox textarea { margin-top: 6px; }
+.teach__submitbox[open] { display: flex; flex-direction: column; }
 .teach__btn {
   background: var(--t-acc); color: #fff; border: 0; border-radius: 8px;
   padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: .15s;
@@ -1163,14 +1146,9 @@ function toast(msg: string) {
 .teach[data-theme='zzz'] .teach__ghost:hover {
   color: #0A0A0A; border-color: var(--t-acc); background: var(--t-acc); box-shadow: none;
 }
-.teach[data-theme='zzz'] .teach__mode {
-  border-radius: 6px; border: 1px solid #444; background: #2A2A2A;
+.teach[data-theme='zzz'] .teach__tutorcard {
+  border-radius: 6px; border: 1px solid #444; border-left: 3px solid var(--t-acc); background: #2A2A2A;
 }
-.teach[data-theme='zzz'] .teach__mode.active {
-  border-color: var(--t-acc); background: var(--t-acc) !important; color: #0A0A0A !important; box-shadow: none !important;
-}
-.teach[data-theme='zzz'] .teach__mode.active .t { color: #0A0A0A !important; font-weight: 700; }
-.teach[data-theme='zzz'] .teach__mode.active .d { color: rgba(10,10,10,0.6) !important; }
 .teach[data-theme='zzz'] .teach__stagechip {
   border-radius: 4px; border: 1px solid #444; background: #2A2A2A;
 }

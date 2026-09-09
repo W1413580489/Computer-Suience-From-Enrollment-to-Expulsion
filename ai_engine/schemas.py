@@ -230,11 +230,26 @@ class ReviewCriterion(BaseModel):
 
 
 class ReviewEvaluation(BaseModel):
-    """评审输出（对齐规格书 Evaluation）。"""
+    """评审输出（对齐规格书 Evaluation）。
+
+    V2 修改 6（输出漂移治理 L1/L2）：score 与 status 是【后端计算字段】，
+    由 review.compute_evaluation() 按 weight 聚合 criteria 得出；
+    LLM 只负责逐条 criteria 的二元判定与理由，绝不决定总分与总状态。
+    """
     status: ReviewStatus = ReviewStatus.NEED_REVIEW
     score: int = 0
     criteria: list[ReviewCriterion] = Field(default_factory=list)
     next_step: str = ""     # 下一步需要补充的证据
+
+
+class ReviewLLMOutput(BaseModel):
+    """LLM 的原始评审输出（只含逐条判定）。
+
+    V2 修改 6：LLM 不再输出 score/status（即使输出了也会被忽略），
+    聚合逻辑全部在代码层，同证据 → 同分。
+    """
+    criteria: list[ReviewCriterion] = Field(default_factory=list)
+    next_step: str = ""
 
 
 class HintDecision(BaseModel):

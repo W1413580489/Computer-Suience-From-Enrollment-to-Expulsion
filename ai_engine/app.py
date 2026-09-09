@@ -20,14 +20,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from schemas import (AISession, DebuggerState, DebugPhase, Evidence, EvidenceType, Mode, ReviewRequest, TeachRequest)
+from schemas import (AISession, DebuggerState, DebugPhase, Evidence, EvidenceType, Mode, ReviewCriterion, ReviewRequest, ReviewStatus, TeachRequest)
 from course_data import get_project, list_projects, get_task, get_rubrics, list_courses, get_next_task, get_stage
 from context_builder import build_context
 from prompts import build_system_prompt, route_behavior, BEHAVIOR_LABELS
 from llm_client import LLMClient, DEFAULT_MODEL, DEFAULT_BASE_URL, EngineError, ProviderError
 from response_validator import validate
 from code_evidence import build_code_evidence
-from review import build_review_system_prompt, collect_evidence, evidence_precheck, evidence_text
+from review import build_review_system_prompt, ci_direct_verdict, collect_evidence, compute_evaluation, evidence_precheck, evidence_text
 import logs as logs_mod
 import hint as hint_mod
 
@@ -173,7 +173,7 @@ def compute_mode_advice(mode: str, req, task) -> dict | None:
             d["moving_task"] = False
         return d
 
-    return adv("reviewer", "看起来完成了，切到「验收」对照标准逐条评审打分", task)
+    return adv("reviewer", "看起来完成了，点「提交验收」对照标准逐条评审打分", task)
 
 
 # ---------------------------------------------------------------------------
@@ -457,13 +457,32 @@ async def review(req: ReviewRequest, request: Request):
 
     available = collect_evidence(sub, repo_code_text)
 
-    # V1.5 Sprint 2：Evidence 硬约束预检
+    # V1.5 Sprint 2：Evidence 硬约束预检（修改 1：deployment 不再是硬性证据）
     precheck = evidence_precheck(rubrics, available)
     forced_results = precheck["forced_needs_review"]
     passable_rubrics = precheck["passable_rubrics"]
 
-    # 如果所有 Rubric 都缺关键证据，直接返回 NEED_REVIEW，不走 LLM
-    if not passable_rubrics:
+    # CI 结论直判分流（V2 修改 6 · L3）：system 判定的 CI 结论在代码层直接映射，
+    # 对应 Rubric 不送 LLM；全部 Rubric 都能直判/预检时整条评审零 LLM 调用
+    ci_workflows = []
+    if ci_status.get("status") == "ok" and ci_status.get("workflows"):
+        ci_workflows = ci_status["workflows"]
+
+    direct_criteria: list[ReviewCriterion] = []
+    llm_rubrics = []
+    for r in passable_rubrics:
+        verdict = ci_direct_verdict(r, ci_workflows) if ci_workflows else None
+        if verdict:
+            direct_criteria.append(ReviewCriterion(
+                rubric_id=r.id, status=verdict["status"],
+                evidence=verdict["evidence"],
+                reason="CI 结论直判（system 权威证据，非 AI 判定）",
+            ))
+        else:
+            llm_rubrics.append(r)
+
+    # 所有 Rubric 都缺证据且无 CI 直判项：直接返回 NEED_REVIEW，不走 LLM
+    if not direct_criteria and not llm_rubrics:
         all_criteria = [
             {"rubric_id": fr["rubric_id"], "status": "NEED_REVIEW",
              "evidence": "", "reason": fr["reason"]}
@@ -491,40 +510,48 @@ async def review(req: ReviewRequest, request: Request):
             },
         }
 
-    # 有可判定的 Rubric：构建 Prompt（仅包含 passable rubrics 的上下文提示）
-    system_prompt = build_review_system_prompt(task, passable_rubrics, available)
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": (
-            "请根据上面给出的 Rubric 和学生已提交的证据，逐条客观评审，严格只输出符合 Evaluation 结构的 JSON。"
-        )},
-    ]
-
-    client = LLMClient(req.api_key, req.base_url, req.model)
     start_ts = time.time()
-    try:
-        evaluation = await client.review(messages)
-    except (PermissionError, TimeoutError, EngineError, RuntimeError) as e:
-        # 错误分类漏斗：评审链任何系统故障 → REVIEW_UNAVAILABLE，绝不写入学生 Evaluation
-        return llm_error_response(e, review=True)
+    llm_criteria: list[ReviewCriterion] = []
+    next_step = ""
+    if llm_rubrics:
+        # 有需要 LLM 语义判定的 Rubric：构建 Prompt（仅包含送审的 rubrics）
+        system_prompt = build_review_system_prompt(task, llm_rubrics, available)
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": (
+                "请根据上面给出的 Rubric 和学生已提交的证据，逐条客观评审，"
+                "严格只输出符合 criteria/next_step 结构的 JSON（不要输出总分 status/score）。"
+            )},
+        ]
+        client = LLMClient(req.api_key, req.base_url, req.model)
+        try:
+            llm_out = await client.review(messages)
+        except (PermissionError, TimeoutError, EngineError, RuntimeError) as e:
+            # 错误分类漏斗：评审链任何系统故障 → REVIEW_UNAVAILABLE，绝不写入学生 Evaluation
+            return llm_error_response(e, review=True)
+        llm_criteria = llm_out.criteria
+        next_step = llm_out.next_step
+    else:
+        next_step = ""
 
+    # V2 修改 6（L1/L2）：合并 CI 直判 + LLM 逐条判定 + 硬约束 NEED_REVIEW，
+    # score/status 全部由代码聚合，LLM 输出不再决定总分
+    all_criteria = direct_criteria + llm_criteria
+    for fr in forced_results:
+        all_criteria.append(ReviewCriterion(
+            rubric_id=fr["rubric_id"],
+            status=ReviewStatus.NEED_REVIEW,
+            evidence="",
+            reason=fr["reason"],
+        ))
+    if not next_step and forced_results:
+        next_step = "请补充以下证据后重新提交：" + "；".join(
+            f"{fr['rubric_id']} 需要 {', '.join(fr['missing'])}" for fr in forced_results
+        )
+    evaluation = compute_evaluation(all_criteria, rubrics, next_step=next_step)
     score = int(evaluation.score)
     status = evaluation.status.value
 
-    # V1.5 Sprint 2：合并硬约束的 NEED_REVIEW 结果
-    if forced_results:
-        from schemas import ReviewCriterion, ReviewStatus
-        for fr in forced_results:
-            evaluation.criteria.append(ReviewCriterion(
-                rubric_id=fr["rubric_id"],
-                status=ReviewStatus.NEED_REVIEW,
-                evidence="",
-                reason=fr["reason"],
-            ))
-        # 有 NEED_REVIEW 强制项时，总状态不能是 PASS
-        if status == "PASS":
-            status = "NEED_REVIEW"
-            evaluation.status = ReviewStatus.NEED_REVIEW
     # Sprint 6：评审事件日志
     logs_mod.log_event(
         type="review",

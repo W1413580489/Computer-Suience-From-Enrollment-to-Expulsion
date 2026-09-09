@@ -229,11 +229,11 @@ def _chatbot_project() -> Project:
                description="Key 只存在于后端，前端不泄露",
                required_evidence=["code"], pass_condition="前端代码中无明文 Key", weight=2),
     ]
-    # —— task_review：提交验收（证据：runtime / deployment / description）——
+    # —— task_review：提交验收（修改 1：运行证据三选一——本地可复现运行说明 / CI 结论 / 自愿部署）——
     rubric_review = [
         Rubric(id="rb_review_1", task_id="task_review", criterion="能正常问答：输入问题看到机器人回答",
                description="核心功能可用",
-               required_evidence=["runtime", "deployment"], pass_condition="有运行/部署证据", weight=2),
+               required_evidence=["runtime"], pass_condition="有运行证据（本地可复现运行说明 / CI 结论 / 部署地址，三选一）", weight=2),
         Rubric(id="rb_review_2", task_id="task_review", criterion="消息能滚动，最新消息在最下方",
                description="列表滚动正常",
                required_evidence=["code"], pass_condition="代码含滚动逻辑或自述佐证", weight=1),

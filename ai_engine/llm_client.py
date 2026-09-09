@@ -15,7 +15,7 @@ import json
 import httpx
 from pydantic import ValidationError
 
-from schemas import AiResponse, Mode, ReviewEvaluation
+from schemas import AiResponse, Mode, ReviewLLMOutput
 
 DEFAULT_BASE_URL = "https://api.deepseek.com"
 DEFAULT_MODEL = "deepseek-v4-flash"
@@ -136,22 +136,27 @@ class LLMClient:
         data = r.json()
         return data["choices"][0]["message"]["content"]
 
-    async def review(self, messages: list[dict]) -> ReviewEvaluation:
-        """调用并校验评审输出（ReviewEvaluation）。校验失败把错误回传模型重试。"""
+    async def review(self, messages: list[dict]) -> ReviewLLMOutput:
+        """调用并校验评审输出（ReviewLLMOutput：只含逐条 criteria 判定）。
+
+        V2 修改 6（输出漂移治理）：LLM 不输出 score/status；
+        Pydantic 默认忽略多余字段，旧 Prompt 残留的 score/status 不会报错也不会生效。
+        校验失败把错误回传模型重试。
+        """
         last_error = None
         current_messages = list(messages)
         for attempt in range(MAX_RETRIES):
             raw = await self._call(current_messages)
             try:
                 obj = _extract_json(raw)
-                return ReviewEvaluation.model_validate(obj)
+                return ReviewLLMOutput.model_validate(obj)
             except (ValidationError, json.JSONDecodeError, KeyError) as e:
                 last_error = e
                 current_messages = current_messages + [
                     {"role": "assistant", "content": raw},
                     {"role": "user", "content": (
                         f"你的上一次回答不是合法 JSON 或缺少必要字段。校验错误：{e}\n"
-                        "请重新只输出符合 ReviewEvaluation schema 的合法 JSON，不要输出任何额外文字。"
+                        "请重新只输出符合 ReviewLLMOutput schema 的合法 JSON，不要输出任何额外文字。"
                     )},
                 ]
         raise EngineError(f"模型连续 {MAX_RETRIES} 次输出非法 JSON：{last_error}")
