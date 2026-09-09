@@ -108,6 +108,18 @@ class CodeContext(BaseModel):
     searchPatterns: list[str] = Field(default_factory=list)  # 代码搜索模式（如 "POST.*chat", "httpx.*post"）
 
 
+class InterviewQuestion(BaseModel):
+    """质检陪练面试题（V2 修改 2：定位"面试自检"，不做判定、不进评审、不算分）。
+
+    硬边界：陪练结果不进 Evidence Store、不影响 score、不写入评审日志字段。
+    """
+    id: str
+    question: str                    # 面试官风格问题
+    answer_anchor: str               # 参考答案锚点（1-2 句，供学生自比）
+    hint: str = ""                   # 答不上时的提示
+    type: Literal["explain", "debug", "transfer"] = "explain"  # 解释/调试/变式
+
+
 class Task(BaseModel):
     """一个任务单元，是 AI 辅导的最小粒度。"""
     id: str
@@ -123,6 +135,7 @@ class Task(BaseModel):
     source_url: str = ""                    # 关联飞书文档
     chunk_key: str = ""                     # 关联 chunks.jsonl 的检索前缀（如 "学习指南 > 克隆复现"）
     code_context: Optional[CodeContext] = None  # V1.5：代码检索提示（Sprint 1）
+    interview_questions: list[InterviewQuestion] = Field(default_factory=list)  # V2 质检陪练（课程作者标注）
 
 
 class Rubric(BaseModel):

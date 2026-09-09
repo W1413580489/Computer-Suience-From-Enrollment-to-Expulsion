@@ -23,6 +23,31 @@ import httpx
 GITHUB_API = "https://api.github.com"
 RAW_BASE = "https://raw.githubusercontent.com"
 
+# 本地可复现运行命令模式（V2 修改 1：三选一运行证据；review.py 复用）
+RUN_CMD_PATTERN = re.compile(
+    r"(uvicorn|npm\s+run|yarn\s+(dev|start)|docker\s+compose|flask\s+run|"
+    r"python\s+[\w./-]+\.(py)|node\s+[\w./-]+\.(js|ts)|pnpm\s+(dev|start))",
+    re.IGNORECASE,
+)
+
+README_NAMES = {"readme.md", "readme", "readme.txt", "readme.rst"}
+
+
+def detect_run_cmd(text: str) -> str:
+    """从文本（README / 学生自述）中提取第一行含启动命令的行，供 runtime 证据使用。
+
+    返回命中的整行（截断 200 字符）或空串（纯函数，可单测）。
+    """
+    if not text:
+        return ""
+    m = RUN_CMD_PATTERN.search(text)
+    if not m:
+        return ""
+    line_start = text.rfind("\n", 0, m.start()) + 1
+    line_end = text.find("\n", m.end())
+    line = text[line_start:line_end if line_end > 0 else len(text)].strip()
+    return line[:200]
+
 STRUCTURE_MAX = 200       # 展示结构最多条目数
 KEY_FILES_MAX = 8         # 最多拉取几个关键文件
 FILE_LINES_MAX = 120      # 单个文件正文最多行数
@@ -391,6 +416,15 @@ async def build_code_evidence(repo_url: str, task_id: str = "", code_context=Non
 
         evidence_text = _assemble(owner, repo, branch, paths, key_files)
 
+        # V2 · T2.5：README 启动命令提取（轻量 Artifact Evidence 扩展；
+        # 作为"本地可复现运行说明"证据，不做部署地址爬虫验证/架构图检测）
+        readme_run_cmd = ""
+        for kf in key_files:
+            if kf["path"].lower().rsplit("/", 1)[-1] in README_NAMES:
+                readme_run_cmd = detect_run_cmd(kf.get("content", ""))
+                if readme_run_cmd:
+                    break
+
         # CI 自动验收证据（GitHub Actions build/test/lint），失败不阻塞主流程
         ci = await fetch_ci_evidence(owner, repo, branch)
         ci_text = ci.get("text", "")
@@ -404,6 +438,7 @@ async def build_code_evidence(repo_url: str, task_id: str = "", code_context=Non
             "ok": True, "repo": f"{owner}/{repo}", "default_branch": branch,
             "file_count": len(paths), "key_files": key_files,
             "evidence_text": evidence_text,
+            "readme_run_cmd": readme_run_cmd,
             "ci": ci if ci.get("ok") else {"ok": False, "code": ci.get("code", "CI_UNKNOWN"),
                                            "error": ci.get("error", ""), "text": ci_text},
         }

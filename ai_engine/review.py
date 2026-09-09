@@ -14,16 +14,11 @@ V2 修改版（输出漂移治理）：
 """
 from __future__ import annotations
 
-import re
+import hashlib
+import json
 
+from code_evidence import detect_run_cmd
 from schemas import ReviewCriterion, ReviewEvaluation, ReviewLLMOutput, ReviewRequest, ReviewStatus, Rubric, Submission, Task
-
-# 运行证据三选一之一：学生自述里出现可复现启动命令（修改 1：不再强制部署）
-_RUN_CMD_PATTERN = re.compile(
-    r"(uvicorn|npm\s+run|yarn\s+(dev|start)|docker\s+compose|flask\s+run|"
-    r"python\s+[\w./-]+\.(py)|node\s+[\w./-]+\.(js|ts)|pnpm\s+(dev|start))",
-    re.IGNORECASE,
-)
 
 
 # ---------------------------------------------------------------------------
@@ -57,14 +52,32 @@ def collect_evidence(submission: Submission | None, repo_code_text: str = "") ->
         ev["description"] = f"学生自述说明：\n{sub.description}"
         # 修改 1：本地可复现运行也算运行证据——自述中出现启动命令（uvicorn/npm run/docker compose…）
         if "runtime" not in ev:
-            hit = _RUN_CMD_PATTERN.search(sub.description)
-            if hit:
-                line_start = sub.description.rfind("\n", 0, hit.start()) + 1
-                line_end = sub.description.find("\n", hit.end())
-                cmd_line = sub.description[line_start:line_end if line_end > 0 else len(sub.description)].strip()
-                ev["runtime"] = f"本地可复现运行说明（学生自述含启动命令）：{cmd_line[:200]}"
+            cmd_line = detect_run_cmd(sub.description)
+            if cmd_line:
+                ev["runtime"] = f"本地可复现运行说明（学生自述含启动命令）：{cmd_line}"
 
     return ev
+
+
+# ---------------------------------------------------------------------------
+# V2 修改 6 · L4：证据快照冻结（幂等缓存的前提："同输入"可被哈希定义）
+# ---------------------------------------------------------------------------
+def snapshot_evidence(available: dict[str, str], ci_workflows: list[dict] | None = None,
+                      task_id: str = "") -> str:
+    """把评审输入冻结为快照并返回 sha256 短 hash。
+
+    快照覆盖：全部可用证据文本 + CI 工作流结论 + 任务 id。
+    同一快照 hash → 评审必然命中幂等缓存（L5），保证"同输入同输出"。
+    """
+    canonical = json.dumps({
+        "task_id": task_id,
+        "evidence": dict(sorted(available.items())),
+        "ci": sorted(
+            (wf.get("name", ""), wf.get("dimension", ""), str(wf.get("conclusion")))
+            for wf in (ci_workflows or [])
+        ),
+    }, ensure_ascii=False, sort_keys=True)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
 
 
 def evidence_text(available: dict[str, str]) -> str:

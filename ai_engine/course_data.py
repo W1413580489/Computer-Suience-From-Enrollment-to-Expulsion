@@ -20,7 +20,7 @@ import json
 from functools import lru_cache
 from pathlib import Path
 
-from schemas import (CodeContext, Course, Project, Rubric, SkillKey, Stage, Task)
+from schemas import (CodeContext, Course, InterviewQuestion, Project, Rubric, SkillKey, Stage, Task)
 
 BASE_DIR = Path(__file__).resolve().parent          # ai_engine/
 ROOT_DIR = BASE_DIR.parent                          # xkz-agent/
@@ -175,6 +175,23 @@ def _chatbot_project() -> Project:
             likelyFiles=["main", "index", "requirements"],
             searchPatterns=["@app\\.post", "fetch\\(", "cors", "scrollTop"],
         ),
+        # V2 修改 2：质检陪练试点——面试自检（不判分、不进评审链，只供学生自答自比）
+        interview_questions=[
+            InterviewQuestion(
+                id="iq_review_1",
+                question="面试官问：你的前端怎么把用户消息发给后端？完整说一遍这条数据流。",
+                answer_anchor="前端 fetch POST /chat（body 带 message）→ 后端 FastAPI 接收并转发 DeepSeek /chat/completions → 抽出 choices[0].message.content 以 {reply} 返回 → 前端追加到消息列表并滚动到底。CORS 由后端放行。",
+                hint="从「前端 → 后端 → DeepSeek → 前端」四段说，每段说清数据长什么样。",
+                type="explain",
+            ),
+            InterviewQuestion(
+                id="iq_review_2",
+                question="变式题：现在这个机器人每次都是全新对话。如果要支持多轮对话记忆，你会改哪里？",
+                answer_anchor="后端维护会话的 messages 历史数组（按会话 id 存内存或前端每次带回完整历史），每次请求把历史消息连同新消息一起发给 DeepSeek，让它看到上下文。",
+                hint="回忆 DeepSeek 请求里的 messages 是一个数组——记忆就是让这个数组越来越长。",
+                type="transfer",
+            ),
+        ],
     )
 
     # ---- Rubrics（每条 criterion 独立一个 Rubric 对象，支撑逐条评审打分）----

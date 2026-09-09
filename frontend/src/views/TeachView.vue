@@ -205,6 +205,31 @@
                 <div v-if="msg.review.evaluation.next_step" class="teach__nextstep"><b>下一步：</b>{{ msg.review.evaluation.next_step }}</div>
               </div>
             </template>
+
+            <!-- V2：验收 PASS 成果卡——简历描述 + 面试自检（陪练不判分） -->
+            <template v-if="msg.role === 'assistant' && msg.pass_bonus">
+              <div class="teach__passbonus">
+                <div v-if="msg.pass_bonus.career" class="pb-sec">
+                  <div class="pb-title">📄 可写进简历的项目经历</div>
+                  <div class="pb-career">{{ msg.pass_bonus.career }}</div>
+                  <button class="teach__btn" @click="copyCareer(msg.pass_bonus.career)">复制</button>
+                </div>
+                <div v-if="msg.pass_bonus.interview.length" class="pb-sec">
+                  <div class="pb-title">🎙 面试自检 · 自答自比，不判分</div>
+                  <div v-for="(q, qi) in msg.pass_bonus.interview" :key="q.id" class="pb-q">
+                    <div class="pb-qtext"><b>{{ qi + 1 }}. {{ q.question }}</b></div>
+                    <textarea v-model="msg.pass_bonus.answers[qi]" rows="2" placeholder="试着用自己的话回答（仅自己可见，不提交、不评分）"></textarea>
+                    <div class="pb-qactions">
+                      <button class="teach__btn" @click="msg.pass_bonus.hintOpen[qi] = !msg.pass_bonus.hintOpen[qi]">{{ msg.pass_bonus.hintOpen[qi] ? '收起提示' : '💡 看提示' }}</button>
+                      <button class="teach__btn" @click="msg.pass_bonus.anchorOpen[qi] = !msg.pass_bonus.anchorOpen[qi]">{{ msg.pass_bonus.anchorOpen[qi] ? '收起参考答案' : '✅ 对参考答案' }}</button>
+                    </div>
+                    <div v-if="msg.pass_bonus.hintOpen[qi]" class="pb-anchor pb-hint">{{ q.hint }}</div>
+                    <div v-if="msg.pass_bonus.anchorOpen[qi]" class="pb-anchor">参考锚点：{{ q.answer_anchor }}</div>
+                  </div>
+                  <div v-if="allBonusViewed(msg.pass_bonus)" class="pb-done">✓ 全部对照完成——这段项目经历可以放心写进简历了</div>
+                </div>
+              </div>
+            </template>
           </div>
           <div v-if="loading" class="teach__msg assistant">
             <div class="teach__bubble teach__loading"><i></i><i></i><i></i> AI 思考中…</div>
@@ -297,7 +322,8 @@ const messagesEl = ref<HTMLElement | null>(null);
 const toastMsg = ref('');
 let toastTimer: ReturnType<typeof setTimeout> | null = null;
 
-interface ChatMsg { role: 'user' | 'assistant' | 'system'; payload?: any; text?: string; review?: any; feedback?: boolean }
+interface ChatMsg { role: 'user' | 'assistant' | 'system'; payload?: any; text?: string; review?: any; pass_bonus?: PassBonus; feedback?: boolean }
+interface PassBonus { career: string; interview: any[]; answers: string[]; hintOpen: boolean[]; anchorOpen: boolean[] }
 const chat = ref<ChatMsg[]>([]);
 const history = ref<{ role: string; content: string }[]>([]);
 const student = ref<StudentState>(loadStudent());
@@ -674,6 +700,8 @@ async function doReview() {
         suggestedNext.value = nt;
         chat.value.push({ role: 'assistant', payload: { message: `✓ 验收通过！建议进入下一任务：${nt.title}（${nt.stage_title}）。点击下方按钮切换，或从任务下拉选择。`, mode_advice: { task_id: nt.task_id, mode: mode.value, title: nt.title } } });
       }
+      // V2 修改 3/2：验收 PASS → 简历描述 + 面试自检（陪练不判分，仅自答自比）
+      loadPassBonus(j.data);
     } else {
       saveStudent();
       pushSystem('评审有未通过项：切回「指导」按评审意见逐条修改，改好后重新提交验收。（对话记录已保留，可直接继续讨论未通过的原因）');
@@ -684,6 +712,70 @@ async function doReview() {
     loading.value = false;
     scrollToBottom();
   }
+}
+
+// ---------- V2 修改 3/2：简历描述 + 面试自检（验收 PASS 后） ----------
+const CAREER_KEY = 'xkz_career_results';
+
+function loadCareerResults(projectId: string): any[] {
+  try { return JSON.parse(localStorage.getItem(CAREER_KEY) || '{}')[projectId] || []; } catch { return []; }
+}
+
+function saveCareerResult(projectId: string, entry: any) {
+  const all = (() => { try { return JSON.parse(localStorage.getItem(CAREER_KEY) || '{}'); } catch { return {}; } })();
+  const list: any[] = all[projectId] || [];
+  const idx = list.findIndex((r: any) => r.task_id === entry.task_id);
+  if (idx >= 0) list[idx] = entry; else list.push(entry);
+  all[projectId] = list;
+  localStorage.setItem(CAREER_KEY, JSON.stringify(all));
+}
+
+async function loadPassBonus(reviewData: any) {
+  const pid = projectId.value || 'project_chatbot';
+  const crits: any[] = reviewData.evaluation?.criteria || [];
+  const entry = {
+    task_id: reviewData.task_id,
+    score: reviewData.score,
+    passed: crits.filter((c: any) => c.status === 'PASS').length,
+    total: crits.length,
+    ci_conclusion: (reviewData.ci?.workflows || []).some((w: any) => w.conclusion === 'success') ? 'success' : '',
+  };
+  saveCareerResult(projectId, entry);
+
+  const bonus: PassBonus = { career: '', interview: [], answers: [], hintOpen: [], anchorOpen: [] };
+  try {
+    const r = await fetch(`/api/career/text`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ project_id: pid, results: loadCareerResults(pid), github_url: repoUrl.value.trim() }),
+    });
+    const j = await r.json();
+    if (j.ok) bonus.career = j.data?.text || '';
+  } catch { /* 简历描述失败不阻塞陪练 */ }
+  try {
+    const r = await fetch(`/api/ai/interview?task_id=${encodeURIComponent(reviewData.task_id)}`);
+    const j = await r.json();
+    if (j.ok && Array.isArray(j.data?.questions)) {
+      bonus.interview = j.data.questions;
+      bonus.answers = j.data.questions.map(() => '');
+      bonus.hintOpen = j.data.questions.map(() => false);
+      bonus.anchorOpen = j.data.questions.map(() => false);
+    }
+  } catch { /* 陪练加载失败不影响主流程 */ }
+  if (bonus.career || bonus.interview.length) {
+    chat.value.push({ role: 'assistant', pass_bonus: bonus, payload: { message: '🎓 验收通过！下面是简历描述与面试自检。' } });
+    scrollToBottom();
+  }
+}
+
+function allBonusViewed(b: PassBonus) {
+  return b.anchorOpen.length > 0 && b.anchorOpen.every(Boolean);
+}
+
+async function copyCareer(text: string) {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast('已复制，可整段粘贴进简历');
+  } catch { toast('复制失败，请手动选择文本'); }
 }
 
 function esc(s: unknown) {
@@ -1092,6 +1184,19 @@ function toast(msg: string) {
 .teach__critev { color: var(--t-dim); font-size: 12px; }
 .teach__nextstep { margin-top: 8px; color: var(--t-dim); }
 .teach__nextstep b { color: var(--t-fg); }
+
+/* V2：PASS 成果卡（简历描述 + 面试自检） */
+.teach__passbonus { border: 1px solid var(--t-line); border-left: 3px solid var(--t-green); background: var(--t-bg2); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 12px; }
+.pb-sec { display: flex; flex-direction: column; gap: 6px; }
+.pb-title { font-weight: 600; color: var(--t-fg); font-size: 13px; }
+.pb-career { color: var(--t-fg); line-height: 1.7; background: var(--t-bg3); border: 1px solid var(--t-line); border-radius: 8px; padding: 8px 10px; }
+.pb-q { display: flex; flex-direction: column; gap: 5px; border-top: 1px dashed var(--t-line); padding-top: 8px; }
+.pb-qtext { color: var(--t-fg); }
+.pb-q textarea { width: 100%; }
+.pb-qactions { display: flex; gap: 8px; }
+.pb-anchor { color: var(--t-dim); font-size: 12px; background: var(--t-bg3); border-radius: 6px; padding: 6px 8px; line-height: 1.6; }
+.pb-hint { color: var(--t-yellow, #b8860b); }
+.pb-done { color: var(--t-green); font-weight: 600; }
 
 /* 输入区 */
 .teach__composer {

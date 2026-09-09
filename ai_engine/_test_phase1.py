@@ -156,6 +156,7 @@ def run_review_once():
         return ReviewLLMOutput.model_validate(FIXED_LLM)
 
     LLMClient.review = fake_review
+    app_mod._REVIEW_CACHE.clear()  # 阶段2幂等缓存生效后，清缓存才能走到 LLM
     try:
         body = {
             "session_id": "t_phase1", "task_id": "task_review", "project_id": "project_chatbot",

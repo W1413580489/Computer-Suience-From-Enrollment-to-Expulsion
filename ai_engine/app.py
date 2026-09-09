@@ -27,7 +27,9 @@ from prompts import build_system_prompt, route_behavior, BEHAVIOR_LABELS
 from llm_client import LLMClient, DEFAULT_MODEL, DEFAULT_BASE_URL, EngineError, ProviderError
 from response_validator import validate
 from code_evidence import build_code_evidence
-from review import build_review_system_prompt, ci_direct_verdict, collect_evidence, compute_evaluation, evidence_precheck, evidence_text
+from career import build_career_text
+from review import build_review_system_prompt, ci_direct_verdict, collect_evidence, compute_evaluation, evidence_precheck, evidence_text, snapshot_evidence
+from pydantic import Field
 import logs as logs_mod
 import hint as hint_mod
 
@@ -47,6 +49,10 @@ _sessions: dict[str, "AISession"] = {}
 
 # V1.5 Sprint 2：Evidence Store（进程内存，重启丢失）
 _evidence_store: dict[str, list[Evidence]] = {}  # task_id -> [Evidence]
+
+# V2 修改 6 · L5：评审幂等缓存（task_id + 快照hash → 评审响应，TTL 内重复评审不调 LLM）
+REVIEW_CACHE_TTL = 600  # 秒
+_REVIEW_CACHE: dict[str, tuple[float, dict]] = {}  # key -> (expires_at, response)
 
 
 def store_evidence(ev: Evidence) -> None:
@@ -437,12 +443,14 @@ async def review(req: ReviewRequest, request: Request):
     repo_code_text = ""
     evidence_status = {"status": "none"}
     ci_status = {"status": "none"}
+    readme_run_cmd = ""
     if repo_url:
         cc = task.code_context if task else None
         ev = await build_code_evidence(repo_url, task_id=req.task_id, code_context=cc)
         if ev["ok"]:
             repo_code_text = ev["evidence_text"]
             evidence_status = {"status": "ok", "repo": ev["repo"], "file_count": ev["file_count"]}
+            readme_run_cmd = ev.get("readme_run_cmd", "")
             if ev.get("ci"):
                 ci = ev["ci"]
                 ci_status = {
@@ -457,6 +465,23 @@ async def review(req: ReviewRequest, request: Request):
 
     available = collect_evidence(sub, repo_code_text)
 
+    # V2 · T2.5：README 启动命令 → runtime 证据（本地可复现运行说明；自述优先级更高）
+    if "runtime" not in available and readme_run_cmd:
+        available["runtime"] = f"README 启动命令（本地可复现运行说明）：{readme_run_cmd}"
+
+    # V2 修改 6 · L4/L5：证据快照冻结 + 幂等缓存（同 task + 同快照 → 直接复用评审结果）
+    ci_workflows = []
+    if ci_status.get("status") == "ok" and ci_status.get("workflows"):
+        ci_workflows = ci_status["workflows"]
+    snapshot_hash = snapshot_evidence(available, ci_workflows, task_id=req.task_id)
+    cache_key = f"{req.task_id}:{snapshot_hash}"
+    now_ts = time.time()
+    hit = _REVIEW_CACHE.get(cache_key)
+    if hit and now_ts < hit[0]:
+        cached_resp = dict(hit[1])
+        cached_resp["data"] = {**cached_resp["data"], "cached": True, "snapshot_hash": snapshot_hash}
+        return cached_resp
+
     # V1.5 Sprint 2：Evidence 硬约束预检（修改 1：deployment 不再是硬性证据）
     precheck = evidence_precheck(rubrics, available)
     forced_results = precheck["forced_needs_review"]
@@ -464,10 +489,6 @@ async def review(req: ReviewRequest, request: Request):
 
     # CI 结论直判分流（V2 修改 6 · L3）：system 判定的 CI 结论在代码层直接映射，
     # 对应 Rubric 不送 LLM；全部 Rubric 都能直判/预检时整条评审零 LLM 调用
-    ci_workflows = []
-    if ci_status.get("status") == "ok" and ci_status.get("workflows"):
-        ci_workflows = ci_status["workflows"]
-
     direct_criteria: list[ReviewCriterion] = []
     llm_rubrics = []
     for r in passable_rubrics:
@@ -488,12 +509,13 @@ async def review(req: ReviewRequest, request: Request):
              "evidence": "", "reason": fr["reason"]}
             for fr in forced_results
         ]
-        return {
+        resp = {
             "ok": True,
             "data": {
                 "task_id": req.task_id,
                 "evidence": evidence_status,
                 "ci": ci_status,
+                "snapshot_hash": snapshot_hash,
                 "evaluation": {
                     "status": "NEED_REVIEW",
                     "score": 0,
@@ -509,6 +531,8 @@ async def review(req: ReviewRequest, request: Request):
                 "session_id": req.session_id or "review",
             },
         }
+        _REVIEW_CACHE[cache_key] = (time.time() + REVIEW_CACHE_TTL, resp)
+        return resp
 
     start_ts = time.time()
     llm_criteria: list[ReviewCriterion] = []
@@ -552,7 +576,7 @@ async def review(req: ReviewRequest, request: Request):
     score = int(evaluation.score)
     status = evaluation.status.value
 
-    # Sprint 6：评审事件日志
+    # Sprint 6：评审事件日志（L5 缓存命中时不会走到这里——重复评审不重复记日志）
     logs_mod.log_event(
         type="review",
         session_id=req.session_id or "review",
@@ -571,12 +595,14 @@ async def review(req: ReviewRequest, request: Request):
         review_score=score,
         repo_used=bool(repo_url),
     )
-    return {
+
+    resp = {
         "ok": True,
         "data": {
             "task_id": req.task_id,
             "evidence": evidence_status,
             "ci": ci_status,
+            "snapshot_hash": snapshot_hash,
             "evaluation": evaluation.model_dump(),
             "score": score,
             "status": status,
@@ -592,6 +618,76 @@ async def review(req: ReviewRequest, request: Request):
             "session_id": req.session_id or "review",
         },
     }
+    # L5：写入幂等缓存（进程内存，重启丢失即可接受——方案明确不建数据库）
+    if len(_REVIEW_CACHE) > 512:
+        for k in [k for k, (exp, _) in _REVIEW_CACHE.items() if exp < time.time()]:
+            _REVIEW_CACHE.pop(k, None)
+    _REVIEW_CACHE[cache_key] = (time.time() + REVIEW_CACHE_TTL, resp)
+    return resp
+
+
+# ---------------------------------------------------------------------------
+# V2 修改 3：Career Text 生成器（一段简历描述，模板填充，不用 LLM）
+# ---------------------------------------------------------------------------
+class CareerTaskResult(BaseModel):
+    task_id: str
+    score: int | None = None
+    passed: int = 0
+    total: int = 0
+    ci_conclusion: str = ""     # "success" | "failure" | ""
+
+
+class CareerTextRequest(BaseModel):
+    project_id: str = "project_chatbot"
+    results: list[CareerTaskResult] = Field(default_factory=list)
+    github_url: str = ""
+
+
+@app.post("/api/career/text")
+async def career_text(req: CareerTextRequest):
+    """由验收结果确定性生成一段 100~200 字项目经历描述（同输入同输出，零 LLM）。"""
+    project = get_project(req.project_id)
+    if not project:
+        return JSONResponse({"ok": False, "error": {"code": "BAD_PROJECT", "message": "项目不存在"}}, status_code=404)
+    if not req.results:
+        return JSONResponse({"ok": False, "error": {"code": "NO_RESULTS", "message": "暂无验收结果，先完成验收"}}, status_code=400)
+
+    task_title = {t.id: t.title for t in project.tasks}
+    skills: list[str] = []
+    for r in req.results:
+        t = get_task(r.task_id)
+        if t and t.skill and t.skill.value not in skills:
+            skills.append(t.skill.value)
+
+    results = [{
+        "task_id": r.task_id,
+        "task_title": task_title.get(r.task_id, ""),
+        "score": r.score,
+        "passed": r.passed,
+        "total": r.total,
+        "ci_conclusion": r.ci_conclusion,
+    } for r in req.results]
+    out = build_career_text(req.project_id, project.title, results, req.github_url, skills)
+    return {"ok": True, "data": out}
+
+
+# ---------------------------------------------------------------------------
+# V2 修改 2：质检陪练（面试自检）——独立接口，硬边界：不判分、不进评审链、
+# 不写 Evidence Store、不写评审日志字段
+# ---------------------------------------------------------------------------
+@app.get("/api/ai/interview")
+async def interview(task_id: str = ""):
+    """返回任务配套的面试自检题（课程作者标注；无标注则空列表，前端不展示）。"""
+    if not task_id:
+        return JSONResponse({"ok": False, "error": {"code": "NO_TASK", "message": "请先选择一个任务"}}, status_code=400)
+    task = get_task(task_id)
+    if not task:
+        return JSONResponse({"ok": False, "error": {"code": "BAD_TASK", "message": "任务不存在"}}, status_code=404)
+    return {"ok": True, "data": {
+        "task_id": task_id,
+        "questions": [q.model_dump() for q in task.interview_questions],
+        "ai_generated": False,  # 试点阶段全部为课程作者标注
+    }}
 
 
 # ---------------------------------------------------------------------------
