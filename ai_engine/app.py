@@ -28,6 +28,7 @@ from llm_client import LLMClient, DEFAULT_MODEL, DEFAULT_BASE_URL, EngineError, 
 from response_validator import validate
 from code_evidence import build_code_evidence
 from career import build_career_text
+import vision as vision_mod
 from review import build_review_system_prompt, ci_direct_verdict, collect_evidence, compute_evaluation, evidence_precheck, evidence_text, snapshot_evidence
 from pydantic import Field
 import logs as logs_mod
@@ -205,6 +206,8 @@ async def config():
         # 导师页与导航「API 配置」共用同一份 BYOK 设置（服务商/BaseURL/模型/Key），
         # 此处仅作默认展示；实际生效值由前端 settingsStore（xkz_settings_v1）请求时携带
         "config_source": "xkz_settings_v1",
+        # V2.1：已验证支持图片输入的模型白名单（前端据此决定是否允许上传运行截图）
+        "vision_models": sorted(vision_mod.VISION_WHITELIST),
         "modes": [m.value for m in Mode],
         "hint_levels": {str(k): v for k, v in {
             0: "仅引导", 1: "提示方向", 2: "思路步骤",
@@ -466,7 +469,39 @@ async def review(req: ReviewRequest, request: Request):
         else:
             evidence_status = {"status": "error", "code": ev["code"], "error": ev["error"]}
 
-    available = collect_evidence(sub, repo_code_text)
+    # V2.1 视觉证据：仅当模型在 Vision 白名单内且学生上传了截图时才分析；
+    # 任何失败（不支持/超时/繁忙/格式问题）都只跳过视觉，普通验收不受影响（fail-open）。
+    visual_evidence = None
+    if req.visual_images:
+        visual_conditions = [r.visual_pass_condition for r in rubrics
+                             if getattr(r, "visual_check", "none") == "supported"
+                             and r.visual_pass_condition]
+        visual_evidence = await vision_mod.analyze_images(
+            req.visual_images,
+            task_title=task.title,
+            task_objective=task.objective,
+            visual_conditions=visual_conditions,
+            model=req.model or DEFAULT_MODEL,
+            api_key=req.api_key,
+            base_url=req.base_url,
+            provider="custom" if req.base_url else "deepseek",
+        )
+        # 只记录元数据（数量/字节/耗时/错误码），绝不记录图片内容或 base64
+        logs_mod.log_event(
+            type="vision",
+            session_id=req.session_id or "review",
+            task_id=req.task_id,
+            project_id=req.project_id,
+            vision_status=visual_evidence.status,
+            vision_code=visual_evidence.code,
+            image_count=visual_evidence.count,
+            image_bytes=visual_evidence.bytes,
+            vision_model=visual_evidence.model,
+            vision_cached=visual_evidence.cached,
+            vision_ms=visual_evidence.latency_ms,
+        )
+
+    available = collect_evidence(sub, repo_code_text, visual=visual_evidence)
 
     # V2 · T2.5：README 启动命令 → runtime 证据（本地可复现运行说明；自述优先级更高）
     if "runtime" not in available and readme_run_cmd:
@@ -518,6 +553,7 @@ async def review(req: ReviewRequest, request: Request):
                 "task_id": req.task_id,
                 "evidence": evidence_status,
                 "ci": ci_status,
+                "visual": visual_evidence.model_dump() if visual_evidence else None,
                 "snapshot_hash": snapshot_hash,
                 "evaluation": {
                     "status": "NEED_REVIEW",
@@ -605,6 +641,7 @@ async def review(req: ReviewRequest, request: Request):
             "task_id": req.task_id,
             "evidence": evidence_status,
             "ci": ci_status,
+            "visual": visual_evidence.model_dump() if visual_evidence else None,
             "snapshot_hash": snapshot_hash,
             "evaluation": evaluation.model_dump(),
             "score": score,

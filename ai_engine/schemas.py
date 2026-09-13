@@ -162,25 +162,61 @@ class Rubric(BaseModel):
     """一条验收标准（每条 criterion 独立成对象，支撑逐条评审打分）。
 
     对齐规格书：criterion / description / requiredEvidence / passCondition / weight。
+
+    V2.1 视觉证据：新增 visual_check / visual_pass_condition 两个**非硬门槛**字段。
+    注意 visual **永远不进 required_evidence**——否则模型不支持视觉或学生没传图时
+    会被 evidence_precheck 判成缺证据 → 强制 NEED_REVIEW，违背"视觉是可选增强"。
     """
     id: str
     task_id: str = ""
     criterion: str = ""                 # 验收条件标题（如 "删除 Todo"）
     description: str = ""               # 详细说明
-    required_evidence: list[str] = Field(default_factory=list)  # code/runtime/test/screenshot/url
+    required_evidence: list[str] = Field(default_factory=list)  # code/runtime/test/url（硬门槛）
     pass_condition: str = ""            # 达标条件
     weight: int = 1
+    visual_check: Literal["none", "supported"] = "none"   # 该标准是否有可通过截图观察的事实
+    visual_pass_condition: str = ""     # 有视觉证据时应观察到什么（只说事实，不评美观）
+
+
+class VisualImage(BaseModel):
+    """学生提交的运行截图（V2.1 Visual Evidence）。
+
+    生命周期硬约束：请求级。服务端只做"接收 → 校验 → 转发 → 释放"，
+    不落磁盘、不写 localStorage、不进 Session、不写日志（仅记元数据）。
+    """
+    name: str = ""                      # 原始文件名（仅用于展示）
+    mime: str = ""                      # 客户端声明的 MIME（服务端以魔数为准，不信任此值）
+    data_base64: str = ""               # 图片内容（base64，不含 data: 前缀）
+
+
+class VisualEvidence(BaseModel):
+    """视觉分析结果（结构化事实，供 Reviewer 消费；原图不保留）。"""
+    status: Literal["ok", "skipped", "error"] = "skipped"
+    code: str = ""                      # 失败/跳过原因码（VISION_*）
+    message: str = ""
+    facts: list[str] = Field(default_factory=list)         # 观察到的事实
+    uncertain: list[str] = Field(default_factory=list)     # 无法确认的部分
+    task_relation: Literal["relevant", "irrelevant", "unclear"] = "unclear"
+    count: int = 0                      # 图片数量
+    bytes: int = 0                      # 图片总字节数
+    image_hashes: list[str] = Field(default_factory=list)  # 图片内容哈希（进快照，保证可审计）
+    model: str = ""                     # 实际执行视觉分析的模型
+    cached: bool = False
+    latency_ms: int = 0
 
 
 class Submission(BaseModel):
-    """学生提交的成果（用于评审链，对齐规格书 Submission Schema）。"""
+    """学生提交的成果（用于评审链，对齐规格书 Submission Schema）。
+
+    注：V2.1 已删除 `screenshot_urls`（URL 语义与"服务器不保存图片"冲突），
+    截图改由 ReviewRequest.visual_images 以 base64 提交、请求结束即释放。
+    """
     id: str = Field(default_factory=lambda: uuid.uuid4().hex[:16])
     task_id: str = ""                 # 与 ReviewRequest.task_id 对齐，可省略
     student_id: str = ""
     github_url: str = ""                  # GitHub 仓库（代码证据）
     deployment_url: str = ""              # 在线访问地址（运行证据）
     code: str = ""                        # 关键代码片段
-    screenshot_urls: list[str] = Field(default_factory=list)  # 运行截图（运行证据）
     description: str = ""                 # 自述说明
     submitted_at: str = Field(default_factory=_now)
 
@@ -190,7 +226,7 @@ class EvidenceType(str, Enum):
     CODE = "code"
     CI = "ci"
     RUNTIME = "runtime"
-    SCREENSHOT = "screenshot"
+    VISUAL = "visual"     # V2.1：运行截图经过视觉分析后的结构化事实（原图不保留）
     GITHUB = "github"
     DESCRIPTION = "description"
     MANUAL = "manual"
@@ -341,6 +377,7 @@ class ReviewRequest(BaseModel):
     task_id: str = ""
     submission: Submission | None = None     # 学生提交的成果
     repo_url: str | None = None              # 兼容：也可单独传 GitHub 仓库链接（代码证据）
+    visual_images: list[VisualImage] = Field(default_factory=list)  # V2.1 运行截图（≤2 张，请求级）
     api_key: str = ""                        # BYOK
     base_url: str | None = None
     model: str | None = None

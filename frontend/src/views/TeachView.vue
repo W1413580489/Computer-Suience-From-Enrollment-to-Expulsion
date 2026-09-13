@@ -99,6 +99,41 @@
             <input v-model="depUrl" placeholder="在线部署地址（选填，加分项）" autocomplete="off" />
             <textarea v-model="codeBlock" class="teach__code-area" placeholder="关键代码片段（选填）"></textarea>
             <textarea v-model="descr" rows="3" placeholder="自述说明：怎么运行、数据流向、遇到并解决的问题（自述写明启动命令可作运行证据）"></textarea>
+
+            <!-- V2.1 视觉证据：运行截图（可选增强，不传不影响验收） -->
+            <div class="teach__shots">
+              <div class="teach__shots-head">
+                <span>运行截图（选填 · 最多 2 张）</span>
+                <span v-if="!visionEnabled" class="teach__shots-warn">
+                  当前模型未验证支持图片，暂时无法使用
+                </span>
+              </div>
+              <input
+                ref="shotInput"
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                multiple
+                class="teach__shots-file"
+                @change="addShots"
+              />
+              <button class="teach__btn" :disabled="!visionEnabled || shots.length >= 2" @click="pickShots">
+                + 添加截图
+              </button>
+              <div v-if="shots.length" class="teach__shots-list">
+                <div v-for="(s, i) in shots" :key="s.name + i" class="teach__shot">
+                  <img :src="s.preview" :alt="s.name" />
+                  <div class="teach__shot-meta">
+                    <span class="n">{{ s.name || '截图' + (i + 1) }}</span>
+                    <span class="b">{{ Math.round(s.bytes / 1024) }} KB</span>
+                  </div>
+                  <button class="teach__ghost" title="移除" @click="removeShot(i)">✕</button>
+                </div>
+              </div>
+              <div class="teach__status">
+                截图用于证明「运行后出现了什么结果」，仅本次评审使用，不保存到你以外的地方；
+                会被发送到当前配置的模型服务商做分析。
+              </div>
+            </div>
           </details>
           <button class="teach__btn teach__full" :disabled="loading" @click="doReview">⚖ 提交验收</button>
         </div>
@@ -195,6 +230,7 @@
                 </div>
                 <div v-if="evidLine(msg.review)" class="teach__evline" v-html="evidLine(msg.review)"></div>
                 <div v-if="ciLine(msg.review)" class="teach__evline" v-html="ciLine(msg.review)"></div>
+                <div v-if="visualLine(msg.review)" class="teach__evline">{{ visualLine(msg.review) }}</div>
                 <div v-for="c in msg.review.evaluation.criteria || []" :key="c.rubric_id" class="teach__critrow">
                   <span :style="{ color: stColor(c.status), fontWeight: 700 }">{{ stMark(c.status) }}</span>
                   <div class="teach__critbody">
@@ -328,6 +364,73 @@ const depUrl = ref('');
 const codeBlock = ref('');
 const descr = ref('');
 const input = ref('');
+
+// ---------- V2.1 视觉证据：运行截图（仅存于当前页面内存，不写 localStorage、不发日志） ----------
+const MAX_SHOTS = 2;
+const MAX_SHOT_BYTES = 800 * 1024;        // 与后端一致
+const shotInput = ref<HTMLInputElement | null>(null);
+interface Shot { name: string; mime: string; data: string; bytes: number; preview: string }
+const shots = ref<Shot[]>([]);
+const visionModels = ref<string[]>([]);
+const visionEnabled = computed(() => visionModels.value.includes(settings.effectiveModel));
+
+function pickShots() {
+  shotInput.value?.click();
+}
+
+async function addShots(e: Event) {
+  const input = e.target as HTMLInputElement;
+  const files = Array.from(input.files || []);
+  input.value = '';                       // 允许重复选择同一文件
+  for (const f of files) {
+    if (shots.value.length >= MAX_SHOTS) { toast(`最多 ${MAX_SHOTS} 张截图`); break; }
+    try {
+      const s = await compressShot(f);
+      if (s.bytes > MAX_SHOT_BYTES) { toast(`${f.name} 压缩后仍超过 800KB，已跳过`); continue; }
+      shots.value.push(s);
+    } catch {
+      toast(`${f.name} 处理失败（需为 PNG/JPEG/WebP/GIF）`);
+    }
+  }
+}
+
+// 浏览器端压缩：截图文字多，优先保留原始 PNG；过大或非 PNG 再降采样转 JPEG
+async function compressShot(file: File): Promise<Shot> {
+  const raw = await file.arrayBuffer();
+  const isPng = new Uint8Array(raw.slice(0, 8)).every((b, i) => b === [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a][i]);
+  if (isPng && file.size <= MAX_SHOT_BYTES) {
+    return { name: file.name, mime: 'image/png', data: base64FromBuffer(raw), bytes: file.size,
+             preview: URL.createObjectURL(file) };
+  }
+  const bitmap = await createImageBitmap(file);
+  const maxEdge = 1600;
+  const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height));
+  const w = Math.max(1, Math.round(bitmap.width * scale));
+  const h = Math.max(1, Math.round(bitmap.height * scale));
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('canvas unavailable');
+  ctx.drawImage(bitmap, 0, 0, w, h);
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+  const data = dataUrl.split(',', 2)[1] || '';
+  return { name: file.name.replace(/\.(png|webp|gif)$/i, '') + '.jpg', mime: 'image/jpeg',
+           data, bytes: Math.round(data.length * 0.75), preview: dataUrl };
+}
+
+function base64FromBuffer(buf: ArrayBuffer): string {
+  let binary = '';
+  const bytes = new Uint8Array(buf);
+  const CHUNK = 0x8000;
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    binary += String.fromCharCode(...Array.from(bytes.subarray(i, i + CHUNK)));
+  }
+  return btoa(binary);
+}
+
+function removeShot(i: number) {
+  shots.value.splice(i, 1);
+}
 const loading = ref(false);
 const statsOpen = ref(false);
 // 侧栏收起状态（localStorage 持久化：'0' = 收起）
@@ -539,6 +642,7 @@ onMounted(async () => {
     const j = await r.json();
     if (!j.ok) throw new Error(j.error?.message || 'config 加载失败');
     const cfg = j.data;
+    visionModels.value = cfg.vision_models || [];
     // 多课程：courses[].projects 携带各自的 stage/task 结构
     courses.value = (cfg.courses || []).map((c: any) => ({
       course_id: c.course_id, title: c.title, description: c.description || '',
@@ -693,6 +797,10 @@ async function doReview() {
       description: descr.value.trim() || '',
     },
     api_key: settings.apiKey.trim(), base_url: settings.effectiveBaseUrl, model: settings.effectiveModel,
+    // V2.1 视觉证据（base64 内联；请求结束即释放，服务端不落盘）
+    visual_images: visionEnabled.value
+      ? shots.value.map(s => ({ name: s.name, mime: s.mime, data_base64: s.data }))
+      : [],
   };
   try {
     const r = await fetch(`/api/ai/review`, {
@@ -706,6 +814,7 @@ async function doReview() {
       } else { toast(j.error?.message || '评审失败'); }
       return;
     }
+    shots.value = [];   // 已提交，清空（图片不保留在页面状态里）
     chat.value.push({ role: 'assistant', payload: { message: `评审完成：${j.data.evaluation.status}（${j.data.score} 分）` }, review: j.data });
     if (j.data.passed && !student.value.completed_tasks.includes(taskId.value)) {
       student.value.completed_tasks.push(taskId.value);
@@ -831,6 +940,29 @@ function ciLine(d: any) {
     return `CI[${esc(w.dimension)}] ${esc(w.name)} <span style="color:${cc};font-weight:700">${m}</span>`;
   }).join(' · ');
   return `CI 自动验收：${chips}`;
+}
+
+const VISION_CODE_TEXT: Record<string, string> = {
+  VISION_UNSUPPORTED: '当前模型未验证支持图片',
+  VISION_BUSY: '分析繁忙，稍后重试',
+  VISION_TIMEOUT: '模型服务限流或超时',
+  VISION_FAILED: '视觉分析失败',
+  IMAGE_TOO_LARGE: '图片过大',
+  IMAGE_TOO_MANY: '图片数量超限',
+  IMAGE_FORMAT_INVALID: '图片格式不支持',
+  NO_IMAGE: '未上传截图',
+  NO_API_KEY: '未配置 API Key',
+};
+function visualLine(d: any) {
+  const v = d && d.visual;
+  if (!v) return '';
+  const code = VISION_CODE_TEXT[v.code] || v.code || '未知原因';
+  if (v.status === 'ok') {
+    const n = (v.facts || []).length;
+    return `视觉证据 ✓ 观察到 ${n} 条运行事实（${v.count} 张截图${v.cached ? '，复用上次分析' : ''}）`;
+  }
+  if (v.status === 'skipped') return `视觉证据 · 已跳过（${code}），本次按其他证据验收`;
+  return `视觉证据 ✕ 分析失败（${code}），不影响本次验收`;
 }
 
 // ---------- 反馈 / 统计 ----------
@@ -1054,6 +1186,15 @@ function toast(msg: string) {
 .teach__submitbox summary:hover { color: var(--t-fg); }
 .teach__submitbox input, .teach__submitbox textarea { margin-top: 6px; }
 .teach__submitbox[open] { display: flex; flex-direction: column; }
+.teach__shots { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.teach__shots-head { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--t-dim); }
+.teach__shots-warn { color: var(--t-yellow, #b8860b); }
+.teach__shots-file { display: none; }
+.teach__shots-list { display: flex; flex-direction: column; gap: 6px; }
+.teach__shot { display: flex; align-items: center; gap: 8px; background: var(--t-bg3); border: 1px solid var(--t-line); border-radius: 8px; padding: 4px 6px; }
+.teach__shot img { width: 44px; height: 32px; object-fit: cover; border-radius: 4px; border: 1px solid var(--t-line); }
+.teach__shot-meta { display: flex; flex-direction: column; font-size: 11px; color: var(--t-dim); flex: 1; min-width: 0; }
+.teach__shot-meta .n { color: var(--t-fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .teach__btn {
   background: var(--t-acc); color: #fff; border: 0; border-radius: 8px;
   padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: .15s;

@@ -24,10 +24,11 @@ from schemas import ReviewCriterion, ReviewEvaluation, ReviewLLMOutput, ReviewRe
 # ---------------------------------------------------------------------------
 # Evidence Collector
 # ---------------------------------------------------------------------------
-def collect_evidence(submission: Submission | None, repo_code_text: str = "") -> dict[str, str]:
+def collect_evidence(submission: Submission | None, repo_code_text: str = "",
+                     visual=None) -> dict[str, str]:
     """把 submission 各字段跟仓库代码证据归一成"可用证据"清单。
 
-    返回 { 证据类型: 文本 }，证据类型 ∈ code / runtime / test / url / description。
+    返回 { 证据类型: 文本 }，证据类型 ∈ code / runtime / test / url / description / visual。
     """
     ev: dict[str, str] = {}
     sub = submission or Submission(task_id="")
@@ -56,7 +57,29 @@ def collect_evidence(submission: Submission | None, repo_code_text: str = "") ->
             if cmd_line:
                 ev["runtime"] = f"本地可复现运行说明（学生自述含启动命令）：{cmd_line}"
 
+    # V2.1：视觉证据（只把"观察到的事实"注入，原图不进入任何证据文本）
+    if visual is not None and getattr(visual, "status", "") == "ok":
+        ev["visual"] = format_visual_evidence(visual)
+
     return ev
+
+
+def format_visual_evidence(v) -> str:
+    """把视觉分析结果渲染成给 Reviewer 读的事实文本（不含图片内容）。
+
+    带上图片哈希，使证据快照能如实反映"本次分析了哪几张图"（可审计、可复现）。
+    """
+    lines = ["[视觉证据] 以下事实由视觉模型从学生提交的运行截图中**观察**得到（原图未保存）："]
+    for f in (v.facts or []):
+        lines.append(f"  - 观察到：{f}")
+    for u in (v.uncertain or []):
+        lines.append(f"  - 无法确认：{u}")
+    if not v.facts and not v.uncertain:
+        lines.append("  - （未观察到明确事实）")
+    lines.append(f"  - 与任务相关性：{v.task_relation}")
+    if v.image_hashes:
+        lines.append(f"  - 截图指纹：{', '.join(v.image_hashes)}（共 {v.count} 张）")
+    return "\n".join(lines)
 
 
 # ---------------------------------------------------------------------------
@@ -87,7 +110,7 @@ def evidence_text(available: dict[str, str]) -> str:
     label = {
         "code": "代码证据", "runtime": "运行证据", "test": "测试证据",
         "deployment": "部署地址", "url": "仓库链接",
-        "description": "学生自述",
+        "description": "学生自述", "visual": "视觉证据（运行截图观察结果）",
     }
     for typ, text in available.items():
         lines.append(f"[{label.get(typ, typ)}] {text}")
@@ -121,7 +144,8 @@ def evidence_precheck(rubrics: list[Rubric], available: dict[str, str]) -> dict:
     present = set(available.keys())
 
     # 修改 1：部署降级——deployment 不再是硬性必交项（自愿提供时仅作加分证据）
-    optional_bonus = {"deployment"}
+    # V2.1：visual 同理——视觉证据永远是可选增强，绝不作为硬门槛（防止课程作者误写入 required_evidence）
+    optional_bonus = {"deployment", "visual"}
 
     for r in rubrics:
         needed = set(r.required_evidence) - optional_bonus
@@ -133,10 +157,14 @@ def evidence_precheck(rubrics: list[Rubric], available: dict[str, str]) -> dict:
         # description 不算硬证据
         missing_real = {m for m in missing if m != "description"}
         if missing_real:
+            reason = f"缺少必要证据类型：{', '.join(sorted(missing_real))}，无法自动判定"
+            # V2.1：该标准有视觉观察点时，说明"截图只是辅助、不能替代运行证据"，避免学生困惑
+            if getattr(r, "visual_check", "none") == "supported" and "runtime" in missing_real:
+                reason += "（运行截图仅作辅助证据，不能替代运行证据：请补充启动命令说明 / CI 结论 / 部署地址）"
             forced.append({
                 "rubric_id": r.id,
                 "missing": sorted(missing_real),
-                "reason": f"缺少必要证据类型：{', '.join(sorted(missing_real))}，无法自动判定",
+                "reason": reason,
             })
         else:
             passable.append(r)
@@ -255,12 +283,17 @@ def build_review_system_prompt(task: Task, rubrics: list[Rubric],
                                available: dict[str, str]) -> str:
     rubric_lines = []
     for i, r in enumerate(rubrics, 1):
-        rubric_lines.append(
+        line = (
             f"{i}. [{r.id}] {r.criterion}\n"
             f"   说明：{r.description}\n"
             f"   所需证据：{', '.join(r.required_evidence) or '自述即可'}\n"
             f"   达标条件：{r.pass_condition}（权重 {r.weight}）"
         )
+        # V2.1：该标准有可通过截图观察的事实时，告知 Reviewer 观察点（可选增强，非硬门槛）
+        if getattr(r, "visual_check", "none") == "supported":
+            line += ("\n   视觉观察点（可选增强证据，缺失不扣分）："
+                     + (r.visual_pass_condition or "如提供运行截图，应能观察到该运行结果"))
+        rubric_lines.append(line)
 
     missing = _missing_evidence(rubrics, available)
     missing_text = "；".join(missing) if missing else "无（全部所需证据类型齐备）"
@@ -316,6 +349,13 @@ def build_review_system_prompt(task: Task, rubrics: list[Rubric],
 5. 你不是来鼓励或教学的，只做客观评价。
 6. FAIL 必须明确说清不达标的理由。
 7. next_step 明确告诉学生：下一步需要补充哪种证据、或修正哪个不达标项。
+
+【视觉证据的边界（V2.1，严格遵循）】若证据里出现 "[视觉证据]"（视觉模型从学生运行截图中观察到的事实）：
+  - 视觉证据只能证明"截图中出现了某个可观察结果"，**不能**证明代码结构正确、也不能替代运行/CI 证据；
+  - 视觉证据**不评价界面美观、配色、设计质量、响应式效果**——这类内容一律不参与判定；
+  - 若代码证据显示没有对应功能，而截图显示了该结果 → 视为证据冲突，判 NEED_REVIEW 并在理由中说明冲突；
+  - 若某条标准的 Visual 观察点在截图中得不到支持，按该标准原有证据判定，**不得仅因"缺少截图"判 FAIL 或 NEED_REVIEW**；
+  - 视觉证据未提供时（模型不支持视觉 / 学生未上传），完全按原有证据链判定，不受任何影响。
 
 【CI 硬证据优先】若证据里出现 "[CI 自动验收证据]"（来自 GitHub Actions，是 system 判定而非 AI 猜测）：
   - build 类工作流 conclusion=success → 这是"可构建/能启动"的权威证据，对应验收项可直接 PASS。
