@@ -127,13 +127,19 @@ check("包含项目名", "套壳聊天机器人" in t1, t1)
 check("包含量化结果（4+3+4=11/11）", "11/11" in t1, t1)
 check("包含 CI 结论", "GitHub Actions" in t1)
 check("包含 GitHub 链接", "github.com/u/r" in t1)
-check("长度在 60~250 字", 60 <= len(t1) <= 250, f"len={len(t1)}")
+# 2026-09-13 改版：结构化简历（标题行 / 技术栈独立行 / Bullet / 量化）
+d1 = j["data"]
+check("标题行含角色", "（独立开发）" in d1["title_line"], d1["title_line"])
+check("text 含技术栈独立行", "技术栈：" in t1)
+check("技术栈为纯技术名词（含 FastAPI）", "FastAPI" in d1["tech"], str(d1["tech"]))
+check("Bullet 为结构化列表", d1["bullets"] and all("label" in b and "text" in b for b in d1["bullets"]),
+      str(d1["bullets"])[:120])
+check("量化指标为列表", isinstance(d1["metrics"], list) and d1["metrics"], str(d1["metrics"]))
 r2 = client.post("/api/career/text", json={"project_id": "project_chatbot", "results": res,
                                            "github_url": "https://github.com/u/r"})
 check("同输入同输出（零漂移）", r2.json()["data"]["text"] == t1)
 r3 = client.post("/api/career/text", json={"project_id": "project_chatbot", "results": []})
 check("空结果 → 400", r3.status_code == 400)
-check("bullets 齐全", set(j["data"]["bullets"].keys()) == {"tech", "features", "metrics"})
 
 print("== T2.4 质检陪练接口 ==")
 r = client.get("/api/ai/interview?task_id=task_review")

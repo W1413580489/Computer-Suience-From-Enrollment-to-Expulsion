@@ -211,8 +211,20 @@
               <div class="teach__passbonus">
                 <div v-if="msg.pass_bonus.career" class="pb-sec">
                   <div class="pb-title">📄 可写进简历的项目经历</div>
-                  <div class="pb-career">{{ msg.pass_bonus.career }}</div>
-                  <button class="teach__btn" @click="copyCareer(msg.pass_bonus.career)">复制</button>
+                  <div class="pb-resume">
+                    <div class="pb-r-head">{{ msg.pass_bonus.resume.title_line }}</div>
+                    <div v-if="msg.pass_bonus.resume.tech.length" class="pb-r-tech">
+                      技术栈：{{ msg.pass_bonus.resume.tech.join(' / ') }}
+                    </div>
+                    <div v-if="msg.pass_bonus.resume.intro" class="pb-r-intro">{{ msg.pass_bonus.resume.intro }}</div>
+                    <div v-for="b in msg.pass_bonus.resume.bullets" :key="b.label" class="pb-r-bullet">
+                      <b>{{ b.label }}：</b>{{ b.text }}
+                    </div>
+                    <div v-if="msg.pass_bonus.resume.metrics.length" class="pb-r-metrics">
+                      量化结果：{{ msg.pass_bonus.resume.metrics.join('；') }}。
+                    </div>
+                  </div>
+                  <button class="teach__btn" @click="copyCareer(msg.pass_bonus.career)">复制整段</button>
                 </div>
                 <div v-if="msg.pass_bonus.interview.length" class="pb-sec">
                   <div class="pb-title">🎙 面试自检 · 自答自比，不判分</div>
@@ -330,7 +342,9 @@ const toastMsg = ref('');
 let toastTimer: ReturnType<typeof setTimeout> | null = null;
 
 interface ChatMsg { role: 'user' | 'assistant' | 'system'; payload?: any; text?: string; review?: any; pass_bonus?: PassBonus; feedback?: boolean }
-interface PassBonus { career: string; interview: any[]; answers: string[]; hintOpen: boolean[]; anchorOpen: boolean[] }
+interface ResumeBlock { title_line: string; intro: string; tech: string[]; bullets: { label: string; text: string }[]; metrics: string[] }
+interface PassBonus { career: string; resume: ResumeBlock; interview: any[]; answers: string[]; hintOpen: boolean[]; anchorOpen: boolean[] }
+const EMPTY_RESUME: ResumeBlock = { title_line: '', intro: '', tech: [], bullets: [], metrics: [] };
 const chat = ref<ChatMsg[]>([]);
 const history = ref<{ role: string; content: string }[]>([]);
 const student = ref<StudentState>(loadStudent());
@@ -747,14 +761,23 @@ async function loadPassBonus(reviewData: any) {
   };
   saveCareerResult(projectId, entry);
 
-  const bonus: PassBonus = { career: '', interview: [], answers: [], hintOpen: [], anchorOpen: [] };
+  const bonus: PassBonus = { career: '', resume: { ...EMPTY_RESUME, tech: [], bullets: [], metrics: [] }, interview: [], answers: [], hintOpen: [], anchorOpen: [] };
   try {
     const r = await fetch(`/api/career/text`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ project_id: pid, results: loadCareerResults(pid), github_url: repoUrl.value.trim() }),
     });
     const j = await r.json();
-    if (j.ok) bonus.career = j.data?.text || '';
+    if (j.ok) {
+      bonus.career = j.data?.text || '';
+      bonus.resume = {
+        title_line: j.data?.title_line || '',
+        intro: j.data?.intro || '',
+        tech: j.data?.tech || [],
+        bullets: j.data?.bullets || [],
+        metrics: j.data?.metrics || [],
+      };
+    }
   } catch { /* 简历描述失败不阻塞陪练 */ }
   try {
     const r = await fetch(`/api/ai/interview?task_id=${encodeURIComponent(reviewData.task_id)}`);
@@ -1202,7 +1225,12 @@ function toast(msg: string) {
 .teach__passbonus { border: 1px solid var(--t-line); border-left: 3px solid var(--t-green); background: var(--t-bg2); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 12px; }
 .pb-sec { display: flex; flex-direction: column; gap: 6px; }
 .pb-title { font-weight: 600; color: var(--t-fg); font-size: 13px; }
-.pb-career { color: var(--t-fg); line-height: 1.7; background: var(--t-bg3); border: 1px solid var(--t-line); border-radius: 8px; padding: 8px 10px; }
+.pb-resume { color: var(--t-fg); line-height: 1.7; background: var(--t-bg3); border: 1px solid var(--t-line); border-radius: 8px; padding: 10px 12px; }
+.pb-r-head { font-weight: 700; font-size: 14px; margin-bottom: 2px; }
+.pb-r-tech { color: var(--t-dim); font-size: 12px; margin-bottom: 6px; }
+.pb-r-intro { margin-bottom: 6px; }
+.pb-r-bullet { margin-bottom: 4px; }
+.pb-r-metrics { margin-top: 6px; color: var(--t-dim); font-size: 12px; }
 .pb-q { display: flex; flex-direction: column; gap: 5px; border-top: 1px dashed var(--t-line); padding-top: 8px; }
 .pb-qtext { color: var(--t-fg); }
 .pb-q textarea { width: 100%; }

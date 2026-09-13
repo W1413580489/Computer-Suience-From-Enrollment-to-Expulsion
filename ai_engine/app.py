@@ -644,33 +644,33 @@ class CareerTextRequest(BaseModel):
     project_id: str = "project_chatbot"
     results: list[CareerTaskResult] = Field(default_factory=list)
     github_url: str = ""
+    date: str = ""     # 简历标题行日期（YYYY.MM）；留空则由服务端按当前月份生成
 
 
 @app.post("/api/career/text")
 async def career_text(req: CareerTextRequest):
-    """由验收结果确定性生成一段 100~200 字项目经历描述（同输入同输出，零 LLM）。"""
+    """由验收结果确定性生成结构化项目经历（同输入同输出，零 LLM）。
+
+    输出结构（2026-09-13 改版）：title_line / intro / tech / bullets / metrics / text
+      - tech 只含纯技术名词（课程作者标注）
+      - bullets 按 架构设计 / 稳定性与容错 / 结果产出 / 工程素养 分组，仅取已通过任务
+      - 学习属性表述（认识/学习/了解…）一律不进简历
+    """
     project = get_project(req.project_id)
     if not project:
         return JSONResponse({"ok": False, "error": {"code": "BAD_PROJECT", "message": "项目不存在"}}, status_code=404)
     if not req.results:
         return JSONResponse({"ok": False, "error": {"code": "NO_RESULTS", "message": "暂无验收结果，先完成验收"}}, status_code=400)
 
-    task_title = {t.id: t.title for t in project.tasks}
-    skills: list[str] = []
-    for r in req.results:
-        t = get_task(r.task_id)
-        if t and t.skill and t.skill.value not in skills:
-            skills.append(t.skill.value)
-
     results = [{
         "task_id": r.task_id,
-        "task_title": task_title.get(r.task_id, ""),
         "score": r.score,
         "passed": r.passed,
         "total": r.total,
         "ci_conclusion": r.ci_conclusion,
     } for r in req.results]
-    out = build_career_text(req.project_id, project.title, results, req.github_url, skills)
+    date = req.date or datetime.now(TZ).strftime("%Y.%m")
+    out = build_career_text(project, results, github_url=req.github_url, date=date)
     return {"ok": True, "data": out}
 
 

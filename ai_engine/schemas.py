@@ -90,6 +90,25 @@ class Project(BaseModel):
     tasks: list[Task] = Field(default_factory=list)
     rubrics: list[Rubric] = Field(default_factory=list)
     source_url: str = ""
+    # —— V2 简历素材（课程作者标注；缺失时生成器跳过该项，绝不编造）——
+    resume_intro: str = ""                                   # 一句话项目简介：是什么、解决什么问题
+    resume_role: str = "独立开发"                             # 角色（简历标题行）
+    resume_tech: list[str] = Field(default_factory=list)      # 纯技术名词（Python / FastAPI / Pytest…）
+    resume_metrics: list[str] = Field(default_factory=list)   # 额外量化指标（人工提供，如性能对比数据）
+
+
+class ResumePoint(BaseModel):
+    """简历亮点/难点（V2 简历生成用）：只记"交付了什么"，不记"学了什么"。
+
+    point  : 亮点短语（如"实现 GitHub API 限流重试"）
+    purpose: 为什么做（如"避免高频调用被平台封禁"）
+    result : 取得的效果（如"保障了工具链的稳定可用"）
+    kind   : 归类 → 决定出现在哪条 Bullet
+    """
+    point: str
+    purpose: str = ""
+    result: str = ""
+    kind: Literal["architecture", "stability", "delivery", "engineering"] = "delivery"
 
 
 class Stage(BaseModel):
@@ -136,6 +155,7 @@ class Task(BaseModel):
     chunk_key: str = ""                     # 关联 chunks.jsonl 的检索前缀（如 "学习指南 > 克隆复现"）
     code_context: Optional[CodeContext] = None  # V1.5：代码检索提示（Sprint 1）
     interview_questions: list[InterviewQuestion] = Field(default_factory=list)  # V2 质检陪练（课程作者标注）
+    resume_points: list[ResumePoint] = Field(default_factory=list)  # V2 简历亮点（课程作者标注）
 
 
 class Rubric(BaseModel):

@@ -20,7 +20,7 @@ import json
 from functools import lru_cache
 from pathlib import Path
 
-from schemas import (CodeContext, Course, InterviewQuestion, Project, Rubric, SkillKey, Stage, Task)
+from schemas import (CodeContext, Course, InterviewQuestion, Project, ResumePoint, Rubric, SkillKey, Stage, Task)
 
 BASE_DIR = Path(__file__).resolve().parent          # ai_engine/
 ROOT_DIR = BASE_DIR.parent                          # xkz-agent/
@@ -110,6 +110,10 @@ def _chatbot_project() -> Project:
             likelyFiles=["main", "app", "server", "requirements"],
             searchPatterns=["@app\\.post", "httpx", "chat/completions", "choices\\[0\\]"],
         ),
+        resume_points=[
+            ResumePoint(point='设计前后端分离结构：API Key 只保存在服务端，前端仅负责展示与交互', purpose='避免密钥暴露在浏览器端', result='满足安全验收要求', kind='architecture'),
+            ResumePoint(point='实现 POST /chat 接口：接收消息 → 转发大模型 API → 解析回复并返回', purpose='打通前后端到模型 API 的链路', result='形成可运行的最小闭环', kind='delivery'),
+        ],
     )
     task_frontend = Task(
         id="task_frontend",
@@ -131,6 +135,9 @@ def _chatbot_project() -> Project:
             likelyFiles=["index", "app", "style"],
             searchPatterns=["fetch\\(", "addEventListener", "onclick", "scrollTop"],
         ),
+        resume_points=[
+            ResumePoint(point='用原生 JavaScript（fetch）实现消息发送、回答渲染与列表自动滚动', purpose='不引入框架完成可用的聊天界面', kind='delivery'),
+        ],
     )
     task_link = Task(
         id="task_link",
@@ -152,6 +159,10 @@ def _chatbot_project() -> Project:
             likelyFiles=["main", "index", "config"],
             searchPatterns=["cors", "uvicorn", "fetch\\(", "localhost"],
         ),
+        resume_points=[
+            ResumePoint(point='处理 CORS 跨域配置并完成前后端联调', purpose='让浏览器可正常访问本地服务', result='消除联调阶段的跨域阻塞', kind='stability'),
+            ResumePoint(point='按「后端端口 → 前端地址 → CORS」三步法定位联通故障', purpose='把排错流程化', result='缩短了问题定位时间', kind='engineering'),
+        ],
     )
 
     # ---- Stage 3：验收（对应 Reviewer 评审）----
@@ -191,6 +202,9 @@ def _chatbot_project() -> Project:
                 hint="回忆 DeepSeek 请求里的 messages 是一个数组——记忆就是让这个数组越来越长。",
                 type="transfer",
             ),
+        ],
+        resume_points=[
+            ResumePoint(point='整理运行说明与验收材料，使项目可被第三方复现', result='交付物可公开验证', kind='engineering'),
         ],
     )
 
@@ -285,6 +299,9 @@ def _chatbot_project() -> Project:
         stages=[stage_setup, stage_dev, stage_accept],
         tasks=[task_setup, task_backend, task_frontend, task_link, task_review],
         rubrics=[*rubric_setup, *rubric_backend, *rubric_frontend, *rubric_link, *rubric_review],
+        # —— 简历素材（V2 简历生成用；技术栈必须是纯技术名词）——
+        resume_intro="用 Python 后端 + 原生前端实现的网页聊天机器人：浏览器收发消息，服务端转发大模型 API 并解析回传回答，打通「前端 → 后端 → 大模型 → 前端」完整链路。",
+        resume_tech=["Python", "FastAPI", "httpx", "原生 JavaScript（fetch）", "DeepSeek API", "CORS"],
     )
 
 
@@ -314,6 +331,9 @@ def _agent_project() -> Project:
             likelyFiles=["agent", "main"],
             searchPatterns=["OpenAI\\(", "chat\\.completions"],
         ),
+        resume_points=[
+            ResumePoint(point='搭建工程骨架（agent.py / tools.py / .env / requirements.txt）', purpose='统一依赖与密钥配置方式', result='项目可一条命令复现运行环境', kind='engineering'),
+        ],
     )
     task_min_loop = Task(
         id="c2t02",
@@ -336,6 +356,9 @@ def _agent_project() -> Project:
             likelyFiles=["agent"],
             searchPatterns=["tool_calls", "tools\\s*=", "role.*tool"],
         ),
+        resume_points=[
+            ResumePoint(point='基于 Function Calling 实现最小 Agent Loop（模型决策 → 本地执行 → 结果回传）', purpose='让模型自主决定是否调用工具', result='跑通 Agent 自主决策闭环', kind='architecture'),
+        ],
     )
 
     # ---- Stage 2：接入 GitHub 工具 ----
@@ -360,6 +383,9 @@ def _agent_project() -> Project:
             likelyFiles=["github_client", "api_client", "github"],
             searchPatterns=["Authorization", "X-RateLimit", "403", "retry"],
         ),
+        resume_points=[
+            ResumePoint(point='封装 GitHub API Client：Token 鉴权 + 401/403 分类处理 + 限流退避重试', purpose='避免高频调用被平台封禁', result='保障了工具链的稳定可用', kind='stability'),
+        ],
     )
     task_repo_tools = Task(
         id="c2t04",
@@ -381,6 +407,9 @@ def _agent_project() -> Project:
             likelyFiles=["tools", "github_client"],
             searchPatterns=["repos/", "git/trees", "def get_repo", "def get_file_tree"],
         ),
+        resume_points=[
+            ResumePoint(point='实现仓库信息与递归文件树工具（含 200 项截断保护）', purpose='控制单次返回体量', result='避免上下文被超长文件树挤占', kind='delivery'),
+        ],
     )
     task_content_tool = Task(
         id="c2t05",
@@ -403,6 +432,9 @@ def _agent_project() -> Project:
             likelyFiles=["tools"],
             searchPatterns=["contents/", "b64decode", "truncat"],
         ),
+        resume_points=[
+            ResumePoint(point='实现文件内容工具：Contents API 拉取 + base64 解码 + 超 200 行截断', purpose='避免超大文件撑爆上下文', result='控制了单次调用的 token 开销', kind='engineering'),
+        ],
     )
 
     # ---- Stage 3：工具驱动执行 ----
@@ -426,6 +458,9 @@ def _agent_project() -> Project:
             likelyFiles=["tools", "agent"],
             searchPatterns=["TOOL_MAP", "\"type\": \"function\"", "description"],
         ),
+        resume_points=[
+            ResumePoint(point='通过 JSON Schema 构建工具注册表，模型据此自主选择工具', purpose='让工具可插拔扩展', result='新增工具无需改动 Loop 逻辑', kind='architecture'),
+        ],
     )
     task_multi_loop = Task(
         id="c2t07",
@@ -447,6 +482,9 @@ def _agent_project() -> Project:
             likelyFiles=["agent"],
             searchPatterns=["while", "tool_calls", "trace"],
         ),
+        resume_points=[
+            ResumePoint(point='把单次调用升级为结果驱动的多步 Agent Loop，每步写入执行轨迹', purpose='支撑需要多次工具调用的复杂分析任务', result='单次任务可连续触发多次工具调用', kind='architecture'),
+        ],
     )
     task_safety = Task(
         id="c2t08",
@@ -469,6 +507,9 @@ def _agent_project() -> Project:
             likelyFiles=["agent"],
             searchPatterns=["max_steps", "stop_reason", "except"],
         ),
+        resume_points=[
+            ResumePoint(point='设计 max_steps 上限与异常安全退出，工具异常以文本回传模型自纠', purpose='避免模型陷入死循环与资源耗尽', result='保障了长时间运行的可靠性', kind='stability'),
+        ],
     )
 
     # ---- Stage 4：完成项目 ----
@@ -492,6 +533,9 @@ def _agent_project() -> Project:
             likelyFiles=["agent", "report"],
             searchPatterns=["report\\.md", "trace", "step"],
         ),
+        resume_points=[
+            ResumePoint(point='生成引用执行轨迹（trace step）的仓库分析报告，结论可溯源', purpose='让结论可验证而非模型臆断', result='提升了报告可信度', kind='delivery'),
+        ],
     )
 
     # ---- Rubrics（判据全部可客观判定；不出现具体厂商名，统一'所选 LLM API'）----
@@ -628,6 +672,9 @@ def _agent_project() -> Project:
                task_registry, task_multi_loop, task_safety, task_report],
         rubrics=[*rubric_c2t01, *rubric_c2t02, *rubric_c2t03, *rubric_c2t04, *rubric_c2t05,
                  *rubric_c2t06, *rubric_c2t07, *rubric_c2t08, *rubric_c2t09],
+        # —— 简历素材（V2 简历生成用；技术栈必须是纯技术名词）——
+        resume_intro="用 Python 实现的命令行智能体（Agent）：自主调用工具读取 GitHub 仓库信息，多步决策后输出引用执行轨迹的代码库分析报告。",
+        resume_tech=["Python", "OpenAI 兼容 API（Function Calling）", "GitHub REST API", "Pytest", "GitHub Actions"],
     )
 
 
