@@ -345,6 +345,7 @@ async def _call_vision(model: str, api_key: str, base_url: str, provider: str,
                 # 报错原因未明说：一次摘掉全部可选字段再试（避免因字段差异直接失败）
                 use_detail, use_json = False, False
                 continue
-        raise VisionError("VISION_FAILED", f"模型服务错误 HTTP {r.status_code}: {re.sub(r'\\s+', ' ', body)[:120]}")
+        snippet = re.sub(r"\s+", " ", body)[:120]   # 注意：不能在 f-string 表达式里写反斜杠（服务器为 Python 3.11）
+        raise VisionError("VISION_FAILED", f"模型服务错误 HTTP {r.status_code}: {snippet}")
 
     raise VisionError("VISION_FAILED", last_err or "视觉分析重试后仍失败")
