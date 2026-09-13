@@ -27,7 +27,7 @@
       @on-item-click="onDrawerNav"
       @on-close="drawerOpen = false"
     />
-    <SettingsDrawer :visible="settingsOpen" @on-close="settingsOpen = false" />
+    <SettingsDrawer :visible="ui.settingsOpen" @on-close="ui.closeSettings()" />
   </div>
 </template>
 
@@ -42,6 +42,7 @@ import { useNavStore } from '@/stores/navStore';
 import { useThemeStore } from '@/stores/themeStore';
 import { useUserStore } from '@/stores/userStore';
 import { useViewport } from '@/composables/useViewport';
+import { useUiStore } from '@/stores/uiStore';
 
 const props = withDefaults(defineProps<{ title: string; subtitle?: string; activeKey?: string; wide?: boolean }>(), {
   subtitle: '',
@@ -57,7 +58,7 @@ const userStore = useUserStore();
 const { isMobile } = useViewport();
 
 const drawerOpen = ref(false);
-const settingsOpen = ref(false);
+const ui = useUiStore();
 const scrollBodyEl = ref<HTMLElement | null>(null);
 
 onMounted(() => {
@@ -71,7 +72,7 @@ function go(path: string) {
 // 点击用户头像：未登录跳转登录页，已登录打开设置面板
 function handleAvatarClick() {
   if (userStore.isLoggedIn) {
-    settingsOpen.value = true;
+    ui.openSettings();
   } else {
     router.push('/login');
   }
@@ -81,7 +82,7 @@ function onDrawerNav(path: string) {
   drawerOpen.value = false;
   // 特殊项：API 配置 → 打开设置抽屉
   if (path === '__settings__') {
-    settingsOpen.value = true;
+    ui.openSettings();
     return;
   }
   router.push(path);

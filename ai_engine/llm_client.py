@@ -18,7 +18,7 @@ from pydantic import ValidationError
 from schemas import AiResponse, Mode, ReviewLLMOutput
 
 DEFAULT_BASE_URL = "https://api.deepseek.com"
-DEFAULT_MODEL = "deepseek-v4-flash"
+DEFAULT_MODEL = "deepseek-flash"  # DeepSeek V4.1（2026-09：V4 Flash/Pro 合并为 V4.1-Flash，官方模型名 deepseek-flash）
 
 MAX_RETRIES = 2
 # 只限制"对话历史"的长度；system prompt 永不因限长被丢弃（见 _trim 不变量）
@@ -105,15 +105,20 @@ class LLMClient:
         self.api_key = api_key
         self.base_url = (base_url or DEFAULT_BASE_URL).rstrip("/")
         self.model = model or DEFAULT_MODEL
+        # 2026-09：导师页改为复用「API 配置」的服务商（可能是 qwen / kimi / GLM / 自定义），
+        # 部分 OpenAI 兼容服务商不支持 response_format=json_object → 首次被拒后自动降级，
+        # 仅靠提示词约束 JSON（下游仍有 Pydantic 校验 + 重试兜底，安全性不降低）。
+        self._use_json_mode = True
 
     async def _call(self, messages: list[dict]) -> str:
-        """调用 DeepSeek，返回 model 的文本输出（不流式，便于结构化校验）。"""
+        """调用上游，返回 model 的文本输出（不流式，便于结构化校验）。"""
         payload = {
             "model": self.model,
             "messages": _trim(messages),
-            "response_format": {"type": "json_object"},
             "temperature": 0.4,
         }
+        if self._use_json_mode:
+            payload["response_format"] = {"type": "json_object"}
         # 请求前置校验：服务商硬约束在发送前本地拦截
         _validate_request(payload, payload["messages"])
         try:
@@ -127,6 +132,10 @@ class LLMClient:
                 )
         except httpx.RequestError as e:
             raise ProviderError(f"无法连接模型服务：{type(e).__name__}") from e
+        if r.status_code == 400 and self._use_json_mode and "response_format" in r.text.lower():
+            # 该服务商/模型不支持 JSON 模式 → 关闭后重试一次（避免学生一换模型就报错）
+            self._use_json_mode = False
+            return await self._call(messages)
         if r.status_code in (401, 403):
             raise PermissionError("API Key 无效或已过期")
         if r.status_code == 429:

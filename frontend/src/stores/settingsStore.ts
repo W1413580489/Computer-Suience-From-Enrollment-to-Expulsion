@@ -12,12 +12,14 @@ export interface ProviderPreset {
 }
 
 // 与后端 config.PROVIDERS 保持一致的服务商预设（FR-BY-01 / FR-BY-MODEL-04）
+// 2026-09 更新：DeepSeek 将 V4 Flash / V4 Pro 合并为 V4.1-Flash，官方模型名 deepseek-flash
+// （旧名 deepseek-v4-flash 目前仍被兼容路由，但随时可能下线，故统一改用新名）
 export const PROVIDER_PRESETS: ProviderPreset[] = [
   {
     key: 'deepseek',
-    label: 'DeepSeek-V4（默认）',
+    label: 'DeepSeek V4.1（默认）',
     baseUrl: 'https://api.deepseek.com/v1',
-    model: 'deepseek-v4-flash',
+    model: 'deepseek-flash',
     keyHelpUrl: 'https://platform.deepseek.com/api_keys',
   },
   {
@@ -57,6 +59,13 @@ interface SettingsState {
   model: string;
 }
 
+// 已下线的模型名 → 当前模型名（避免老用户 localStorage 里存着旧名导致请求失败）
+const MODEL_MIGRATION: Record<string, string> = {
+  'deepseek-v4-flash': 'deepseek-flash',
+  'deepseek-v4-pro': 'deepseek-flash',
+  'deepseek-chat': 'deepseek-flash',
+};
+
 function loadFromLocal(): SettingsState {
   try {
     const raw = localStorage.getItem(LS_KEY);
@@ -66,13 +75,13 @@ function loadFromLocal(): SettingsState {
         provider: parsed.provider ?? 'deepseek',
         apiKey: parsed.apiKey ?? '',
         baseUrl: parsed.baseUrl ?? '',
-        model: parsed.model ?? '',
+        model: MODEL_MIGRATION[parsed.model] ?? parsed.model ?? '',
       };
     }
   } catch {
     /* localStorage 不可用时忽略 */
   }
-  // FR-BY-MODEL-03：首次打开预选 DeepSeek-V4
+  // FR-BY-MODEL-03：首次打开预选 DeepSeek V4.1
   return { provider: 'deepseek', apiKey: '', baseUrl: '', model: '' };
 }
 

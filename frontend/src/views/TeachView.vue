@@ -42,21 +42,21 @@
       <!-- 左侧配置栏 -->
       <aside class="teach__side">
         <div class="teach__group">
-          <label>API Key（BYOK · 仅存本机）</label>
-          <div class="teach__keyrow">
-            <input v-model="apiKey" :type="showKey ? 'text' : 'password'" placeholder="sk-..." autocomplete="off" />
-            <button class="teach__ghost" :title="showKey ? '隐藏' : '显示'" @click="showKey = !showKey">👁</button>
+          <label>模型配置（与「API 配置」同步）</label>
+          <div class="teach__cfgcard">
+            <div class="row"><span class="k">服务商</span><span class="v">{{ settings.preset.label }}</span></div>
+            <div class="row"><span class="k">模型</span><span class="v">{{ settings.effectiveModel || '默认' }}</span></div>
+            <div class="row">
+              <span class="k">Key</span>
+              <span class="v" :style="{ color: settings.hasKey ? 'var(--t-green)' : 'var(--t-red)' }">
+                {{ settings.hasKey ? '已配置' : '未配置' }}
+              </span>
+            </div>
+            <button class="teach__btn teach__full" @click="ui.openSettings()">⚙ 打开 API 配置</button>
+            <div class="teach__status">
+              在导航菜单「API 配置」里改一次，导师这里自动生效（可换通义千问 / Kimi / GLM / 自定义）
+            </div>
           </div>
-          <div class="teach__status">
-            {{ apiKey.trim() ? '已保存到本机' : '未配置 Key（访问将返回 400）' }}
-          </div>
-        </div>
-
-        <div class="teach__group">
-          <label>模型</label>
-          <select v-model="model">
-            <option v-for="m in models" :key="m.model" :value="m.model">{{ m.label }}</option>
-          </select>
         </div>
 
         <div class="teach__group">
@@ -257,6 +257,8 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import PageShell from '@/components/common/PageShell.vue';
 import { useThemeStore } from '@/stores/themeStore';
 import { useAchievementStore } from '@/stores/achievementStore';
+import { useSettingsStore } from '@/stores/settingsStore';
+import { useUiStore } from '@/stores/uiStore';
 import { renderAiMarkdown } from '@/composables/useAiMarkdown';
 
 const theme = useThemeStore();
@@ -298,18 +300,23 @@ function saveSel() {
 const projects = ref<Project[]>([]);
 const projectId = ref('');
 const stages = ref<Stage[]>([]);
-const models = ref<{ model: string; label: string }[]>([]);
 const mode = ref<string>('tutor');
-const apiKey = ref(localStorage.getItem(LS_API) || '');
+// 2026-09：导师页与导航「API 配置」共用同一份 BYOK 设置（settingsStore / xkz_settings_v1）。
+// 好处：只需配置一次，两处生效；且设置页可选服务商更多（通义千问/Kimi/GLM/自定义）。
+const settings = useSettingsStore();
+const ui = useUiStore();
+// 一次性迁移：把导师页历史上的独立 Key 迁到统一设置里（迁移后仅保留 xkz_settings_v1）
+if (!settings.apiKey) {
+  const legacy = (localStorage.getItem(LS_API) || '').trim();
+  if (legacy) { settings.apiKey = legacy; settings.save(); }
+}
 const repoUrl = ref(localStorage.getItem(LS_REPO) || '');
-const model = ref('');
 const taskId = ref('');
 const depUrl = ref('');
 const codeBlock = ref('');
 const descr = ref('');
 const input = ref('');
 const loading = ref(false);
-const showKey = ref(false);
 const statsOpen = ref(false);
 // 侧栏收起状态（localStorage 持久化：'0' = 收起）
 const sideOpen = ref(localStorage.getItem('xkz_teach_side') !== '0');
@@ -328,11 +335,10 @@ const chat = ref<ChatMsg[]>([]);
 const history = ref<{ role: string; content: string }[]>([]);
 const student = ref<StudentState>(loadStudent());
 
-watch(apiKey, v => localStorage.setItem(LS_API, v.trim()));
 watch(repoUrl, v => localStorage.setItem(LS_REPO, v.trim()));
 
-// 成就：首次配置 API Key
-watch(apiKey, v => { if (v.trim()) useAchievementStore().unlock('green_fruit_2'); });
+// 成就：首次配置 API Key（Key 现在统一在「API 配置」里填写，故监听统一设置）
+watch(() => settings.apiKey, v => { if (v.trim()) useAchievementStore().unlock('green_fruit_2'); });
 
 // 成就：进入课程（原"切到指导模式"成就随入口收敛迁移至此）
 function unlockTutorEntry() {
@@ -519,8 +525,6 @@ onMounted(async () => {
     const j = await r.json();
     if (!j.ok) throw new Error(j.error?.message || 'config 加载失败');
     const cfg = j.data;
-    models.value = cfg.models || [];
-    if (models.value.length) model.value = models.value[0].model;
     // 多课程：courses[].projects 携带各自的 stage/task 结构
     courses.value = (cfg.courses || []).map((c: any) => ({
       course_id: c.course_id, title: c.title, description: c.description || '',
@@ -580,7 +584,7 @@ async function send() {
   const text = input.value.trim();
   if (!text || loading.value) return;
   if (!taskId.value) { toast('请先选择一个任务'); return; }
-  if (!apiKey.value.trim()) { toast('请先填写 DeepSeek API Key'); return; }
+  if (!settings.apiKey.trim()) { toast('请先在「API 配置」里填写 API Key'); ui.openSettings(); return; }
 
   useAchievementStore().unlock('green_fruit_3');
 
@@ -597,7 +601,8 @@ async function send() {
     course_id: courseId.value, project_id: projectId.value,
     task_id: taskId.value, mode: mode.value, user_input: text,
     repo_url: repoUrl.value.trim() || null,
-    api_key: apiKey.value.trim(), model: model.value, history: history.value.slice(-6),
+    api_key: settings.apiKey.trim(), base_url: settings.effectiveBaseUrl,
+    model: settings.effectiveModel, history: history.value.slice(-6),
   };
 
   try {
@@ -659,7 +664,7 @@ function stColor(s: string) { return (ST_REVIEW[s] || ST_REVIEW.NEED_REVIEW)[1];
 
 async function doReview() {
   if (!taskId.value) { toast('请先选择一个任务'); return; }
-  if (!apiKey.value.trim()) { toast('请先填写 DeepSeek API Key'); return; }
+  if (!settings.apiKey.trim()) { toast('请先在「API 配置」里填写 API Key'); ui.openSettings(); return; }
   // 成就：首次提交验收（按课程范围解锁；原"切到验收模式"成就随入口收敛迁移至此）
   if (courseId.value === 'course_001') useAchievementStore().unlock('why_birds_fly');  // 鸟为什么会飞
   if (courseId.value === 'course_002') useAchievementStore().unlock('feather_6');      // 希望有羽毛和翅膀Ⅵ
@@ -673,7 +678,7 @@ async function doReview() {
       code: codeBlock.value.trim() || '',
       description: descr.value.trim() || '',
     },
-    api_key: apiKey.value.trim(), model: model.value,
+    api_key: settings.apiKey.trim(), base_url: settings.effectiveBaseUrl, model: settings.effectiveModel,
   };
   try {
     const r = await fetch(`/api/ai/review`, {
@@ -1013,6 +1018,14 @@ function toast(msg: string) {
 }
 .teach__tutorcard .t { font-weight: 600; font-size: 13px; color: var(--t-fg); }
 .teach__tutorcard .d { color: var(--t-mut); font-size: 11px; margin-top: 3px; line-height: 1.5; }
+.teach__cfgcard {
+  background: var(--t-bg3); border: 1px solid var(--t-line); border-radius: 8px;
+  padding: 8px 10px; display: flex; flex-direction: column; gap: 4px;
+}
+.teach__cfgcard .row { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; }
+.teach__cfgcard .k { color: var(--t-mut); }
+.teach__cfgcard .v { color: var(--t-fg); font-weight: 600; max-width: 62%; text-align: right; word-break: break-all; }
+.teach__cfgcard .teach__btn { margin-top: 4px; }
 .teach__submitbox { font-size: 12px; }
 .teach__submitbox summary { cursor: pointer; font-size: 12px; color: var(--t-dim); }
 .teach__submitbox summary:hover { color: var(--t-fg); }

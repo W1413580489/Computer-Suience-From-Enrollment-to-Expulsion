@@ -199,9 +199,12 @@ async def health():
 async def config():
     return {"ok": True, "data": {
         "models": [
-            {"model": "deepseek-v4-flash", "label": "DeepSeek V4 Flash（快速）"},
-            {"model": "deepseek-v4-pro", "label": "DeepSeek V4 Pro（更稳）"},
+            # 2026-09：DeepSeek 将 V4 Flash / V4 Pro 合并为 V4.1-Flash，官方模型名 deepseek-flash
+            {"model": "deepseek-flash", "label": "DeepSeek V4.1（默认）"},
         ],
+        # 导师页与导航「API 配置」共用同一份 BYOK 设置（服务商/BaseURL/模型/Key），
+        # 此处仅作默认展示；实际生效值由前端 settingsStore（xkz_settings_v1）请求时携带
+        "config_source": "xkz_settings_v1",
         "modes": [m.value for m in Mode],
         "hint_levels": {str(k): v for k, v in {
             0: "仅引导", 1: "提示方向", 2: "思路步骤",
