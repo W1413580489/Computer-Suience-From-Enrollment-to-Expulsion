@@ -66,15 +66,7 @@ const nav = useNavStore();
 .changelog__item {
   font-size: 13px;
   color: var(--text-secondary);
-  padding-left: 14px;
-  position: relative;
-}
-
-.changelog__item::before {
-  content: '▸';
-  position: absolute;
-  left: 0;
-  color: var(--accent-primary);
+  line-height: 1.65;
 }
 
 .empty {
@@ -104,11 +96,7 @@ const nav = useNavStore();
   }
   .changelog__item {
     font-size: 14px;
-    line-height: 1.6;
-    padding-left: 16px;
-  }
-  .changelog__item::before {
-    font-size: 14px;
+    line-height: 1.7;
   }
 }
 </style>
