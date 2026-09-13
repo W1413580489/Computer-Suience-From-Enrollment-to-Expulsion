@@ -159,6 +159,55 @@ VISION_SYSTEM_PROMPT = """你是「AI 项目导师」的视觉证据观察器，
 task_relation 表示该截图与「当前任务」是否相关。"""
 
 
+# V2.2：对话场景的读图提示词——目标不是"判定"，而是把图中可见内容如实转录给导师
+CHAT_VISION_SYSTEM_PROMPT = """你是「AI 项目导师」的图片读取器。学生会把运行截图、报错截图或代码截图贴进对话，
+你的唯一职责是：把图片里**可见的内容如实转录出来**，供导师回答学生的问题。
+
+【转录优先，不要概括】
+- 逐字转录图中的关键文本：报错类型与完整报错信息、文件名与行号、终端命令与输出、关键代码行、界面上的文案；
+- 例如必须写出 "ModuleNotFoundError: No module named 'requests'"，而不是"有一个导入错误"；
+- 图中有多段内容时分条列出；看不清的部分放进 uncertain，绝不猜测。
+
+【边界】
+- 只做"读图"，不评价代码好坏、不评价界面美观、不给出解决方案（那是导师的职责）；
+- 不推断学生是否完成了任务，不做通过/不通过判定。
+
+【输出格式】只输出一个合法 JSON：
+{
+  "facts": ["图上可见内容的转录或描述，每条一句话"],
+  "uncertain": ["看不清或无法确定的部分"],
+  "task_relation": "relevant" | "irrelevant" | "unclear",
+  "analysis_error": ""
+}
+task_relation 表示这些图片与当前任务是否相关。"""
+
+
+def build_chat_vision_prompt(task_title: str, user_question: str) -> str:
+    """对话场景的读图指令：带上学生的提问，让转录更聚焦。"""
+    q = (user_question or "").strip() or "（学生只发了图片，没有文字说明）"
+    return (
+        f"【当前任务】{task_title}\n"
+        f"【学生的提问】{q}\n\n"
+        "请读取下面这些图片，把图中可见的关键内容逐条转录出来"
+        "（尤其是报错信息、终端输出、代码片段），供导师据此回答学生。"
+    )
+
+
+def render_chat_visual_text(ev: "VisualEvidence") -> str:
+    """把对话读图结果渲染成注入对话的消息文本（不含图片内容本身）。"""
+    if ev is None or ev.status != "ok":
+        return ""
+    lines = ["[学生上传了运行截图，以下是视觉模型对图片内容的转录（不是学生的文字输入）]"]
+    for f in (ev.facts or []):
+        lines.append(f"- {f}")
+    for u in (ev.uncertain or []):
+        lines.append(f"- 无法辨认：{u}")
+    if not ev.facts and not ev.uncertain:
+        return ""
+    lines.append("[图片内容结束，请结合学生下面的提问作答]")
+    return "\n".join(lines)
+
+
 def build_vision_prompt(task_title: str, task_objective: str,
                         visual_conditions: list[str]) -> str:
     cond = "\n".join(f"- {c}" for c in visual_conditions) or "（本任务未声明视觉观察点）"
@@ -209,8 +258,13 @@ async def analyze_images(images: list[VisualImage],
                          model: str,
                          api_key: str,
                          base_url: str | None = None,
-                         provider: str = "deepseek") -> VisualEvidence:
-    """分析运行截图，返回结构化事实。
+                         provider: str = "deepseek",
+                         purpose: str = "review",
+                         user_question: str = "") -> VisualEvidence:
+    """分析图片，返回结构化结果。
+
+    purpose="review"（默认）：验收场景，只观察事实（供 Reviewer 判定）；
+    purpose="chat"：对话场景，转录图中内容（供导师回答学生问题）。
 
     永远不抛异常：任何失败都以 status=skipped/error 返回，由调用方决定忽略（fail-open）。
     """
@@ -234,7 +288,9 @@ async def analyze_images(images: list[VisualImage],
 
     hashes = [image_hash(raw) for raw, _ in decoded]
     total_bytes = sum(len(raw) for raw, _ in decoded)
-    cache_key = "|".join(sorted(hashes)) + f"::{model}"
+    # 用途前缀：同一张图在"验收观察"与"对话转录"下的结果不同，必须分开缓存
+    is_chat = purpose == "chat"
+    cache_key = ("chat:" if is_chat else "review:") + "|".join(sorted(hashes)) + f"::{model}"
 
     # 3) 事实缓存（文本；命中不再调用模型）
     now = time.time()
@@ -254,9 +310,14 @@ async def analyze_images(images: list[VisualImage],
     _inflight += 1
     start = time.time()
     try:
+        if is_chat:
+            system_prompt = CHAT_VISION_SYSTEM_PROMPT
+            user_text = build_chat_vision_prompt(task_title, user_question)
+        else:
+            system_prompt = VISION_SYSTEM_PROMPT
+            user_text = build_vision_prompt(task_title, task_objective, visual_conditions)
         facts = await _call_vision(model, api_key, base_url or DEFAULT_BASE_URL, provider,
-                                   build_vision_prompt(task_title, task_objective, visual_conditions),
-                                   decoded)
+                                   user_text, decoded, system_prompt=system_prompt)
     except VisionError as e:
         return VisualEvidence(status="error", code=e.code, message=e.message,
                               count=len(decoded), bytes=total_bytes, image_hashes=hashes,
@@ -295,7 +356,8 @@ def _cache_put(key: str, facts: VisualFacts) -> None:
 
 
 async def _call_vision(model: str, api_key: str, base_url: str, provider: str,
-                       user_text: str, images: list[tuple[bytes, str]]) -> VisualFacts:
+                       user_text: str, images: list[tuple[bytes, str]],
+                       system_prompt: str = VISION_SYSTEM_PROMPT) -> VisualFacts:
     """调用视觉模型（服务端只转发，不做本地推理）。
 
     兼容性自愈：服务商若拒绝 response_format 或 detail 字段，自动去掉后重试一次；
@@ -307,7 +369,7 @@ async def _call_vision(model: str, api_key: str, base_url: str, provider: str,
     last_err = ""
 
     for _attempt in range(3):
-        payload = build_vision_payload(model, provider, VISION_SYSTEM_PROMPT, user_text,
+        payload = build_vision_payload(model, provider, system_prompt, user_text,
                                        images, use_json_mode=use_json, use_detail=use_detail)
         try:
             async with httpx.AsyncClient(timeout=VISION_TIMEOUT) as client:

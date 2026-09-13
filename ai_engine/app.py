@@ -221,6 +221,14 @@ async def config():
 # ---------------------------------------------------------------------------
 # 核心辅导接口
 # ---------------------------------------------------------------------------
+def _visual_note(ev) -> str:
+    """对话附图要点：写入前端对话历史，让后续追问仍能引用图片内容（不含图片本身）。"""
+    if ev is None or ev.status != "ok" or not ev.facts:
+        return ""
+    body = "；".join(ev.facts[:4])[:400]
+    return f"[此前学生贴了 {ev.count} 张截图，图中可见：{body}]"
+
+
 @app.post("/api/ai/teach")
 async def teach(req: TeachRequest, request: Request):
     # 校验参数
@@ -228,8 +236,8 @@ async def teach(req: TeachRequest, request: Request):
         return JSONResponse({"ok": False, "error": {"code": "NO_TASK", "message": "请先选择一个任务"}}, status_code=400)
     if not req.api_key:
         return JSONResponse({"ok": False, "error": {"code": "NO_API_KEY", "message": "需要提供 DeepSeek API Key（BYOK）"}}, status_code=400)
-    if not req.user_input.strip():
-        return JSONResponse({"ok": False, "error": {"code": "EMPTY_INPUT", "message": "请输入你要问的内容"}}, status_code=400)
+    if not req.user_input.strip() and not req.visual_images:
+        return JSONResponse({"ok": False, "error": {"code": "EMPTY_INPUT", "message": "请输入你要问的内容，或贴一张截图"}}, status_code=400)
 
     mode = req.mode.value if isinstance(req.mode, Mode) else req.mode
     task = get_task(req.task_id)
@@ -253,10 +261,45 @@ async def teach(req: TeachRequest, request: Request):
         _sessions[skey] = sess
     sess.mode = req.mode  # 记录最近一次使用的模式（不影响会话身份）
 
+    # V2.2 对话附图：先读图（转录图中内容），结果同时用于行为路由与对话。
+    # 任何失败（模型不支持/超时/繁忙/格式问题）只跳过图片，普通对话完全不受影响（fail-open）。
+    visual_evidence = None
+    visual_text = ""
+    if req.visual_images:
+        visual_evidence = await vision_mod.analyze_images(
+            req.visual_images,
+            task_title=task.title,
+            task_objective=task.objective,
+            visual_conditions=[],
+            model=req.model or DEFAULT_MODEL,
+            api_key=req.api_key,
+            base_url=req.base_url,
+            provider="custom" if req.base_url else "deepseek",
+            purpose="chat",
+            user_question=req.user_input,
+        )
+        visual_text = vision_mod.render_chat_visual_text(visual_evidence)
+        # 只记元数据（数量/字节/耗时/错误码），绝不记录图片内容或 base64
+        logs_mod.log_event(
+            type="vision",
+            session_id=sid,
+            task_id=req.task_id,
+            project_id=req.project_id,
+            vision_purpose="chat",
+            vision_status=visual_evidence.status,
+            vision_code=visual_evidence.code,
+            image_count=visual_evidence.count,
+            image_bytes=visual_evidence.bytes,
+            vision_model=visual_evidence.model,
+            vision_cached=visual_evidence.cached,
+            vision_ms=visual_evidence.latency_ms,
+        )
+
     # 指导模式内部行为路由（拆解/推进/调试，用户无感；调试状态机挂在行为上）
+    # 有图片时把读图结果一起纳入判断：贴报错截图 → 直接进入调试行为
     behavior = ""
     if mode == "tutor":
-        behavior = route_behavior(req.user_input, sess)
+        behavior = route_behavior((req.user_input + "\n" + visual_text).strip() or "（学生发来一张图片）", sess)
 
     # 组装上下文
     ctx = build_context(req, student)
@@ -291,7 +334,10 @@ async def teach(req: TeachRequest, request: Request):
     for h in history[-6:]:
         if h.get("role") in ("user", "assistant") and h.get("content"):
             messages.append({"role": h["role"], "content": h["content"]})
-    messages.append({"role": "user", "content": req.user_input})
+    # 图片本身不进对话（只进"读图结果"）；学生只贴图没打字时用占位问句，保证消息非空
+    if visual_text:
+        messages.append({"role": "user", "content": visual_text})
+    messages.append({"role": "user", "content": req.user_input.strip() or "请看上面的图片。"})
 
     # 调用 LLM
     client = LLMClient(req.api_key, req.base_url, req.model)
@@ -332,7 +378,10 @@ async def teach(req: TeachRequest, request: Request):
 
     # 记录会话 & 更新 hint level
     sess.hint_level = ctx.hint_level
-    sess.history.append({"role": "user", "content": req.user_input})
+    hist_user = req.user_input
+    if visual_evidence is not None and visual_evidence.status == "ok":
+        hist_user = f"[附 {visual_evidence.count} 张图片] {req.user_input}".strip()
+    sess.history.append({"role": "user", "content": hist_user})
     sess.history.append({"role": "assistant", "content": resp.message})
 
     # 调试行为：更新取证状态机
@@ -387,6 +436,9 @@ async def teach(req: TeachRequest, request: Request):
             "behavior_label": BEHAVIOR_LABELS.get(behavior, ""),
             # 代码证据状态（V2）
             "evidence": evidence_status,
+            # V2.2 对话附图：状态（供前端提示）+ 要点（供前端写入对话历史，让后续追问仍能引用图片内容）
+            "visual": visual_evidence.model_dump() if visual_evidence else None,
+            "visual_note": _visual_note(visual_evidence),
             # Sprint 4：Debugger 取证状态机（前端展示轮次/阶段）
             "debug_state": debug_state_info,
             # 模式链建议（推荐下一个辅导模式）

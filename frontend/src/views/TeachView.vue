@@ -96,7 +96,7 @@
           <label>提交验收</label>
           <div class="teach__tutorcard">
             <div class="t">在对话框里直接提交</div>
-            <div class="d">贴运行截图（Ctrl+V 粘贴或拖入）、写一句说明，点输入框旁的「⚖ 提交验收」。材料全部选填，不填也能提交。</div>
+            <div class="d">在输入框里直接完成：贴截图（Ctrl+V / 拖入）、写说明，点「⚖ 验收」提交评审；图片也可以直接发送给导师一起讨论。材料全部选填。</div>
           </div>
         </div>
 
@@ -261,7 +261,7 @@
           <!-- 待提交的运行截图（验收用；只存在当前页面内存） -->
           <div v-if="shots.length || dragging" class="teach__dock">
             <div class="teach__dock-head">
-              <span>运行截图 · 随本次验收提交（最多 {{ MAX_SHOTS }} 张）</span>
+              <span>附图 · 最多 {{ MAX_SHOTS }} 张（随消息发给导师；点「⚖ 验收」时作为运行证据）</span>
               <span v-if="dragging" class="teach__dock-tip">松开即可添加</span>
             </div>
             <div class="teach__dock-list">
@@ -378,7 +378,7 @@ const shots = ref<Shot[]>([]);
 const visionModels = ref<string[]>([]);
 const visionEnabled = computed(() => visionModels.value.includes(settings.effectiveModel));
 const composerHint = computed(() => visionEnabled.value
-  ? '描述进展、贴代码或报错；运行截图可直接 Ctrl+V 粘贴 / 拖入，验收时随材料一起提交…（Enter 发送，Shift+Enter 换行）'
+  ? '描述进展、贴代码或报错；截图可直接 Ctrl+V 粘贴 / 拖入，Enter 发送给导师，或点「⚖ 验收」提交评审…'
   : '描述你当前的进展、粘贴代码或报错…（Enter 发送，Shift+Enter 换行）');
 
 function pickShots() {
@@ -733,14 +733,22 @@ function saveStudent() {
 
 async function send() {
   const text = input.value.trim();
-  if (!text || loading.value) return;
+  const hasImages = shots.value.length > 0;
+  // 允许"只贴图不打字"发送（导师会读图后回应）
+  if ((!text && !hasImages) || loading.value) return;
   if (!taskId.value) { toast('请先选择一个任务'); return; }
   if (!settings.apiKey.trim()) { toast('请先在「API 配置」里填写 API Key'); ui.openSettings(); return; }
 
   useAchievementStore().unlock('green_fruit_3');
 
+  // 图片随本条消息发出（服务端只做一次读图，原图不保存）
+  const previews = hasImages ? shots.value.map(s => s.preview) : undefined;
+  const visualImages = hasImages
+    ? shots.value.map(s => ({ name: s.name, mime: s.mime, data_base64: s.data }))
+    : [];
   input.value = '';
-  pushMsg('user', text);
+  shots.value = [];
+  pushMsg('user', text || '（请看这张截图）', undefined, previews);
   loading.value = true;
   scrollToBottom();
 
@@ -754,6 +762,8 @@ async function send() {
     repo_url: repoUrl.value.trim() || null,
     api_key: settings.apiKey.trim(), base_url: settings.effectiveBaseUrl,
     model: settings.effectiveModel, history: history.value.slice(-6),
+    // V2.2 对话附图（base64 内联；请求结束即释放，服务端不落盘）
+    visual_images: visualImages,
   };
 
   try {
@@ -773,6 +783,20 @@ async function send() {
       return;
     }
     const d = j.data;
+    if (d.visual_note) {
+      // 把图片要点并入本轮学生消息的历史，让后续追问（如"第二行是什么"）仍能引用图片内容
+      for (let k = history.value.length - 1; k >= 0; k--) {
+        if (history.value[k].role === 'user') {
+          history.value[k].content = `${d.visual_note}\n${history.value[k].content}`;
+          break;
+        }
+      }
+    }
+    if (hasImages && d.visual && d.visual.status !== 'ok') {
+      // 读图失败不影响对话，但要让同学知道"这次没看图"
+      const why = VISION_CODE_TEXT[d.visual.code] || '未知原因';
+      pushSystem(`图片未被读取（${why}），本次按你输入的文字回答。`);
+    }
     pushMsg('assistant', d);
     // 成就：发送含报错的消息并获得 AI 修复帮助（按课程范围解锁）
     if (/error|错误|报错|失败|traceback|exception|404|500|failed/i.test(text)) {
@@ -795,8 +819,8 @@ function pushSystem(text: string) {
   scrollToBottom();
 }
 
-function pushMsg(role: 'user' | 'assistant', payload: any, review?: any) {
-  chat.value.push({ role, payload, review });
+function pushMsg(role: 'user' | 'assistant', payload: any, review?: any, images?: string[]) {
+  chat.value.push({ role, payload, review, images });
   if (role === 'user') history.value.push({ role: 'user', content: typeof payload === 'string' ? payload : payload.message });
   else history.value.push({ role: 'assistant', content: payload?.message || '' });
   if (history.value.length > 40) history.value = history.value.slice(-40);

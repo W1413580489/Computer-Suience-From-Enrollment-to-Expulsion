@@ -368,6 +368,7 @@ class TeachRequest(BaseModel):
     base_url: str | None = None
     model: str | None = None
     history: list[dict[str, Any]] | None = None
+    visual_images: list[VisualImage] = Field(default_factory=list)   # V2.2 对话附图（请求级，不落盘）
 
 
 class ReviewRequest(BaseModel):
