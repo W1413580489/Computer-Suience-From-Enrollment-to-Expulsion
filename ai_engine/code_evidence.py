@@ -49,14 +49,24 @@ def detect_run_cmd(text: str) -> str:
     return line[:200]
 
 STRUCTURE_MAX = 200       # 展示结构最多条目数
-KEY_FILES_MAX = 8         # 最多拉取几个关键文件
+KEY_FILES_MAX = 10        # 最多拉取几个关键文件（含报告类/测试类）
 FILE_LINES_MAX = 120      # 单个文件正文最多行数
-EVIDENCE_CHAR_CAP = 16000 # 证据文本总字符上限
+REPORT_LINES_MAX = 250    # 报告类文件（测试报告等）正文上限——表格类文本更长
+EVIDENCE_CHAR_CAP = 20000 # 证据文本总字符上限（报告进入证据后上调）
 CACHE_TTL = 300           # 秒
 
 # 在文件树中忽略的目录
 _SKIP_DIRS = {".git", "node_modules", "__pycache__", "venv", ".venv",
               "dist", "build", ".next", ".nuxt", "target", "Pods", ".idea", ".vscode"}
+
+# 报告类文件：课程要求学生把「测试报告 / 问题记录 / 复盘」写在仓库根目录的 Markdown 里，
+# 作为正式的自述型证据。优先级最高——它比 README 更能反映学生真实使用与测试过程。
+_KEY_REPORT = {
+    "test_report.md", "test-report.md", "testreport.md", "test_record.md",
+    "testrecord.md", "testing.md", "test.md", "report.md", "testreport.md",
+    "bugs.md", "bug_report.md", "bugreport.md", "issues.md", "issue.md",
+    "feedback.md", "retro.md", "retrospective.md", "regression.md",
+}
 
 _KEY_README = {"readme.md", "readme", "readme.txt", "readme.rst"}
 _KEY_DEPS = {"requirements.txt", "pyproject.toml", "setup.py", "environment.yml",
@@ -147,20 +157,47 @@ def _filter_structure(tree: list[dict]) -> list[str]:
     return paths
 
 
+def _lines_cap_for(path: str) -> int:
+    """报告类文件放宽行数上限（表格类文本更长），其余用默认值。"""
+    name = path.lower().rsplit("/", 1)[-1]
+    return REPORT_LINES_MAX if name in _KEY_REPORT else FILE_LINES_MAX
+
+
+def _is_report_file(path: str) -> bool:
+    """是否为课程约定的"测试报告/问题记录"类文件。"""
+    return path.lower().rsplit("/", 1)[-1] in _KEY_REPORT
+
+
 def _pick_key_files(paths: list[str], structure: list[dict]) -> list[str]:
-    """按优先级精选关键文件（小写比对根节点名）。"""
+    """按优先级精选关键文件（小写比对根节点名）。
+
+    优先级：报告类 > README > 依赖 > 主入口 > 配置；最后再补 1~2 个测试文件
+    （测试通常在 tests/ 下，不在根目录，需要单独扫）。
+    报告类排最前，因为课程验收要核对"学生自己写的测试报告"。
+    """
     root = {p.split("/")[0].lower(): p for p in paths if "/" not in p}
     targets: list[str] = []
-    for group in (_KEY_README, _KEY_DEPS, _KEY_MAIN, _KEY_CFG):
+    for group in (_KEY_REPORT, _KEY_README, _KEY_DEPS, _KEY_MAIN, _KEY_CFG):
         for name in group:
             if name in root and root[name] not in targets:
                 targets.append(root[name])
             if len(targets) >= KEY_FILES_MAX:
                 return targets
+
+    # 补测试文件（最多 2 个）：让"是否真的写了测试"这类验收项有据可查
+    test_added = 0
+    for p in paths:
+        if len(targets) >= KEY_FILES_MAX or test_added >= 2:
+            break
+        name = p.lower().rsplit("/", 1)[-1]
+        if (name.startswith("test_") or name.endswith("_test.py")) and p not in targets:
+            targets.append(p)
+            test_added += 1
     return targets
 
 
-async def _fetch_file_content(owner: str, repo: str, branch: str, path: str) -> tuple[str, bool]:
+async def _fetch_file_content(owner: str, repo: str, branch: str, path: str,
+                             max_lines: int = FILE_LINES_MAX) -> tuple[str, bool]:
     """通过 GitHub Contents API 拉取文件内容（走 api.github.com，不依赖 raw.githubusercontent.com）。"""
     import base64
     url = f"{GITHUB_API}/repos/{owner}/{repo}/contents/{path}?ref={branch}"
@@ -180,8 +217,8 @@ async def _fetch_file_content(owner: str, repo: str, branch: str, path: str) -> 
         return "(该文件内容无法获取，请重试或更换网络)", False
     truncated = False
     lines = raw.splitlines()
-    if len(lines) > FILE_LINES_MAX:
-        lines = lines[:FILE_LINES_MAX]
+    if len(lines) > max_lines:
+        lines = lines[:max_lines]
         truncated = True
     return "\n".join(lines), truncated
 
@@ -203,6 +240,68 @@ def _ci_dimension(name: str) -> str:
         if key in n:
             return dim
     return "test" if "test" in n else "unknown"
+
+
+ISSUES_MAX = 5            # 最多拉取几条 Issue
+ISSUE_BODY_MAX = 800      # 单条 Issue 正文最多字符
+
+
+async def fetch_issues_evidence(owner: str, repo: str, state: str = "all") -> dict:
+    """拉取仓库 Issue（标题/正文/状态/时间戳/标签）——课程 03 的「发现问题」过程证据。
+
+    - GitHub 的 issues 接口会把 PR 一并返回，这里按 pull_request 字段过滤掉；
+    - 仓库未启用 Issues 时返回 404，按「没有记录」处理，不阻塞主流程；
+    - 返回 {ok, count, items, text} 或 {ok: False, code, error, text}。
+    """
+    url = f"{GITHUB_API}/repos/{owner}/{repo}/issues?state={state}&per_page=30"
+    try:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(connect=10, read=30, write=10, pool=10)) as c:
+            r = await c.get(url, headers=_auth_headers())
+    except httpx.RequestError as e:
+        return {"ok": False, "code": "NETWORK",
+                "error": f"无法连接 GitHub：{type(e).__name__}", "text": ""}
+    if r.status_code == 404:
+        return {"ok": False, "code": "ISSUES_DISABLED",
+                "error": "仓库未启用 Issues 或无权访问", "text": ""}
+    if r.status_code in (401, 403):
+        return {"ok": False, "code": "RATE_LIMITED",
+                "error": "GitHub 限流或无权访问 Issues", "text": ""}
+    if r.status_code != 200:
+        return {"ok": False, "code": "ISSUES_FAILED",
+                "error": f"HTTP {r.status_code}", "text": ""}
+
+    raw = r.json()
+    if not isinstance(raw, list):
+        return {"ok": False, "code": "ISSUES_FAILED", "error": "返回结构异常", "text": ""}
+
+    items: list[dict] = []
+    for it in raw:
+        if not isinstance(it, dict) or it.get("pull_request"):
+            continue                      # 过滤 PR（issues 接口会混入 PR）
+        items.append({
+            "number": it.get("number"),
+            "title": (it.get("title") or "").strip(),
+            "body": (it.get("body") or "").strip()[:ISSUE_BODY_MAX],
+            "state": it.get("state", ""),
+            "created_at": (it.get("created_at") or "")[:10],
+            "labels": [l.get("name") for l in (it.get("labels") or []) if isinstance(l, dict)],
+        })
+        if len(items) >= ISSUES_MAX:
+            break
+
+    if not items:
+        return {"ok": True, "count": 0, "items": [],
+                "text": "[GitHub Issues] 该仓库暂无 Issue 记录。"}
+
+    lines = [f"[GitHub Issues] 共 {len(items)} 条（最多取 {ISSUES_MAX} 条，作为「发现问题」的过程证据）："]
+    for it in items:
+        head = f"## #{it['number']} {it['title']}  [{it['state']}] {it['created_at']}"
+        if it["labels"]:
+            head += f"  标签：{', '.join(it['labels'])}"
+        lines.append(head)
+        lines.append(it["body"] or "（无正文）")
+        lines.append("")
+    return {"ok": True, "count": len(items), "items": items, "text": "\n".join(lines)}
 
 
 async def fetch_ci_evidence(owner: str, repo: str, branch: str) -> dict:
@@ -404,14 +503,16 @@ async def build_code_evidence(repo_url: str, task_id: str = "", code_context=Non
                     selected = [p for p, _ in ranked[:3]]
                 ai_reasons = {}
             for p in selected:
-                content, truncated = await _fetch_file_content(owner, repo, branch, p)
+                content, truncated = await _fetch_file_content(
+                    owner, repo, branch, p, max_lines=_lines_cap_for(p))
                 key_files.append({"path": p, "content": content, "truncated": truncated,
                                   "relevance": ranked_dict.get(p, 0.0),
                                   "reason": ai_reasons.get(p, "")})
         else:
             # 无 code_context：回退到原有固定选取逻辑
             for p in _pick_key_files(paths, tree):
-                content, truncated = await _fetch_file_content(owner, repo, branch, p)
+                content, truncated = await _fetch_file_content(
+                    owner, repo, branch, p, max_lines=_lines_cap_for(p))
                 key_files.append({"path": p, "content": content, "truncated": truncated})
 
         evidence_text = _assemble(owner, repo, branch, paths, key_files)
@@ -434,6 +535,15 @@ async def build_code_evidence(repo_url: str, task_id: str = "", code_context=Non
         if ci_block:
             evidence_text = evidence_text + ci_block
 
+        # 课程 03：GitHub Issues（学生「发现问题」的过程证据），失败不阻塞主流程
+        issues = await fetch_issues_evidence(owner, repo)
+        if issues.get("text"):
+            evidence_text = evidence_text + "\n\n" + issues["text"]
+        elif not issues.get("ok"):
+            # 拉取失败要显式写明，避免被误读成「学生没有提任何 Issue」
+            evidence_text = evidence_text + (
+                f"\n\n[GitHub Issues] 获取失败：{issues.get('error', '未知')}（不影响代码证据）")
+
         result = {
             "ok": True, "repo": f"{owner}/{repo}", "default_branch": branch,
             "file_count": len(paths), "key_files": key_files,
@@ -441,6 +551,9 @@ async def build_code_evidence(repo_url: str, task_id: str = "", code_context=Non
             "readme_run_cmd": readme_run_cmd,
             "ci": ci if ci.get("ok") else {"ok": False, "code": ci.get("code", "CI_UNKNOWN"),
                                            "error": ci.get("error", ""), "text": ci_text},
+            "issues": issues if issues.get("ok") else {"ok": False, "items": [], "count": 0,
+                                                      "code": issues.get("code", "ISSUES_UNKNOWN"),
+                                                      "error": issues.get("error", "")},
         }
         if len(result["evidence_text"]) > EVIDENCE_CHAR_CAP:
             result["evidence_text"] = result["evidence_text"][:EVIDENCE_CHAR_CAP] + "\n…[证据过长已截断]"
@@ -471,10 +584,12 @@ def _assemble(owner: str, repo: str, branch: str, paths: list[str],
     if key_files:
         parts.append("关键文件内容（供审阅，可能截断）:")
         for kf in key_files:
-            parts.append(f"===== {kf['path']} =====")
+            # 报告类文件显式打标：评审需要认出「这是学生自己写的测试报告」，才能按表逐条核对
+            tag = "【学生测试报告/问题记录】" if _is_report_file(kf["path"]) else ""
+            parts.append(f"===== {tag}{kf['path']} =====")
             parts.append(kf["content"])
             if kf["truncated"]:
-                parts.append("...[内容过长已截断（仅展示前 {} 行）]".format(FILE_LINES_MAX))
+                parts.append("...[内容过长已截断（仅展示前 {} 行）]".format(_lines_cap_for(kf["path"])))
 
     text = "\n\n".join(parts)
     if len(text) > EVIDENCE_CHAR_CAP:

@@ -699,6 +699,13 @@ _COURSES: dict[str, dict] = {
         "img": "/courses/agent.jpg", "img_pos": "center 30%",
     },
 }
+# ---- 课程 03：从接手MCP开始的牛马生活（一个课程 + 两个项目）----
+from course03_data import COURSE_003, build_project_mcp_build, build_project_mcp_test  # noqa: E402
+
+_PROJECT_BUILDERS["project_mcp_build"] = build_project_mcp_build
+_PROJECT_BUILDERS["project_mcp_test"] = build_project_mcp_test
+_COURSES["course_003"] = COURSE_003
+
 _project_cache: dict[str, Project] = {}
 
 

@@ -231,6 +231,8 @@ class EvidenceType(str, Enum):
     DESCRIPTION = "description"
     MANUAL = "manual"
     TRACE = "trace"   # Agent 执行轨迹（agent_trace.json，课程 02+）
+    REPORT = "report"    # 课程 03：学生测试报告（仓库根目录 TEST_REPORT.md 等）
+    ISSUE = "issue"      # 课程 03：GitHub Issue（问题记录与产品反馈）
 
 
 class Evidence(BaseModel):

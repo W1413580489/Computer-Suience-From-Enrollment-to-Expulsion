@@ -24,11 +24,48 @@ from schemas import ReviewCriterion, ReviewEvaluation, ReviewLLMOutput, ReviewRe
 # ---------------------------------------------------------------------------
 # Evidence Collector
 # ---------------------------------------------------------------------------
+# 课程 03：学生测试报告在 GitHub 证据文本里的标记（由 code_evidence._assemble 打上）
+_REPORT_TAG = "【学生测试报告/问题记录】"
+REPORT_SECTION_LIMIT = 2500
+
+
+def extract_report_section(evidence_text: str, limit: int = REPORT_SECTION_LIMIT) -> str:
+    """从 GitHub 证据文本里抽出「学生测试报告」正文（课程 03 的正式自述型证据）。"""
+    if _REPORT_TAG not in evidence_text:
+        return ""
+    chunk = evidence_text.split(_REPORT_TAG, 1)[1]
+    # 跳过标记后残留的文件名与分隔符（形如 "TEST_REPORT.md =====\n"）
+    first_nl = chunk.find("\n")
+    if first_nl > 0 and "=====" in chunk[:first_nl]:
+        chunk = chunk[first_nl + 1:]
+    end = chunk.find("\n=====")          # 到下一个文件分隔符为止
+    if end > 0:
+        chunk = chunk[:end]
+    chunk = chunk.strip()
+    if not chunk:
+        return ""
+    return chunk[:limit] + ("\n…[报告过长已截断]" if len(chunk) > limit else "")
+
+
+_ISSUE_TAG = "[GitHub Issues]"
+ISSUE_SECTION_LIMIT = 2000
+
+
+def extract_issues_section(evidence_text: str, limit: int = ISSUE_SECTION_LIMIT) -> str:
+    """从 GitHub 证据文本里抽出 Issue 记录（课程 03 的「发现问题」过程证据）。"""
+    if _ISSUE_TAG not in evidence_text:
+        return ""
+    chunk = evidence_text.split(_ISSUE_TAG, 1)[1].strip()
+    if not chunk:
+        return ""
+    return chunk[:limit] + ("\n…[Issue 记录过长已截断]" if len(chunk) > limit else "")
+
+
 def collect_evidence(submission: Submission | None, repo_code_text: str = "",
                      visual=None) -> dict[str, str]:
     """把 submission 各字段跟仓库代码证据归一成"可用证据"清单。
 
-    返回 { 证据类型: 文本 }，证据类型 ∈ code / runtime / test / url / description / visual。
+    返回 { 证据类型: 文本 }，证据类型 ∈ code / runtime / test / url / description / visual / report / issue。
     """
     ev: dict[str, str] = {}
     sub = submission or Submission(task_id="")
@@ -38,6 +75,14 @@ def collect_evidence(submission: Submission | None, repo_code_text: str = "",
         # 课程 02+：仓库含 agent_trace.json 时登记 Trace 证据（Agent 执行轨迹）
         if "agent_trace.json" in repo_code_text:
             ev["trace"] = "仓库中包含 agent_trace.json（Agent 执行轨迹），可验证工具调用与多步行为"
+        # 课程 03：仓库里出现"测试报告"时登记 report 证据（供评审按表逐条核对）
+        report_section = extract_report_section(repo_code_text)
+        if report_section:
+            ev["report"] = f"学生测试报告（来自仓库）：\n{report_section}"
+        # 课程 03：GitHub Issues → issue 证据
+        issues_section = extract_issues_section(repo_code_text)
+        if issues_section:
+            ev["issue"] = f"GitHub Issue 记录：\n{issues_section}"
     elif sub.github_url:
         ev["url"] = f"GitHub 仓库地址：{sub.github_url}（尚未拉取，仅链路可访问）"
         ev["code"] = f"GitHub 仓库地址已提供：{sub.github_url}"
@@ -111,6 +156,8 @@ def evidence_text(available: dict[str, str]) -> str:
         "code": "代码证据", "runtime": "运行证据", "test": "测试证据",
         "deployment": "部署地址", "url": "仓库链接",
         "description": "学生自述", "visual": "视觉证据（运行截图观察结果）",
+        "report": "学生测试报告（仓库内报告文件）",
+        "issue": "GitHub Issue（问题与反馈记录）",
     }
     for typ, text in available.items():
         lines.append(f"[{label.get(typ, typ)}] {text}")
@@ -145,7 +192,8 @@ def evidence_precheck(rubrics: list[Rubric], available: dict[str, str]) -> dict:
 
     # 修改 1：部署降级——deployment 不再是硬性必交项（自愿提供时仅作加分证据）
     # V2.1：visual 同理——视觉证据永远是可选增强，绝不作为硬门槛（防止课程作者误写入 required_evidence）
-    optional_bonus = {"deployment", "visual"}
+    # 课程 03：report / issue 同理——它们只增不减证据强度，缺了不该阻塞判定
+    optional_bonus = {"deployment", "visual", "report", "issue"}
 
     for r in rubrics:
         needed = set(r.required_evidence) - optional_bonus
@@ -356,6 +404,18 @@ def build_review_system_prompt(task: Task, rubrics: list[Rubric],
   - 若代码证据显示没有对应功能，而截图显示了该结果 → 视为证据冲突，判 NEED_REVIEW 并在理由中说明冲突；
   - 若某条标准的 Visual 观察点在截图中得不到支持，按该标准原有证据判定，**不得仅因"缺少截图"判 FAIL 或 NEED_REVIEW**；
   - 视觉证据未提供时（模型不支持视觉 / 学生未上传），完全按原有证据链判定，不受任何影响。
+
+【测试报告的核对规则（课程 03 起）】若证据里出现带「【学生测试报告/问题记录】」标记的文件：
+  - 把它当作"学生自述 + 自测结果"处理：逐条核对"学生声称的结果"与"他给出的实际证据"是否一致；
+  - 学生的"实际结果"栏若只有笼统描述（如"正常""OK""没问题"）而没有具体文本，该条不足以判 PASS；
+  - 报告里出现的报错原文、工具返回原文、数据库导出等**具体文本**，可作为对应验收项的辅助证据；
+  - 报告不能替代代码 / CI / 运行证据：它证明"学生做过测试"，不证明"功能正确"；
+  - 报告与代码或 CI 结论冲突时（例如报告称测试全过但 CI 失败）→ 判 NEED_REVIEW，并在理由里指出冲突。
+
+【Issue 证据的用法】若证据里出现 GitHub Issue 记录：
+  - 它证明"学生发现并描述了问题"，可用于判定"能否写清 Expected vs Actual""是否提出产品反馈"这类验收项；
+  - Issue 的存在**不能**证明问题已修复——修复必须看代码改动与 CI 结论；
+  - "产品反馈型" Issue（如"分类规则区分不清""提醒太打扰"）与 Bug 同等有效，不要因为没有复现步骤就否定它。
 
 【CI 硬证据优先】若证据里出现 "[CI 自动验收证据]"（来自 GitHub Actions，是 system 判定而非 AI 猜测）：
   - build 类工作流 conclusion=success → 这是"可构建/能启动"的权威证据，对应验收项可直接 PASS。
