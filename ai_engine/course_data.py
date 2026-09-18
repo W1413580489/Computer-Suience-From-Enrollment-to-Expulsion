@@ -690,13 +690,13 @@ _COURSES: dict[str, dict] = {
         "title": "AI 微项目实战（套壳聊天机器人）",
         "description": "十几分钟完成一个套壳聊天机器人，体验'前端→后端→大模型 API'最小闭环。",
         "projects": ["project_chatbot"],
-        "img": "/courses/chatbot.jpg", "img_pos": "center 25%",
+        "img": "/courses/chatbot.webp", "img_pos": "center 25%",
     },
     "course_002": {
         "title": "Agent 实战（GitHub 项目分析）",
         "description": "做一个会调用工具、多步执行、输出带证据报告的 CLI Agent。前置：已完成套壳聊天机器人。",
         "projects": ["project_agent"],
-        "img": "/courses/agent.jpg", "img_pos": "center 30%",
+        "img": "/courses/agent.webp", "img_pos": "center 30%",
     },
 }
 # ---- 课程 03：从接手MCP开始的牛马生活（一个课程 + 两个项目）----

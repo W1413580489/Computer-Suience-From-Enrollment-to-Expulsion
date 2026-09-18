@@ -17,7 +17,20 @@
     <!-- ZZZ 字体：Bebas Neue + Noto Sans SC / AK 字体：Noto Serif SC（明日方舟日间衬线标题） -->
     <link rel="preconnect" href="https://fonts.loli.net">
     <link rel="preconnect" href="https://gstatic.loli.net" crossorigin>
-    <link href="https://fonts.loli.net/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@400;500;700;900&family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!--
+      字体样式表改为「非阻塞」加载。
+      原因：这份 CSS 体积极大（中文字体按 unicode-range 被切成上百个分片，实测约 430KB，
+      外网 TTFB 0.7~3.2s、总耗时可达 6.5s）。用普通 <link rel="stylesheet"> 会阻塞首屏渲染，
+      表现就是"页面要等一段时间才显现"。改为 preload + onload 切换后，首屏立即用系统字体渲染
+      （--font-body 的回退链已有 PingFang SC / Microsoft YaHei），字体到位后自动替换，不影响观感。
+    -->
+    <link
+      rel="preload" as="style"
+      href="https://fonts.loli.net/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@400;500;700;900&family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.loli.net/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@400;500;700;900&family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap">
+    </noscript>
     <!-- 自托管字体（JetBrains Mono 本地回退） -->
     <link rel="stylesheet" href="/src/styles/fonts.css" />
     <script>

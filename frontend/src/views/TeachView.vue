@@ -561,18 +561,18 @@ const wheelList = computed(() => {
     const doneCount = tasks.filter(t => (student.value.completed_tasks || []).includes(t.task_id)).length;
     const total = tasks.length;
     return { c, course_id: c.course_id, title: c.title, description: c.description, blank: false,
-      img: c.img || '/courses/more.jpg', pos: c.img_pos || 'center 30%',
+      img: c.img || '/courses/more.webp', pos: c.img_pos || 'center 30%',
       doneCount, total, pct: total ? Math.round(doneCount / total * 100) : 0,
       done: total > 0 && doneCount === total,
       progBtn: total > 0 && doneCount === total ? '重温课程' : (doneCount > 0 ? '继续学习' : '开始学习') };
   });
-  // 少于 3 张时补空白卡垫位，保证转盘两侧始终有卡片可见
-  const blanks = [];
-  for (let k = 0; real.length + k < 3; k++) {
-    blanks.push({ course_id: `blank_${k}`, title: '更多课程', description: '后续开放 · 敬请期待', blank: true,
-      img: '/courses/more.jpg', pos: '82% 40%',
-      doneCount: 0, total: 0, pct: 0, done: false, progBtn: '敬请期待' });
-  }
+  // 「更多课程」占位卡：固定在末位。当前 3 门课 → 它正好是第 4 张卡。
+  // 以后新增课程时它会顺延到更后面，始终保持「最后一格是入口预告」的语义。
+  const blanks = [{
+    course_id: 'blank_more', title: '更多课程', description: '后续开放 · 敬请期待', blank: true,
+    img: '/courses/more.webp', pos: '82% 40%',
+    doneCount: 0, total: 0, pct: 0, done: false, progBtn: '敬请期待',
+  }];
   const all = [...real, ...blanks];
   const n = Math.max(all.length, 3);
   return all.map((w, i) => {
@@ -679,7 +679,7 @@ onMounted(async () => {
     // 多课程：courses[].projects 携带各自的 stage/task 结构
     courses.value = (cfg.courses || []).map((c: any) => ({
       course_id: c.course_id, title: c.title, description: c.description || '',
-      img: c.img || '/courses/more.jpg', img_pos: c.img_pos || 'center 30%',
+      img: c.img || '/courses/more.webp', img_pos: c.img_pos || 'center 30%',
       projects: (c.projects || []).map((p: any) => ({ project_id: p.project_id, title: p.title, description: p.description || '', stages: p.stages || [] })),
     }));
     if (!courses.value.length) {

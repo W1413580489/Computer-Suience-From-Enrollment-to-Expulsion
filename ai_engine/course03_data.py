@@ -26,7 +26,7 @@ COURSE_003 = {
     "description": "接手一个已经做了一半的 AI 工具，用 Python 把它做成真正能用的 MCP Server；"
                    "然后自己当第一个真实用户去测试它、提 Issue、修好、做回归。",
     "projects": ["project_mcp_build", "project_mcp_test"],
-    "img": "/courses/mcp.jpg",
+    "img": "/courses/mcp.webp",
     "img_pos": "center 30%",
 }
 

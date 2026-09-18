@@ -42,7 +42,7 @@ check("course_003 已注册", "course_003" in courses, str(list(courses)))
 c3 = courses.get("course_003", {})
 check("课程 03 挂了两个项目", len(c3.get("projects", [])) == 2,
       str([p.get("project_id") for p in c3.get("projects", [])]))
-check("课程 03 有封面图", c3.get("img") == "/courses/mcp.jpg", str(c3.get("img")))
+check("课程 03 有封面图", c3.get("img") == "/courses/mcp.webp", str(c3.get("img")))
 check("课程 01/02 仍在（回归）", "course_001" in courses and "course_002" in courses)
 
 build = cd.get_project("project_mcp_build")
