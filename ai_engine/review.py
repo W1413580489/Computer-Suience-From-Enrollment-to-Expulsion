@@ -18,7 +18,12 @@ import hashlib
 import json
 
 from code_evidence import detect_run_cmd
-from schemas import ReviewCriterion, ReviewEvaluation, ReviewLLMOutput, ReviewRequest, ReviewStatus, Rubric, Submission, Task
+from schemas import EvaluationRole, ReviewCriterion, ReviewEvaluation, ReviewLLMOutput, ReviewRequest, ReviewStatus, Rubric, Submission, Task
+
+
+def _role(r: Rubric) -> EvaluationRole:
+    """Rubric 的完成判定职责（缺省视为 acceptance，兼容未标注的存量数据）。"""
+    return getattr(r, "evaluation_role", EvaluationRole.acceptance) or EvaluationRole.acceptance
 
 
 # ---------------------------------------------------------------------------
@@ -196,6 +201,11 @@ def evidence_precheck(rubrics: list[Rubric], available: dict[str, str]) -> dict:
     optional_bonus = {"deployment", "visual", "report", "issue"}
 
     for r in rubrics:
+        # V2 验收语义分离：只有 acceptance 角色构成交付硬门槛；
+        # theory / reflection 未达标不阻断任务，因此不参与证据缺口强制 NEED_REVIEW。
+        if _role(r) != EvaluationRole.acceptance:
+            passable.append(r)
+            continue
         needed = set(r.required_evidence) - optional_bonus
         if not needed:
             # 无证据要求的 Rubric 交给 LLM
@@ -232,16 +242,35 @@ def compute_evaluation(criteria: list[ReviewCriterion],
                        next_step: str = "") -> ReviewEvaluation:
     """由逐条 criteria 聚合出 score/status（代码层确定性计算，同证据 → 同分）。
 
+    V2 验收语义分离：按 Rubric 的 evaluation_role 三分桶聚合，互不污染——
+      - acceptance：score / status 的唯一来源；有不达标 → FAIL，有 NEED_REVIEW → NEED_REVIEW
+      - theory    ：未达标只进 learning_gaps（Learning Gap），永不改变 status
+      - reflection：只作为 Retro 记录，永不改变 status
+
     规则：
-      - score = sum(通过条目 weight) / sum(全部 weight) × 100，四舍五入取整
-      - status：有 FAIL → FAIL；否则有 NEED_REVIEW → NEED_REVIEW；全 PASS → PASS
+      - score = sum(通过条目 weight) / sum(acceptance weight) × 100，四舍五入取整
+      - criteria 只回填 acceptance 条目（前端交付判定视图口径不变）
     """
+    role_of = {r.id: _role(r) for r in rubrics}
     weight_of = {r.id: max(int(r.weight), 0) for r in rubrics}
+    acc_criteria: list[ReviewCriterion] = []
+    learning_gaps: list[ReviewCriterion] = []
+    reflection: list[ReviewCriterion] = []
     total = 0
     passed = 0
     has_fail = False
     has_need_review = False
     for c in criteria:
+        role = role_of.get(c.rubric_id, EvaluationRole.acceptance)
+        if role == EvaluationRole.theory:
+            if c.status != ReviewStatus.PASS:
+                learning_gaps.append(c)
+            continue
+        if role == EvaluationRole.reflection:
+            reflection.append(c)
+            continue
+        # acceptance
+        acc_criteria.append(c)
         w = weight_of.get(c.rubric_id, 1)
         total += w
         if c.status == ReviewStatus.PASS:
@@ -257,7 +286,10 @@ def compute_evaluation(criteria: list[ReviewCriterion],
         status = ReviewStatus.NEED_REVIEW
     else:
         status = ReviewStatus.PASS
-    return ReviewEvaluation(status=status, score=score, criteria=criteria, next_step=next_step)
+    return ReviewEvaluation(
+        status=status, score=score, criteria=acc_criteria, next_step=next_step,
+        learning_gaps=learning_gaps, reflection=reflection,
+    )
 
 
 # CI 维度 → 可直判的 requiredEvidence 类型（与 code_evidence._CI_DIMENSION 对应）
@@ -280,6 +312,9 @@ def ci_direct_verdict(rubric: Rubric, ci_workflows: list[dict]) -> dict | None:
           conclusion=其它（startup_failure/neutral/cancelled/timed_out…）→ 返回 None，交给 LLM/NEED_REVIEW
     返回 {"status": ReviewStatus, "evidence": str} 或 None。
     """
+    # V2 验收语义分离：CI 直判只作用于 acceptance；theory / reflection 交给 LLM 逐条判定
+    if _role(rubric) != EvaluationRole.acceptance:
+        return None
     needed = set(rubric.required_evidence) - {"deployment"}  # deployment 已降级为可选加分项
     if not needed or ({"description", "code"} & needed):
         return None  # 含语义判定类型 → CI 结论不足以直判

@@ -9,6 +9,7 @@
       <!-- 夜间 zzz：zenless-ui 输入框 / 日间 ak：原版 textarea -->
       <z-input
         v-if="theme.isZzz"
+        :key="inputResetKey"
         v-model="text"
         type="textarea"
         :auto-size="true"
@@ -133,6 +134,8 @@ const message = useMessage();
 const text = ref('');
 const inputEl = ref<HTMLTextAreaElement | null>(null);
 const showClearConfirm = ref(false);
+/* z-input 强制重建计数：发送后 +1 彻底清空内部值（受控组件清空可能不同步） */
+const inputResetKey = ref(0);
 /* Enter 直接发送 / Ctrl+Enter 发送（夜间 zzz 显示开关） */
 const enterSend = ref(true);
 
@@ -186,6 +189,8 @@ function onSend() {
   }
   emit('onSend', q);
   text.value = '';
+  // 发送后强制重建 z-input，确保输入框回到空白（受控组件清空可能残留旧值）
+  inputResetKey.value += 1;
   if (!theme.isZzz) autoGrow(); // z-input autoSize 自动收缩，原版需手动
 }
 

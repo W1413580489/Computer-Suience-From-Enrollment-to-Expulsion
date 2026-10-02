@@ -4,6 +4,9 @@ logs/
 # 知识库分块文件是部署必需数据，例外放行（服务器 clone 后需要它）
 !data/chunks.jsonl
 
+# SQLite 会话/评审真相源（运行时数据，含学生记录，绝不入库）
+data/engine.db*
+
 # ---- 前端依赖与构建产物 ----
 frontend/node_modules/
 # 前端 dist 是部署必需（服务器无 Node.js 环境无法本地构建），例外放行

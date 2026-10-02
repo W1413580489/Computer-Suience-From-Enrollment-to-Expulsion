@@ -11,6 +11,7 @@ const routes = [
   { path: '/guides', name: 'guides', component: () => import('@/views/GuidesView.vue') },
   { path: '/appendix', name: 'appendix', component: () => import('@/views/AppendixView.vue') },
   { path: '/about', name: 'about', component: () => import('@/views/AboutView.vue') },
+  { path: '/faq', name: 'faq', component: () => import('@/views/FaqView.vue') },
   { path: '/changelog', name: 'changelog', component: () => import('@/views/ChangelogView.vue') },
   { path: '/glossary', name: 'glossary', component: () => import('@/views/GlossaryView.vue') },
   { path: '/quest', name: 'quest', component: () => import('@/views/QuestView.vue') },
@@ -19,6 +20,7 @@ const routes = [
   { path: '/resources', name: 'resources', component: () => import('@/views/ResourceView.vue') },
   { path: '/calendar', name: 'calendar', component: () => import('@/views/CalendarView.vue') },
   { path: '/chat', name: 'chat', component: () => import('@/views/ChatView.vue') },
+  { path: '/thanks', name: 'thanks', component: () => import('@/views/ThanksView.vue') },
   { path: '/:pathMatch(.*)*', redirect: '/' },
 ];
 

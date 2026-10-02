@@ -211,7 +211,7 @@ def _chatbot_project() -> Project:
     # ---- Rubrics（每条 criterion 独立一个 Rubric 对象，支撑逐条评审打分）----
     # —— task_setup：拆解与准备（证据：自述说明 none）——
     rubric_setup = [
-        Rubric(id="rb_setup_1", task_id="task_setup", criterion="能说清项目由哪几部分组成（前端+后端）",
+        Rubric(id="rb_setup_1", evaluation_role="theory", task_id="task_setup", criterion="能说清项目由哪几部分组成（前端+后端）",
                description="能讲清前端负责展示和发送、后端负责转发 DeepSeek",
                required_evidence=["description"], pass_condition="能准确说出前后端各自职责", weight=1),
         Rubric(id="rb_setup_2", task_id="task_setup", criterion="Python 环境就绪，能跑 python --version",
@@ -232,7 +232,7 @@ def _chatbot_project() -> Project:
         Rubric(id="rb_backend_3", task_id="task_backend", criterion="能 uvicorn 启动且接口可被调用返回回答",
                description="服务启动成功，请求能收到回答",
                required_evidence=["code", "runtime"], pass_condition="有启动成功的运行证据或可复现命令", weight=1),
-        Rubric(id="rb_backend_4", task_id="task_backend", criterion="能解释每段代码的作用（接口/转发/取回答）",
+        Rubric(id="rb_backend_4", evaluation_role="theory", task_id="task_backend", criterion="能解释每段代码的作用（接口/转发/取回答）",
                description="学生理解并讲清自己写的代码",
                required_evidence=["description"], pass_condition="能自述接口、转发、取回答逻辑", weight=1),
     ]
@@ -253,7 +253,7 @@ def _chatbot_project() -> Project:
         Rubric(id="rb_link_1", task_id="task_link", criterion="前后端联通：页面能收到机器人回答",
                description="输入问题能在页面看到机器人回复",
                required_evidence=["runtime", "test"], pass_condition="有实际运行的联通证据", visual_check="supported", visual_pass_condition="截图显示页面内出现了后端返回的机器人回答", weight=1),
-        Rubric(id="rb_link_2", task_id="task_link", criterion="报错能按后端端口→前端地址→CORS 正确排查",
+        Rubric(id="rb_link_2", evaluation_role="theory", task_id="task_link", criterion="报错能按后端端口→前端地址→CORS 正确排查",
                description="遇到报错能按三步排查定位",
                required_evidence=["description", "runtime"], pass_condition="能描述排查过程或已解决的报错", weight=1),
         Rubric(id="rb_link_3", task_id="task_link", criterion="API Key 未出现在前端页面里",
@@ -271,7 +271,7 @@ def _chatbot_project() -> Project:
         Rubric(id="rb_review_3", task_id="task_review", criterion="API Key 只在后端代码，未硬编码进前端",
                description="安全要求",
                required_evidence=["code"], pass_condition="代码证据显示 Key 未暴露前端", weight=1),
-        Rubric(id="rb_review_4", task_id="task_review", criterion="能讲清前端→后端→DeepSeek→前端完整数据流向",
+        Rubric(id="rb_review_4", evaluation_role="theory", task_id="task_review", criterion="能讲清前端→后端→DeepSeek→前端完整数据流向",
                description="理解整体架构",
                required_evidence=["description"], pass_condition="能清晰自述数据流向", weight=1),
     ]
@@ -543,7 +543,7 @@ def _agent_project() -> Project:
         Rubric(id="rb_c2t01_1", task_id="c2t01", criterion="项目骨架齐全且 CLI 可运行",
                description="agent.py/tools.py/.env/requirements.txt 齐备，CLI 运行打印回答",
                required_evidence=["code"], pass_condition="文件齐全且能运行", weight=2),
-        Rubric(id="rb_c2t01_2", task_id="c2t01", criterion="能说清 Agent 与聊天机器人至少两条区别",
+        Rubric(id="rb_c2t01_2", evaluation_role="theory", task_id="c2t01", criterion="能说清 Agent 与聊天机器人至少两条区别",
                description="区别围绕：是否调用工具/是否多步/是否自主决策",
                required_evidence=["description"], pass_condition="自述含至少两条要点", weight=1),
         Rubric(id="rb_c2t01_3", task_id="c2t01", criterion="GitHub Token 已配置且源码无硬编码",
@@ -560,7 +560,7 @@ def _agent_project() -> Project:
         Rubric(id="rb_c2t02_3", task_id="c2t02", criterion="能演示一次完整闭环运行",
                description="问时间类问题得到正确回答",
                required_evidence=["code", "runtime"], pass_condition="有运行演示或输出截图/文本", visual_check="supported", visual_pass_condition="终端输出显示工具被调用且结果已回传模型（出现工具执行与最终回答两段）", weight=2),
-        Rubric(id="rb_c2t02_4", task_id="c2t02", criterion="能解释'为什么结果要回传给模型而不是直接打印'",
+        Rubric(id="rb_c2t02_4", evaluation_role="theory", task_id="c2t02", criterion="能解释'为什么结果要回传给模型而不是直接打印'",
                description="理解回传后模型才能基于结果作答",
                required_evidence=["description"], pass_condition="自述正确", weight=1),
     ]
@@ -574,7 +574,7 @@ def _agent_project() -> Project:
         Rubric(id="rb_c2t03_3", task_id="c2t03", criterion="限流时有退避重试且不会无限重试",
                description="读 Retry-After/X-RateLimit 头，退避一次",
                required_evidence=["code"], pass_condition="单测 mock 限流响应验证", weight=2),
-        Rubric(id="rb_c2t03_4", task_id="c2t03", criterion="能解释 Token 泄露的风险与处理方式",
+        Rubric(id="rb_c2t03_4", evaluation_role="theory", task_id="c2t03", criterion="能解释 Token 泄露的风险与处理方式",
                description="风险：他人可冒充身份操作；处理：Revoke 并重新生成",
                required_evidence=["description"], pass_condition="自述含 Revoke", weight=1),
     ]
@@ -596,7 +596,7 @@ def _agent_project() -> Project:
         Rubric(id="rb_c2t05_2", task_id="c2t05", criterion="截断与异常路径齐全（超行/不存在/二进制/空）",
                description="三条异常路径都有友好返回",
                required_evidence=["code"], pass_condition="单测覆盖", visual_check="supported", visual_pass_condition="终端输出显示超长文件被截断的提示，或不存在的文件被友好处理", weight=2),
-        Rubric(id="rb_c2t05_3", task_id="c2t05", criterion="能说清'为什么要截断'",
+        Rubric(id="rb_c2t05_3", evaluation_role="theory", task_id="c2t05", criterion="能说清'为什么要截断'",
                description="上下文是有限资源",
                required_evidence=["description"], pass_condition="自述提到上下文限制", weight=1),
     ]
@@ -607,7 +607,7 @@ def _agent_project() -> Project:
         Rubric(id="rb_c2t06_2", task_id="c2t06", criterion="工具描述清晰，三类提问均选中正确工具",
                description="描述是写给模型看的",
                required_evidence=["code", "runtime"], pass_condition="Trace 显示选对工具", weight=2),
-        Rubric(id="rb_c2t06_3", task_id="c2t06", criterion="能说清新增一个工具需要做几步",
+        Rubric(id="rb_c2t06_3", evaluation_role="theory", task_id="c2t06", criterion="能说清新增一个工具需要做几步",
                description="写函数→写 Schema→注册",
                required_evidence=["description"], pass_condition="自述完整", weight=1),
     ]
@@ -621,7 +621,7 @@ def _agent_project() -> Project:
         Rubric(id="rb_c2t07_3", task_id="c2t07", criterion="trace 文件结构符合约定字段",
                description="step/tool_name/arguments/result_summary/timestamp",
                required_evidence=["code", "trace"], pass_condition="agent_trace.json 字段齐全", weight=2),
-        Rubric(id="rb_c2t07_4", task_id="c2t07", criterion="能讲清'多步'与'一问一答'的本质区别",
+        Rubric(id="rb_c2t07_4", evaluation_role="theory", task_id="c2t07", criterion="能讲清'多步'与'一问一答'的本质区别",
                description="状态在循环中累积",
                required_evidence=["description"], pass_condition="自述正确", weight=1),
     ]
@@ -635,7 +635,7 @@ def _agent_project() -> Project:
         Rubric(id="rb_c2t08_3", task_id="c2t08", criterion="超限安全退出且 trace 记录 stop_reason",
                description="max_steps_reached",
                required_evidence=["code", "trace"], pass_condition="CI 或 Trace 验证", weight=2),
-        Rubric(id="rb_c2t08_4", task_id="c2t08", criterion="能说出不设上限的两个后果",
+        Rubric(id="rb_c2t08_4", evaluation_role="theory", task_id="c2t08", criterion="能说出不设上限的两个后果",
                description="token 消耗失控 + 死循环",
                required_evidence=["description"], pass_condition="自述完整", weight=1),
     ]
@@ -708,6 +708,58 @@ _COURSES["course_003"] = COURSE_003
 
 _project_cache: dict[str, Project] = {}
 
+# ---------------------------------------------------------------------------
+# P4 Project State 配置（completion_required / depends_on）
+# 依据：执行方案修正意见 §12 / §13
+#   - completion_required：项目完成的必做任务，只标"交付里程碑"；
+#     环境准备 / 铺垫 / 提交验收这类不产生独立交付物的任务不纳入（避免收窄完成定义）。
+#     注意：这里是显式白名单（opt-in），不是"除黑名单外全 True"。
+#   - depends_on：稀疏声明前置任务，仅用于给出 blocked_reason（不做强制门禁）。
+# ---------------------------------------------------------------------------
+_P4_REQUIRED: set[str] = {
+    # 套壳聊天机器人：三大交付（后端接口 / 前端页面 / 联调跑通）
+    "task_backend", "task_frontend", "task_link",
+    # GitHub 项目分析 Agent：核心实现 → 报告
+    "c2t02", "c2t03", "c2t04", "c2t05", "c2t06", "c2t07", "c2t08", "c2t09",
+    # MCP Server 构建：核心功能 → v0.1 交付
+    "c3_t04", "c3_t05", "c3_t06", "c3_t07",
+    # MCP Server 测试与迭代：真实使用 → 报告 → Issue → 修复 → 复盘
+    "c3_t08", "c3_t09", "c3_t10", "c3_t11", "c3_t12",
+}
+
+_P4_DEPENDS_ON: dict[str, list[str]] = {
+    # 套壳聊天机器人
+    "task_link": ["task_backend", "task_frontend"],
+    # Agent（项目内链式推进）
+    "c2t02": ["c2t01"],
+    "c2t03": ["c2t01"],
+    "c2t04": ["c2t03"],
+    "c2t05": ["c2t04"],
+    "c2t06": ["c2t04", "c2t05"],
+    "c2t07": ["c2t06"],
+    "c2t08": ["c2t07"],
+    "c2t09": ["c2t07"],
+    # MCP 构建
+    "c3_t02": ["c3_t01"],
+    "c3_t05": ["c3_t04"],
+    "c3_t06": ["c3_t04", "c3_t05"],
+    "c3_t07": ["c3_t06"],
+    # MCP 测试与迭代（跨项目：先交付 v0.1，才能把它当产品测试）
+    "c3_t08": ["c3_t07"],
+    "c3_t09": ["c3_t08"],
+    "c3_t10": ["c3_t09"],
+    "c3_t11": ["c3_t10"],
+    "c3_t12": ["c3_t11", "c3_t07"],
+}
+
+
+def _apply_p4_config(proj: Project) -> Project:
+    """把 P4 配置应用到已构建的项目（get_project 唯一入口，缓存前调用一次）。"""
+    for t in proj.tasks:
+        t.completion_required = t.id in _P4_REQUIRED
+        t.depends_on = list(_P4_DEPENDS_ON.get(t.id, []))
+    return proj
+
 
 def get_course(course_id: str = "course_001") -> Course | None:
     info = _COURSES.get(course_id)
@@ -727,6 +779,9 @@ def _project_summary(proj: Project) -> dict:
             "tasks": [{
                 "task_id": t.id, "title": t.title, "objective": t.objective,
                 "skill": t.skill.value if t.skill else None,
+                # P4：项目完成必做标记 + 前置任务（前端可据此提示，不做强制门禁）
+                "completion_required": t.completion_required,
+                "depends_on": list(t.depends_on),
             } for t in proj.tasks if t.stage_id == s.id],
         } for s in proj.stages],
     }
@@ -751,7 +806,8 @@ def get_project(project_id: str = "project_chatbot") -> Project | None:
     if project_id not in _PROJECT_BUILDERS:
         return None
     if project_id not in _project_cache:
-        _project_cache[project_id] = _PROJECT_BUILDERS[project_id]()
+        # P4：构建后先应用 completion_required / depends_on 配置，再进缓存
+        _project_cache[project_id] = _apply_p4_config(_PROJECT_BUILDERS[project_id]())
     return _project_cache[project_id]
 
 
@@ -761,6 +817,15 @@ def get_task(task_id: str) -> Task | None:
         t = next((t for t in proj.tasks if t.id == task_id), None)
         if t:
             return t
+    return None
+
+
+def get_project_of_task(task_id: str) -> Project | None:
+    """按 task_id 反查其所属项目；找不到返回 None。"""
+    for pid in _PROJECT_BUILDERS:
+        proj = get_project(pid)
+        if any(t.id == task_id for t in proj.tasks):
+            return proj
     return None
 
 

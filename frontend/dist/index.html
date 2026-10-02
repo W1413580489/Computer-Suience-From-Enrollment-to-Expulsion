@@ -13,7 +13,34 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="信科助手" />
     <meta name="mobile-web-app-capable" content="yes" />
-    <title>信科院智能助手 · INFO SYSTEM</title>
+    <title>信科院智能助手｜暨南大学 AI 教学与学习助手</title>
+    <meta
+      name="description"
+      content="信科院智能助手：暨南大学信科院学生王叔发起的学习与 AI 工具站，内置校园 RAG 问答与 AI 项目制导师教学引擎，大学发展路线图攻略。"
+    />
+    <meta name="keywords" content="暨南大学,信科院,智能助手,RAG,AI导师,王叔,校园问答,AI教学" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="信科院智能助手" />
+    <meta property="og:title" content="信科院智能助手｜暨南大学 AI 教学与学习助手" />
+    <meta
+      property="og:description"
+      content="信科院智能助手：暨南大学信科院学生王叔发起的学习与 AI 工具站，内置校园 RAG 问答与 AI 项目制导师教学引擎，大学发展路线图攻略。"
+    />
+    <meta property="og:url" content="https://jnuxky.xyz/" />
+    <meta property="og:locale" content="zh_CN" />
+    <link rel="canonical" href="https://jnuxky.xyz/" />
+    <!--
+      结构化数据不再写死在这份全站 index.html 里。
+      原因：Google / Bing 都要求结构化数据真实代表页面可见内容。若每个 URL 都带上
+      WebSite + Organization + Person + Course×3 + FAQPage×6，则 /about、/guides 等页面
+      会声明大量页面上并不存在的内容。
+      现在改由后端在 SPA fallback 中按路由注入（backend/main.py 的 ROUTE_JSONLD）：
+        /       → WebSite + Organization（founder 王叔）
+        /teach  → WebSite + Course×3
+        /faq    → WebSite + FAQPage
+        /about  → WebSite + ProfilePage
+        其余页面 → 仅站点级 WebSite
+    -->
     <!-- ZZZ 字体：Bebas Neue + Noto Sans SC / AK 字体：Noto Serif SC（明日方舟日间衬线标题） -->
     <link rel="preconnect" href="https://fonts.loli.net">
     <link rel="preconnect" href="https://gstatic.loli.net" crossorigin>
@@ -43,10 +70,76 @@
         }
       })();
     </script>
-    <script type="module" crossorigin src="/assets/index-By4j8Gjd.js"></script>
+    <script type="module" crossorigin src="/assets/index-BjhnpAh_.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-Cji6NBZz.css">
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <!--XKZ_STATIC_BEGIN-->
+      <!-- 预置静态首页直出：爬虫可直接读取；Vue 挂载后无缝替换。保持与站点 zzz 夜间默认观感一致。
+           这是首页（及静态托管时的兜底）版本；/teach、/faq、/about 等路由的正文由
+           backend/main.py 的 ROUTE_STATIC_BODY 在这两个标记之间替换，保证 head 与正文一致。 -->
+      <div
+        style="
+          min-height: 100vh;
+          box-sizing: border-box;
+          padding: 56px 20px;
+          font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+          color: #f5f5f5;
+          background: radial-gradient(1200px 620px at 50% -12%, rgba(255, 217, 61, 0.09), transparent 60%), #101114;
+        "
+      >
+        <div style="max-width: 960px; margin: 0 auto">
+          <p style="margin: 0 0 10px; font-size: 13px; letter-spacing: 0.22em; color: #ffd93d; font-family: 'Bebas Neue', 'Noto Sans SC', sans-serif">
+            INFO SYSTEM · JNU 信科院智能助手
+          </p>
+          <h1 style="margin: 0 0 14px; font-size: 30px; line-height: 1.35; font-weight: 900">
+            信科院智能助手｜暨南大学 AI 教学与学习助手
+          </h1>
+          <p style="margin: 0 0 26px; max-width: 720px; font-size: 15px; line-height: 1.9; color: #a8a8a8">
+            信科院智能助手：暨南大学信科院学生王叔发起的学习与 AI 工具站，内置校园 RAG 问答与 AI 项目制导师教学引擎，大学发展路线图攻略。
+          </p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px">
+            <div style="padding: 18px; background: #16171b; border: 1px solid #4c4c4c; border-left: 3px solid #ffd93d">
+              <div style="font-size: 12px; letter-spacing: 0.1em; color: #ffd93d">课程 01</div>
+              <div style="margin-top: 6px; font-size: 15px; font-weight: 700">套壳聊天机器人</div>
+              <div style="margin-top: 8px; font-size: 13px; line-height: 1.7; color: #a8a8a8">从零搭建一个可对话的聊天机器人，学会「怎么教 AI 写代码」。</div>
+            </div>
+            <div style="padding: 18px; background: #16171b; border: 1px solid #4c4c4c; border-left: 3px solid #ffd93d">
+              <div style="font-size: 12px; letter-spacing: 0.1em; color: #ffd93d">课程 02</div>
+              <div style="margin-top: 6px; font-size: 15px; font-weight: 700">GitHub 项目分析 Agent</div>
+              <div style="margin-top: 8px; font-size: 13px; line-height: 1.7; color: #a8a8a8">构建分析 GitHub 项目的 Agent，把第一段项目经历写进简历。</div>
+            </div>
+            <div style="padding: 18px; background: #16171b; border: 1px solid #4c4c4c; border-left: 3px solid #ffd93d">
+              <div style="font-size: 12px; letter-spacing: 0.1em; color: #ffd93d">课程 03</div>
+              <div style="margin-top: 6px; font-size: 15px; font-weight: 700">MCP 项目记忆服务</div>
+              <div style="margin-top: 8px; font-size: 13px; line-height: 1.7; color: #a8a8a8">基于 MCP 打造带记忆的项目服务，体验真实工程项目开发流程。</div>
+            </div>
+          </div>
+          <p style="margin: 22px 0 0; font-size: 13px; color: #7a7a7a">
+            <a href="/faq" style="color: #00f0ff">常见问题</a>
+            <span style="margin: 0 8px">·</span>
+            <a href="/thanks" style="color: #00f0ff">鸣谢</a>
+            <span style="margin: 0 8px">·</span>
+            本站为面向暨南大学同学的开放式学习社区，非学校官方平台。
+          </p>
+        </div>
+      </div>
+      <!--XKZ_STATIC_END-->
+    </div>
+    <noscript>
+      <main style="max-width: 960px; margin: 0 auto; padding: 40px 20px; font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #f5f5f5; background: #101114">
+        <h1 style="font-size: 28px">信科院智能助手｜暨南大学 AI 教学与学习助手</h1>
+        <p style="line-height: 1.9; color: #a8a8a8">
+          信科院智能助手：暨南大学信科院学生王叔发起的学习与 AI 工具站，内置校园 RAG 问答与 AI 项目制导师教学引擎，大学发展路线图攻略。
+        </p>
+        <ul style="line-height: 2.2; color: #a8a8a8">
+          <li>课程 01 · 套壳聊天机器人</li>
+          <li>课程 02 · GitHub 项目分析 Agent</li>
+          <li>课程 03 · MCP 项目记忆服务</li>
+        </ul>
+        <p style="color: #a8a8a8"><a href="/faq" style="color: #00f0ff">常见问题</a> · <a href="/thanks" style="color: #00f0ff">鸣谢</a></p>
+      </main>
+    </noscript>
   </body>
 </html>

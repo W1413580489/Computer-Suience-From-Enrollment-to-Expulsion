@@ -131,6 +131,69 @@ async def _repo_default_branch(owner: str, repo: str) -> str | None:
         return r.json().get("default_branch") or "main"
 
 
+async def _repo_head_sha(owner: str, repo: str, branch: str) -> str:
+    """取默认分支最新提交 sha（P2 最小能力：仅多一次 /commits/{branch} 请求）。
+
+    只用于 submissions / evaluations 行的修订追踪（P3 compare 的基准），
+    绝不注入 evidence_text —— 因此不会进入 review 缓存 key，避免"同提交因 sha 变化"重复烧 BYOK。
+    任何失败都返回空串（不影响主流程）。
+    """
+    try:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(connect=10, read=20, write=10, pool=10)) as c:
+            r = await c.get(f"{GITHUB_API}/repos/{owner}/{repo}/commits/{branch}",
+                            headers=_auth_headers())
+            if r.status_code != 200:
+                return ""
+            return r.json().get("sha", "") or ""
+    except Exception:  # noqa: BLE001 — 修订追踪是增强能力，失败不阻塞证据拉取
+        return ""
+
+
+COMPARE_FILES_MAX = 50   # 修订比对最多返回的文件条目数（总量仍全量统计）
+
+
+async def compare_revisions(repo_url: str, base_sha: str, head_sha: str) -> dict:
+    """GitHub compare：上一版 HEAD → 本版 HEAD 的变更摘要（P3 Revision 演进）。
+
+    只用于写入 submissions / evaluations 行（修订追踪），**绝不进 evidence_text**
+    —— 因此不进 review 缓存 key，不会因"重交同一版本"重复烧学生 BYOK。
+    任何失败 / 缺失都返回 {}（修订追踪是增强能力，不阻塞评审）。
+    """
+    parsed = parse_repo_url(repo_url)
+    if not parsed or not base_sha or not head_sha or base_sha == head_sha:
+        return {}
+    owner, repo = parsed
+    try:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(connect=10, read=25, write=10, pool=10)) as c:
+            r = await c.get(f"{GITHUB_API}/repos/{owner}/{repo}/compare/{base_sha}...{head_sha}",
+                            headers=_auth_headers())
+            if r.status_code != 200:
+                return {}
+            d = r.json()
+    except Exception:  # noqa: BLE001
+        return {}
+
+    files = d.get("files") or []
+    kept = [
+        {"filename": f.get("filename", ""), "status": f.get("status", ""),
+         "additions": f.get("additions", 0), "deletions": f.get("deletions", 0)}
+        for f in files[:COMPARE_FILES_MAX]
+    ]
+    return {
+        "base_sha": base_sha,
+        "head_sha": head_sha,
+        "status": d.get("status", "unknown"),        # ahead / behind / diverged / identical
+        "ahead_by": d.get("ahead_by", 0),
+        "behind_by": d.get("behind_by", 0),
+        "total_commits": d.get("total_commits", 0),
+        "files_changed": len(files),
+        "additions": sum((f.get("additions") or 0) for f in files),
+        "deletions": sum((f.get("deletions") or 0) for f in files),
+        "files": kept,
+        "truncated": len(files) > COMPARE_FILES_MAX,
+    }
+
+
 async def _fetch_tree(owner: str, repo: str, branch: str) -> list[dict]:
     url = f"{GITHUB_API}/repos/{owner}/{repo}/git/trees/{branch}?recursive=1"
     async with httpx.AsyncClient(timeout=httpx.Timeout(connect=10, read=30, write=10, pool=10)) as c:
@@ -474,6 +537,8 @@ async def build_code_evidence(repo_url: str, task_id: str = "", code_context=Non
         branch = await _repo_default_branch(owner, repo)
         if not branch:
             return {"ok": False, "code": "REPO_NOT_FOUND", "error": f"仓库 {owner}/{repo} 不存在或无法访问"}
+        # P2：HEAD sha（修订追踪用；只入 submissions/evaluations 行，不进 evidence_text）
+        head_sha = await _repo_head_sha(owner, repo, branch)
         tree = await _fetch_tree(owner, repo, branch)
         paths = _filter_structure(tree)
         if not paths:
@@ -546,6 +611,7 @@ async def build_code_evidence(repo_url: str, task_id: str = "", code_context=Non
 
         result = {
             "ok": True, "repo": f"{owner}/{repo}", "default_branch": branch,
+            "head_sha": head_sha,
             "file_count": len(paths), "key_files": key_files,
             "evidence_text": evidence_text,
             "readme_run_cmd": readme_run_cmd,

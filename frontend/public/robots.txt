@@ -1,0 +1,53 @@
+# 信科院智能助手 robots.txt
+# 本站内容开放收录：Bing / Google / 各大 AI 搜索引擎均可抓取。
+# 目标：让中文 AI 联网搜索能发现、理解并引用 jnuxky.xyz。
+
+User-agent: *
+Allow: /
+Disallow: /splash
+Disallow: /login
+Disallow: /api/
+
+# --- 一、AI 检索类爬虫：决定「AI 搜索能不能引用本站」，日志里优先监测这几个 UA ---
+# OAI-SearchBot：ChatGPT Search 的检索来源。放行它，网站才可能出现在 ChatGPT 搜索答案里。
+#                它和 GPTBot（训练用途）是两套独立爬虫，数据要分开统计，不能混为一谈。
+User-agent: OAI-SearchBot
+Allow: /
+
+# ClaudeBot：Claude 联网检索抓取
+User-agent: ClaudeBot
+Allow: /
+
+# PerplexityBot：Perplexity 检索抓取
+User-agent: PerplexityBot
+Allow: /
+
+# 说明：Bingbot、Googlebot 已被上面的 `User-agent: *` 放行，无需单独声明。
+#       Bing 侧是本站的第一入口（Bing → Copilot → 中文 AI 检索生态）。
+
+# --- 二、AI 训练 / 语料爬虫（真实爬虫，与「能否被 AI 引用」无关）---
+User-agent: GPTBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+# --- 三、用途控制 token：不是独立爬虫，日志里不会、也不该出现这些 UA ---
+# Google-Extended：没有独立的 HTTP User-Agent，实际抓取仍由 Googlebot 完成。
+#                  它只是 robots.txt 中控制 Google 将内容用于 Gemini/Vertex 的用途开关，
+#                  既不影响 Google Search 收录与否，也不是排名信号。
+#                  因此不要期待日志里出现「Google-Extended」的抓取次数。
+User-agent: Google-Extended
+Allow: /
+
+# Applebot-Extended：同类用途 token，实际抓取由 Applebot 完成。
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: https://jnuxky.xyz/sitemap.xml

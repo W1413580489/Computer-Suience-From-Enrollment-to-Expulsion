@@ -9,7 +9,7 @@ Context Builder：根据学生当前任务，从课程结构 + chunks.jsonl 组�
 from __future__ import annotations
 
 from schemas import Student, TeachContext, TeachRequest
-from course_data import get_project, get_rubrics, get_stage, get_task
+from course_data import get_project, get_project_of_task, get_rubrics, get_stage, get_task
 from course_data import chunks_by_section_path
 from hint import calculate_hint_level
 
@@ -38,7 +38,10 @@ def build_context(req: TeachRequest, student: Student) -> TeachContext:
     """组装教学上下文。hint_level 由尝试次数推导。"""
     task = get_task(req.task_id) if req.task_id else None
     stage = get_stage(task.stage_id) if task else None
-    project = get_project(req.project_id)
+    # project_id 可能为空或已失效：优先用请求值，其次按 task 反查，最后兜底为空
+    project = get_project(req.project_id) if req.project_id else None
+    if project is None and task is not None:
+        project = get_project_of_task(task.id)
 
     hint_level = calculate_hint_level(
         attempt_count=student.attempt_count.get(req.task_id, 0),
@@ -51,7 +54,7 @@ def build_context(req: TeachRequest, student: Student) -> TeachContext:
 
     ctx = TeachContext(
         course_title=req.course_id,
-        project_title=project.title,
+        project_title=project.title if project else "",
         stage_title=stage.title if stage else "",
         task_title=task.title if task else "(未选择任务)",
         task_objective=task.objective if task else "",

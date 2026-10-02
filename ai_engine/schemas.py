@@ -29,7 +29,6 @@ class Mode(str, Enum):
     tutor = "tutor"          # 教练：拆解任务、引导方向
     coach = "coach"          # 督学：追问进度、推动执行
     debugger = "debugger"    # 调错：定位报错、逐步修复
-    reviewer = "reviewer"    # 评审：对照验收标准评估成果
 
 
 class HintLevel(str, Enum):
@@ -58,11 +57,48 @@ class SkillKey(str, Enum):
     paper_writing = "paper_writing"
 
 
+class EvaluationRole(str, Enum):
+    """Rubric 在【项目完成判定】中的职责（V2 验收语义分离）。
+
+    描述的是"这一条 Rubric 在完成判定里扮演什么角色"，而不是整个 Task 的角色；
+    同一个 Task 内允许混合多种角色（如 c3_t08 = acceptance + reflection）。
+
+    acceptance : 判断交付物是否达标（有客观可核验证据）→ 有阻断权
+    theory     : 非交付能力（知识/原理/排障技能等）→ 无阻断权，未达标产出 Learning Gap
+    reflection : 过程记录 / 体验反馈 / 边界说明 / 复盘 → 无阻断权，用于 Project Retro
+
+    硬规则：acceptance 全部 PASS 时，即使 theory / reflection 有 FAIL，Task 仍为 COMPLETED
+    （theory 只产出 Learning Gap、reflection 只产出 Retro 记录）——反思/理论永不阻断项目交付。
+
+    分类依据：看这条 Rubric 到底在验证什么（证据类型），不是看文字长相；
+    不要为了"同一 Task 角色一致"强行统一，c3_t08 = acceptance + reflection 混合是合法的。
+    theory 覆盖"排障技能"等非交付能力，不要窄化为知识问答。
+
+    —— 冻结基线 TOTAL=81：acceptance=64 / theory=14 / reflection=3 ——
+    边界样本（防止再误分类）：
+      rb_link_2  → theory      （排障技能，证据 description+runtime）
+      rb_c3t03_2 → theory      （痛点理解，属 Project Reflection）
+      rb_c3t05_1 → acceptance  （验证实现是否真的区分 4 种记忆，证据 code+runtime）
+      rb_c3t08_2 → acceptance  （验证跨会话恢复是否真的发生，证据 runtime）
+      rb_c3t09_3 → acceptance  （验证是否交付了规定的测试报告，证据 report）
+    """
+    acceptance = "acceptance"
+    theory = "theory"
+    reflection = "reflection"
+
+
 # ---------------------------------------------------------------------------
 # 8 个核心业务对象
 # ---------------------------------------------------------------------------
 class Student(BaseModel):
-    """学生档案。V1 存 localStorage，由前端提交。"""
+    """学生档案。V1 存 localStorage，由前端提交。
+
+    P2 身份分离：
+      student_id —— 稳定身份（前端 localStorage `xkz_student_id` 首次生成后不再变），
+                    归属于"人"，重置学生进度不清除，用于学习记录/评审归属。
+      session_id —— 降级为纯会话标识（可被重置/换新），只决定对话历史的分档 key。
+    """
+    student_id: str = ""   # 稳定身份（空值由后端回退到 session_id，兼容存量请求）
     session_id: str = Field(default_factory=lambda: uuid.uuid4().hex[:16])
     name: str = "匿名学生"
     skills: dict[SkillKey, int] = Field(
@@ -156,6 +192,13 @@ class Task(BaseModel):
     code_context: Optional[CodeContext] = None  # V1.5：代码检索提示（Sprint 1）
     interview_questions: list[InterviewQuestion] = Field(default_factory=list)  # V2 质检陪练（课程作者标注）
     resume_points: list[ResumePoint] = Field(default_factory=list)  # V2 简历亮点（课程作者标注）
+    # P4 Project State：本条 Task 是否为「项目完成」的必做任务。
+    # 默认 False（opt-in）——不能贸然全默认 true，否则会收窄项目完成定义；
+    # 由课程作者在 course_data._P4_TASK_CONFIG 中显式标注"交付里程碑"任务。
+    completion_required: bool = False
+    # P4 Task Dependency（非常克制）：仅用于回答"这个任务能不能自然进入下一阶段"，
+    # 第一版只给 blocked_reason 提示，不做强制门禁、不做 DAG 引擎。空列表 = 无前置。
+    depends_on: list[str] = Field(default_factory=list)
 
 
 class Rubric(BaseModel):
@@ -176,6 +219,8 @@ class Rubric(BaseModel):
     weight: int = 1
     visual_check: Literal["none", "supported"] = "none"   # 该标准是否有可通过截图观察的事实
     visual_pass_condition: str = ""     # 有视觉证据时应观察到什么（只说事实，不评美观）
+    # V2 验收语义分离：本条在"项目完成判定"中的职责（默认 acceptance，保证存量行为不突变）
+    evaluation_role: EvaluationRole = EvaluationRole.acceptance
 
 
 class VisualImage(BaseModel):
@@ -214,10 +259,19 @@ class Submission(BaseModel):
     id: str = Field(default_factory=lambda: uuid.uuid4().hex[:16])
     task_id: str = ""                 # 与 ReviewRequest.task_id 对齐，可省略
     student_id: str = ""
+    project_id: str = ""              # P2：归属项目（学习记录/简历取数）
     github_url: str = ""                  # GitHub 仓库（代码证据）
     deployment_url: str = ""              # 在线访问地址（运行证据）
     code: str = ""                        # 关键代码片段
     description: str = ""                 # 自述说明
+    # P2 修订追踪：head_sha 记录提交时仓库 HEAD（只入 submissions/evaluations 行，
+    # 绝不进 review 缓存 key，避免"同一提交因 sha 变化"重复烧学生 BYOK）；
+    # parent_submission_id 指向上一版提交（P3 GitHub compare 用；空 = 首版）
+    head_sha: str = ""
+    parent_submission_id: str = ""
+    # P3 修订演进：与上一版提交的 GitHub compare 摘要（JSON 字符串；只入本表 / evaluations 行，
+    # 绝不进 evidence_text 与 review 缓存 key）
+    revision_json: str = ""
     submitted_at: str = Field(default_factory=_now)
 
 
@@ -309,8 +363,11 @@ class ReviewEvaluation(BaseModel):
     """
     status: ReviewStatus = ReviewStatus.NEED_REVIEW
     score: int = 0
-    criteria: list[ReviewCriterion] = Field(default_factory=list)
+    criteria: list[ReviewCriterion] = Field(default_factory=list)   # 只含 acceptance（交付判定）
     next_step: str = ""     # 下一步需要补充的证据
+    # V2 验收语义分离：非阻断角色的判定结果（不影响 status/score，供 Learning/Retro 消费）
+    learning_gaps: list[ReviewCriterion] = Field(default_factory=list)  # theory 未达标 → Learning Gap
+    reflection: list[ReviewCriterion] = Field(default_factory=list)     # reflection 记录（永不阻断）
 
 
 class ReviewLLMOutput(BaseModel):
@@ -360,7 +417,7 @@ class TeachRequest(BaseModel):
     session_id: str | None = None
     student: Student | None = None
     course_id: str = "course_001"
-    project_id: str = "project_xie_xiu"
+    project_id: str = "project_chatbot"
     task_id: str = ""
     mode: Mode = Mode.tutor
     user_input: str = ""
@@ -376,6 +433,7 @@ class TeachRequest(BaseModel):
 class ReviewRequest(BaseModel):
     """POST /api/ai/review 请求体（评审链 Sprint 5）。"""
     session_id: str | None = None
+    student_id: str | None = None            # P2：稳定学生身份（空则回退 session_id）
     project_id: str = "project_chatbot"
     task_id: str = ""
     submission: Submission | None = None     # 学生提交的成果

@@ -2,7 +2,8 @@
   <div class="msg" :class="`msg--${message.role}`">
     <div class="msg__bubble">
       <div class="msg__content">
-        <span class="msg__text">{{ message.content }}</span>
+        <span class="msg__text" v-if="message.role === 'user'">{{ message.content }}</span>
+        <span class="msg__text md-body" v-else v-html="renderMarkdown(message.content)"></span>
         <ChatCursor v-if="message.streaming" />
         <p v-if="message.error" class="msg__error">
           {{ message.error }}
@@ -101,6 +102,7 @@ import { computed, ref } from 'vue';
 import NeonIcon from '@/components/common/NeonIcon.vue';
 import ChatCursor from '@/components/chat/ChatCursor.vue';
 import ChatCitationCard from '@/components/chat/ChatCitationCard.vue';
+import { renderMarkdown } from '@/composables/useMarkdown';
 import { useThemeStore } from '@/stores/themeStore';
 import type { ChatMessage } from '@/types/nav';
 
@@ -264,6 +266,33 @@ const showKeyFixHint = computed(
   font-size: 11px;
   color: var(--text-muted);
 }
+
+/* markdown 渲染样式（和 TeachView 保持一致） */
+.md-body { white-space: normal; }
+.md-body > :first-child { margin-top: 0; }
+.md-body > :last-child { margin-bottom: 0; }
+.md-body p { margin: 6px 0; }
+.md-body ul, .md-body ol { margin: 6px 0; padding-left: 20px; }
+.md-body li { margin: 3px 0; }
+.md-body h1, .md-body h2, .md-body h3, .md-body h4 { margin: 10px 0 6px; }
+.md-body h1 { font-size: 18px; }
+.md-body h2 { font-size: 16px; }
+.md-body h3, .md-body h4 { font-size: 15px; }
+.md-body blockquote { margin: 6px 0; padding: 4px 10px; border-left: 3px solid var(--border-subtle); color: var(--text-muted); }
+.md-body code:not(.hljs) {
+  background: rgba(128, 128, 128, 0.18); border-radius: 4px; padding: 1px 5px;
+  font-family: ui-monospace, Consolas, monospace; font-size: 12.5px;
+}
+.md-body pre {
+  background: #14161a; color: #e6e6e6; border-radius: 8px; padding: 10px 12px;
+  overflow-x: auto; margin: 8px 0; font-size: 12.5px; line-height: 1.55;
+}
+.md-body pre code { font-family: ui-monospace, Consolas, monospace; background: none; padding: 0; white-space: pre; }
+.md-body table { border-collapse: collapse; margin: 8px 0; font-size: 12.5px; }
+.md-body th, .md-body td { border: 1px solid var(--border-subtle); padding: 4px 8px; text-align: left; }
+.md-body th { background: rgba(128, 128, 128, 0.12); }
+.md-body a { color: var(--text-link); text-decoration: underline; }
+.md-body a:hover { color: var(--amber); }
 
 /* zenless-ui 引用折叠面板 */
 .msg__zcite {

@@ -79,6 +79,14 @@
       "number": "09",
       "route": "https://github.com/Live-GalGame/LiveGalGame",
       "icon": "star"
+    },
+    {
+      "key": "thanks",
+      "label": "鸣谢",
+      "subLabel": "THANKS",
+      "number": "10",
+      "route": "/thanks",
+      "icon": "scene"
     }
   ],
   "guides": [

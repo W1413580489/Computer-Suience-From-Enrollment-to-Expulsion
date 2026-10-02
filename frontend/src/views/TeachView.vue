@@ -5,8 +5,8 @@
       <div v-if="view === 'select'" class="teach__wheel">
         <div class="tw-stripe"></div>
         <div class="tw-tag">
-          <div class="t1">课程选择</div>
-          <div class="t2">COURSE SELECT</div>
+          <h1 class="t1">AI 项目制教学</h1>
+          <div class="t2">COURSE SELECT · 课程选择</div>
           <div class="num">{{ String(wheelIndex + 1).padStart(2, '0') }}</div>
         </div>
         <button class="tw-arrow left" title="上一个" @click="moveWheel(-1)">
@@ -36,100 +36,164 @@
             <button class="tw-btn" @click.stop="enterCourse(i)">{{ w.progBtn }}</button>
           </div>
         </div>
-        <div class="tw-foot">CHOOSE YOUR COURSE · 转动选择你的课程</div>
+        <div class="tw-foot">
+          <p class="tw-def">信科院智能助手目前开设三门 AI 项目制课程：套壳聊天机器人、GitHub 项目分析 Agent、MCP 项目记忆服务。</p>
+          <div class="tw-hint">CHOOSE YOUR COURSE · 转动选择你的课程</div>
+        </div>
       </div>
       <template v-else>
-      <!-- 左侧配置栏 -->
+      <!-- 左侧学习导航 / Task Rail：固定区（当前课程+总进度）+ 可滚动区 -->
       <aside class="teach__side">
-        <div class="teach__group">
-          <label>模型配置（与「API 配置」同步）</label>
-          <div class="teach__cfgcard">
-            <div class="row"><span class="k">服务商</span><span class="v">{{ settings.preset.label }}</span></div>
-            <div class="row"><span class="k">模型</span><span class="v">{{ settings.effectiveModel || '默认' }}</span></div>
-            <div class="row">
-              <span class="k">Key</span>
-              <span class="v" :style="{ color: settings.hasKey ? 'var(--t-green)' : 'var(--t-red)' }">
-                {{ settings.hasKey ? '已配置' : '未配置' }}
+        <div class="teach__rail-fixed">
+          <section class="teach__railsec">
+            <div class="teach__eyebrow">CURRENT COURSE · 当前课程</div>
+            <div class="teach__course-title">{{ currentCourseTitle }}</div>
+            <select :value="courseId" @change="e => onCourseChange(e.target.value)">
+              <option v-for="c in courses" :key="c.course_id" :value="c.course_id">{{ c.title }}</option>
+            </select>
+          </section>
+
+          <section class="teach__railsec teach__progcard" title="查看全部任务" @click="scrollToTasks">
+            <div class="teach__prog-head">
+              <span class="teach__eyebrow">PROJECT PROGRESS · 项目总进度</span>
+              <span class="teach__prog-count">{{ progStats.done }} / {{ progStats.total }}</span>
+            </div>
+            <div class="teach__prog-bar"><i :style="{ width: progStats.pct + '%' }"></i></div>
+            <div class="teach__prog-foot">
+              <span class="teach__prog-now">当前任务：{{ currentTaskShortTitle }}</span>
+              <span class="teach__prog-link">查看全部任务 ↗</span>
+            </div>
+          </section>
+        </div>
+
+        <div class="teach__rail-scroll">
+          <section class="teach__railsec">
+            <div class="teach__sec-head">
+              <span class="teach__eyebrow teach__eyebrow--sec">TASKS · 教学任务</span>
+              <span class="teach__sec-tools">
+                <select v-if="projects.length > 1" :value="projectId" class="teach__projsel" @change="e => onProjectChange(e.target.value)">
+                  <option v-for="p in projects" :key="p.project_id" :value="p.project_id">{{ p.title }}</option>
+                </select>
+                <button class="teach__collapse" :title="tasksOpen ? '收起任务清单' : '展开任务清单'" @click="toggleTasks">
+                  <svg :class="{ closed: !tasksOpen }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
               </span>
             </div>
-            <button class="teach__btn teach__full" @click="ui.openSettings()">⚙ 打开 API 配置</button>
-            <div class="teach__status">
-              在导航菜单「API 配置」里改一次，导师这里自动生效（可换通义千问 / Kimi / GLM / 自定义）
+            <div v-if="tasksOpen">
+              <div v-if="stages.length" class="teach__tasklist">
+                <div v-for="sg in stages" :key="sg.stage_id" class="teach__stage">
+                  <div class="teach__stage-title">{{ sg.title }}</div>
+                  <button
+                    v-for="t in sg.tasks"
+                    :key="t.task_id"
+                    class="teach__taskitem"
+                    :class="{ current: t.task_id === taskId, done: isTaskDone(t.task_id) }"
+                    @click="pickTask(t.task_id)"
+                  >
+                    <span class="teach__taskmark">
+                      <svg v-if="isTaskDone(t.task_id)" class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                      <span v-else-if="t.task_id === taskId" class="teach__taskdot"></span>
+                      <span v-else class="teach__tasko"></span>
+                    </span>
+                    <span class="teach__taskname">{{ t.title }}</span>
+                    <span v-if="t.task_id === taskId" class="teach__taskst">当前任务</span>
+                  </button>
+                </div>
+              </div>
+              <div v-else class="teach__taskempty">进入课程后显示任务清单</div>
             </div>
-          </div>
-        </div>
+          </section>
 
-        <div class="teach__group">
-          <label>课程</label>
-          <select v-model="courseId" @change="onCourseChange">
-            <option v-for="c in courses" :key="c.course_id" :value="c.course_id">{{ c.title }}</option>
-          </select>
-          <label style="margin-top:6px">教学任务</label>
-          <select v-model="projectId" @change="onProjectChange">
-            <option v-for="p in projects" :key="p.project_id" :value="p.project_id">{{ p.title }}</option>
-        </select>
-        <div class="teach__progress">
-          <div class="teach__progress-row">
-            <span>总进度</span>
-            <span>{{ progStats.done }} / {{ progStats.total }}</span>
-          </div>
-          <div class="teach__progress-bar"><i :style="{ width: progStats.pct + '%' }"></i></div>
-        </div>
-        <select v-model="taskId" @change="onTaskChange">
-          <template v-for="sg in stages" :key="sg.stage_id">
-            <optgroup :label="sg.title">
-              <option v-for="t in sg.tasks" :key="t.task_id" :value="t.task_id">{{ taskPrefix(t.task_id) }}{{ t.title }}</option>
-            </optgroup>
-          </template>
-        </select>
-        </div>
+          <section class="teach__railsec">
+            <div class="teach__eyebrow teach__eyebrow--sec">PROJECT · GitHub 仓库</div>
+            <div v-if="repoUrl.trim() && !repoEditing" class="teach__repocard">
+              <div class="teach__repo-head">
+                <span class="teach__repo-name">{{ repoName }}</span>
+                <span class="teach__repo-conn"><i></i>已连接</span>
+              </div>
+              <div class="teach__repo-url">{{ repoUrl }}</div>
+              <div class="teach__repo-actions">
+                <a :href="repoUrl" target="_blank" rel="noopener" class="teach__repo-open">查看项目 ↗</a>
+                <button class="teach__repo-edit" @click="editRepo">修改</button>
+              </div>
+            </div>
+            <template v-else>
+              <input
+                ref="repoInput"
+                v-model="repoUrl"
+                class="teach__repo"
+                placeholder="https://github.com/用户名/仓库名"
+                autocomplete="off"
+                @keydown.enter="repoEditing = false"
+                @blur="repoEditing = false"
+              />
+              <div class="teach__status">
+                {{ repoUrl.trim() ? '已设置仓库地址' : '未配置（Reviewer 将跳过 CI/代码证据）' }}
+              </div>
+            </template>
+          </section>
 
-        <div class="teach__group">
-          <label>AI 项目导师</label>
-          <div class="teach__tutorcard">
-            <div class="t">指导模式 · 全自动行为路由</div>
-            <div class="d">拆任务、推进度、帮调试由 AI 自动识别切换，无需手动选模式；做完后点下方「提交验收」。</div>
-          </div>
-        </div>
+          <section class="teach__railsec">
+            <div class="teach__eyebrow">AI MENTOR · 项目导师</div>
+            <div class="teach__mentorcard">
+              <div class="teach__mentor-line">
+                <span class="teach__mentor-name">AI 项目导师</span>
+                <span class="teach__online"><i></i>在线</span>
+              </div>
+              <div class="teach__mentor-desc">导师会根据你的任务、代码进展和验收结果，自动调整指导方式。</div>
+              <div class="teach__mentor-mode">指导模式：<b>全自动行为路由</b></div>
+            </div>
+          </section>
 
-        <div class="teach__group">
-          <label>提交验收</label>
-          <div class="teach__tutorcard">
-            <div class="t">在对话框里直接提交</div>
-            <div class="d">在输入框里直接完成：贴截图（Ctrl+V / 拖入）、写说明，点「⚖ 验收」提交评审；图片也可以直接发送给导师一起讨论。材料全部选填。</div>
-          </div>
-        </div>
+          <section class="teach__railsec">
+            <div class="teach__eyebrow">SYSTEM · 系统配置</div>
+            <div class="teach__cfgcard">
+              <div class="row"><span class="k">服务商</span><span class="v">{{ settings.preset.label }}</span></div>
+              <div class="row"><span class="k">模型</span><span class="v">{{ settings.effectiveModel || '默认' }}</span></div>
+              <div class="row">
+                <span class="k">API Key</span>
+                <span class="v" :style="{ color: settings.hasKey ? 'var(--t-green)' : 'var(--t-red)' }">
+                  {{ settings.hasKey ? '已配置' : '未配置' }}
+                </span>
+              </div>
+              <button class="teach__ghost teach__full" @click="ui.openSettings()">⚙ 打开 API 配置</button>
+              <div class="teach__status">在导航菜单「API 配置」里改一次，导师这里自动生效</div>
+            </div>
+          </section>
 
-        <div class="teach__group">
-          <label>GitHub 仓库链接</label>
-          <input
-            v-model="repoUrl"
-            class="teach__repo"
-            placeholder="https://github.com/用户名/仓库名"
-            autocomplete="off"
-          />
-          <div class="teach__status">
-            {{ repoUrl.trim() ? '已设置仓库地址' : '未配置（Reviewer 将跳过 CI/代码证据）' }}
-          </div>
+          <section class="teach__student">
+            <label>学生状态</label>
+            <div class="teach__badge">进度：完成任务 {{ doneCount }} · 已尝试 {{ attemptedCount }} 个任务</div>
+            <!-- P6：项目状态 / 学习缺口（服务端真相源；接口不可用时自动隐藏，本地进度不受影响） -->
+            <div v-if="projectStateView" class="teach__badge">
+              项目状态：{{ projectStateView.label }}<template v-if="projectStateView.defined">（必做任务 {{ projectStateView.passed }}/{{ projectStateView.total }}）</template>
+            </div>
+            <div v-if="gapsOpen !== null" class="teach__badge">学习缺口：{{ gapsOpen }} 项</div>
+            <!-- P6：项目复盘（来自 SQLite 提交/评审历史；无提交时不展示） -->
+            <div v-if="retroView" class="teach__retro">
+              <div class="teach__retro-head">项目复盘 · 提交 {{ retroView.submissions }} 次 · 通过 {{ retroView.passed_attempts }} · 未通过 {{ retroView.failed_attempts }}</div>
+              <div v-for="r in retroView.tasks" :key="r.task_id" class="teach__retro-row">
+                <span class="teach__retro-t">{{ r.title }}</span>
+                <span class="teach__retro-s" :class="r.passed ? 'ok' : 'no'">{{ r.attempts }} 次 · {{ statusLabel(r.latest_status) }}</span>
+              </div>
+            </div>
+            <div class="teach__row2">
+              <button class="teach__ghost" @click="resetStudent">重置学生进度</button>
+              <button class="teach__ghost" @click="clearChat">清空对话</button>
+            </div>
+          </section>
         </div>
-
-        <div class="teach__student">
-          <label>学生状态（localStorage）</label>
-          <div class="teach__badge">进度：完成任务 {{ doneCount }} · 已尝试 {{ attemptedCount }} 个任务</div>
-          <div class="teach__row2">
-            <button class="teach__ghost" @click="resetStudent">重置学生进度</button>
-            <button class="teach__ghost" @click="clearChat">清空对话</button>
-          </div>
-        </div>
-
       </aside>
 
       <!-- 右侧对话区 -->
       <main class="teach__main">
         <div class="teach__chathead">
-          <p class="teach__task" v-html="currentTaskTitleHtml"></p>
+          <div class="teach__mission">
+            <div class="teach__mission-no">CURRENT MISSION · {{ currentTaskNo || '– / –' }}</div>
+            <p class="teach__task" v-html="currentTaskTitleHtml"></p>
+          </div>
           <div class="teach__chips">
-            <button class="teach__metachip teach__sidetoggle" :title="sideOpen ? '收起侧栏，放大对话区' : '展开侧栏'" @click="toggleSide">{{ sideOpen ? '⇤ 收起' : '⇥ 设置' }}</button>
+            <button class="teach__metachip teach__sidetoggle" :title="sideOpen ? '收起侧栏，放大对话区' : '展开侧栏'" @click="toggleSide">{{ sideOpen ? '◀ 收起' : '▶ 展开' }}</button>
             <span class="teach__metachip">{{ modeLabel }}</span>
             <span class="teach__metachip">总进度 {{ progStats.done }}/{{ progStats.total }}</span>
           </div>
@@ -137,9 +201,15 @@
 
         <div ref="messagesEl" class="teach__messages">
           <div v-if="chat.length === 0" class="teach__welcome">
+            <div class="teach__wstatus"><i></i> AI 导师在线 · 等待你的下一步</div>
             <h2 v-if="taskObjective" v-html="taskObjectiveHtml"></h2>
             <h2 v-else>👨‍🏫 AI 项目导师</h2>
-            <p>{{ taskObjective ? '直接描述你的进展 / 粘贴代码或报错，AI 会自动拆解任务、推进进度、帮你调试；做完后把截图贴进来、点输入框旁的「⚖ 验收」提交。' : '选择左侧课程与任务，输入你的进展 / 代码 / 报错，AI 会按 Hint Level 渐进辅导。' }}</p>
+            <p class="teach__wdesc">{{ taskObjective ? '直接描述你的进展、粘贴代码或报错，导师会围绕当前任务拆解问题、推动进度；做完后把截图贴进来，点「⚖ 验收」提交这一阶段。' : '选择左侧课程与任务，输入你的进展 / 代码 / 报错，AI 会按 Hint Level 渐进辅导。' }}</p>
+            <div class="teach__wtips">
+              <span>粘贴代码 / 报错</span>
+              <span>截图 Ctrl+V / 拖入</span>
+              <span>准备好后点「验收」提交</span>
+            </div>
           </div>
           <div v-for="(msg, i) in chat" :key="i" class="teach__msg" :class="msg.role">
             <!-- 系统状态条（服务异常提示，不进入 AI 对话上下文） -->
@@ -287,7 +357,9 @@
               :disabled="!visionEnabled || shots.length >= MAX_SHOTS"
               :title="visionEnabled ? '添加运行截图（也可直接 Ctrl+V 粘贴 / 拖入）' : '当前模型未验证支持图片，无法添加截图'"
               @click="pickShots"
-            >📎</button>
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+            </button>
             <textarea
               v-model="input"
               rows="2"
@@ -295,8 +367,8 @@
               @keydown="onKeydown"
               @paste="onPaste"
             ></textarea>
-            <button class="teach__btn teach__ghost-send" :disabled="loading" @click="send">发送</button>
-            <button class="teach__btn teach__submit" :disabled="loading" title="用输入框的文字作自述、附带的截图作运行证据，提交本次任务验收" @click="doReview">⚖ 验收</button>
+            <button class="teach__send" :disabled="loading" @click="send">发送</button>
+            <button class="teach__submit" :disabled="loading" title="用输入框的文字作自述、附带的截图作运行证据，提交本次任务验收" @click="doReview">⚖ 验收</button>
           </div>
         </div>
       </main>
@@ -326,14 +398,26 @@ const MODE_NAMES: Record<string, string> = { tutor: '指导', reviewer: '验收'
 const LS_STATUS = 'xkz_ai_student';
 const LS_API = 'xkz_ai_api_key';
 const LS_REPO = 'xkz_ai_repo';
+// P2：稳定学生身份独立存放（首次生成后不再变化）；"重置学生进度"只换 session_id，不清除它
+const LS_STUDENT_ID = 'xkz_student_id';
+function ensureStudentId(): string {
+  try {
+    const v = localStorage.getItem(LS_STUDENT_ID);
+    if (v) return v;
+    const nv = 'u_' + Math.random().toString(16).slice(2, 10) + Date.now().toString(16).slice(-4);
+    localStorage.setItem(LS_STUDENT_ID, nv);
+    return nv;
+  } catch { return 'u_' + Math.random().toString(16).slice(2, 10); }
+}
 
-interface StudentState { session_id: string; name: string; skills: Record<string, unknown>; completed_tasks: string[]; attempt_count: Record<string, number>; timestamp: string }
+interface StudentState { student_id: string; session_id: string; name: string; skills: Record<string, unknown>; completed_tasks: string[]; attempt_count: Record<string, number>; timestamp: string }
 function loadStudent(): StudentState {
+  const studentId = ensureStudentId();
   try {
     const raw = localStorage.getItem(LS_STATUS);
-    if (raw) { const s = JSON.parse(raw); if (s && s.session_id) return s; }
+    if (raw) { const s = JSON.parse(raw); if (s && s.session_id) return { ...s, student_id: s.student_id || studentId }; }
   } catch { /* ignore */ }
-  return { session_id: 's_' + Math.random().toString(16).slice(2, 10), name: '匿名学生', skills: {}, completed_tasks: [], attempt_count: {}, timestamp: new Date().toISOString() };
+  return { student_id: studentId, session_id: 's_' + Math.random().toString(16).slice(2, 10), name: '匿名学生', skills: {}, completed_tasks: [], attempt_count: {}, timestamp: new Date().toISOString() };
 }
 
 interface Project { project_id: string; title: string; description: string; stages: Stage[] }
@@ -485,6 +569,66 @@ const chat = ref<ChatMsg[]>([]);
 const history = ref<{ role: string; content: string }[]>([]);
 const student = ref<StudentState>(loadStudent());
 
+// ---------- P6：服务端项目记录（服务端优先 + localStorage 兜底） ----------
+// 数据来自 GET /api/ai/project_record（SQLite 真相源：evaluations/submissions + 课程配置，零 LLM）。
+// 接口不可用时全部保持 null → 面板自动退回 localStorage 口径，绝不清空任务列表。
+const serverProject = ref<any>(null);   // → project_state（P4）
+const serverLearner = ref<any>(null);   // → learner_state（P5）
+const serverRetro = ref<any>(null);     // → retrofit（P6 项目复盘）
+const serverLoading = ref(false);
+
+async function fetchProjectRecord(pid: string): Promise<any | null> {
+  if (!student.value.student_id || !pid || serverLoading.value) return null;
+  serverLoading.value = true;
+  try {
+    const r = await fetch(`/api/ai/project_record?student_id=${encodeURIComponent(student.value.student_id)}&project_id=${encodeURIComponent(pid)}`);
+    const j = await r.json();
+    if (!j.ok) return null;
+    serverProject.value = j.data?.project_state || null;
+    serverLearner.value = j.data?.learner_state || null;
+    serverRetro.value = j.data?.retro || null;
+    return j.data;
+  } catch {
+    return null;   // 服务端不可用：保持 localStorage 兜底
+  } finally {
+    serverLoading.value = false;
+  }
+}
+
+// 评审响应已内挂 project_state / learner_state（P4/P5），直接采用可省一次请求
+function applyServerState(data: any) {
+  if (data?.project_state) serverProject.value = data.project_state;
+  if (data?.learner_state) serverLearner.value = data.learner_state;
+}
+
+const PROJECT_STATE_LABEL: Record<string, string> = {
+  NOT_STARTED: '未开始', IN_PROGRESS: '进行中', COMPLETED: '已完成', BLOCKED: '受阻',
+};
+const projectStateView = computed(() => {
+  const ps = serverProject.value;
+  if (!ps) return null;
+  return {
+    label: PROJECT_STATE_LABEL[ps.state] || ps.state || '',
+    passed: ps.required_passed ?? 0,
+    total: ps.required_total ?? 0,
+    defined: !!ps.completion_defined,
+  };
+});
+const gapsOpen = computed(() => {
+  const n = serverLearner.value?.counts?.gaps_open;
+  return typeof n === 'number' ? n : null;
+});
+const retroView = computed(() => {
+  const rt = serverRetro.value;
+  if (!rt || !rt.totals?.submissions) return null;
+  const tasks = (rt.tasks || []).slice(-8);   // 只展示最近 8 个任务的尝试情况，避免侧栏过长
+  return { ...rt.totals, tasks };
+});
+const REVIEW_STATUS_LABEL: Record<string, string> = {
+  PASS: '已通过', FAIL: '未通过', NEED_REVIEW: '待补证据', NOT_EVALUATED: '未评审',
+};
+function statusLabel(s: string) { return REVIEW_STATUS_LABEL[s] || s || '未评审'; }
+
 watch(repoUrl, v => localStorage.setItem(LS_REPO, v.trim()));
 
 // 成就：首次配置 API Key（Key 现在统一在「API 配置」里填写，故监听统一设置）
@@ -536,8 +680,30 @@ function linkify(text: string): string {
     '<a href="$1" target="_blank" rel="noopener" class="t-link">$1</a>');
 }
 const currentTaskTitleHtml = computed(() => linkify(currentTaskTitle.value));
-const taskObjectiveHtml = computed(() => linkify(taskObjective.value));
+// Hero 大标题：objective 最后一个子句（全角逗号/分号后）用主题色强调——突出"做到什么才算完成"
+const taskObjectiveHtml = computed(() => {
+  const raw = taskObjective.value;
+  const cut = Math.max(raw.lastIndexOf('，'), raw.lastIndexOf('；'), raw.lastIndexOf(';'));
+  const tail = cut >= 0 ? raw.slice(cut + 1) : '';
+  if (!tail || tail.trim().length < 6) return linkify(raw);
+  return linkify(raw.slice(0, cut + 1)) + '<em>' + linkify(tail) + '</em>';
+});
 const modeLabel = computed(() => 'AI 项目导师');
+
+// ---------- 学习导航（Task Rail）视图数据 ----------
+const currentCourseTitle = computed(() => courses.value.find(c => c.course_id === courseId.value)?.title || '选择课程');
+const currentTaskShortTitle = computed(() => {
+  for (const sg of stages.value) {
+    const t = sg.tasks.find(t => t.task_id === taskId.value);
+    if (t) return t.title;
+  }
+  return '选择任务开始';
+});
+const currentTaskNo = computed(() => {
+  const all = stages.value.flatMap(sg => sg.tasks);
+  const idx = all.findIndex(t => t.task_id === taskId.value);
+  return idx >= 0 ? `${String(idx + 1).padStart(2, '0')} / ${String(all.length).padStart(2, '0')}` : '';
+});
 const doneCount = computed(() => (student.value.completed_tasks || []).length);
 const attemptedCount = computed(() => Object.keys(student.value.attempt_count || {}).length);
 const blockedTasks = computed(() => {
@@ -616,6 +782,7 @@ function doEnterCourse(i: number) {
   if (!w || w.blank) { toast('更多课程即将开放，敬请期待'); return; }
   const c = courses.value.find(x => x.course_id === w.course_id);
   if (!c || !c.projects.length) return;
+  saveChat();   // 离开旧课程前先入库
   courseId.value = c.course_id;
   projects.value = c.projects;
   projectId.value = c.projects[0].project_id;   // 修复：漏设导致项目下拉空白
@@ -623,6 +790,7 @@ function doEnterCourse(i: number) {
   loadProject(c.projects[0]);
   if (saved && stages.value.some(sg => sg.tasks.some(t => t.task_id === saved))) {
     taskId.value = saved;   // 恢复上次学到的任务
+    restoreChat();   // 该任务之前的对话一并恢复
   }
   saveSel();
   // 成就：首次点击对应课程 + 进入导师对话（指导入口）
@@ -661,10 +829,16 @@ function loadProject(p: Project | undefined) {
   }));
   const first = stages.value[0]?.tasks[0];
   taskId.value = first ? first.task_id : '';
-  // 换项目 = 换学习路径：清空对话（会话按 任务 隔离）
+  // 换项目 = 换学习路径：清空当前对话后按新任务恢复存档（会话按任务隔离、按任务保存）
   chat.value = [];
   history.value = [];
+  restoreChat();
   saveSel();
+  // P6：切项目后刷新服务端记录（先清空避免展示上一个项目的数据；失败则退回本地口径）
+  serverProject.value = null;
+  serverLearner.value = null;
+  serverRetro.value = null;
+  void fetchProjectRecord(projectId.value);
 }
 
 onMounted(async () => {
@@ -696,8 +870,10 @@ onMounted(async () => {
 });
 
 
-function onCourseChange() {
-  const c = courses.value.find(x => x.course_id === courseId.value);
+function onCourseChange(cid: string) {
+  saveChat();   // 旧课程对话先入库（此时 courseId 尚未变更，key 准确）
+  courseId.value = cid;
+  const c = courses.value.find(x => x.course_id === cid);
   projects.value = c ? c.projects : [];
   if (projects.value.length) {
     projectId.value = projects.value[0].project_id;
@@ -711,18 +887,61 @@ function onCourseChange() {
   toast(c ? `已切换到课程：${c.title}` : '');
 }
 
-function onProjectChange() {
-  const p = projects.value.find(x => x.project_id === projectId.value);
+function onProjectChange(pid: string) {
+  saveChat();   // 旧项目对话先入库（projectId 尚未变更，key 准确）
+  projectId.value = pid;
+  const p = projects.value.find(x => x.project_id === pid);
   loadProject(p);
   toast(p ? `已切换到项目：${p.title}` : '');
 }
 
 function onTaskChange() {
-  // 换任务 = 新会话：清空对话，避免上一个任务的上下文串味
+  // 换任务 = 新会话：旧对话入库，再恢复目标任务的存档
+  saveChat();
   chat.value = [];
   history.value = [];
   suggestedNext.value = null;
   saveSel();
+  restoreChat();
+}
+
+// 左侧任务清单：点击任务行切换（与下拉 onTaskChange 同一套会话隔离逻辑）
+function pickTask(id: string) {
+  if (taskId.value === id) return;
+  saveChat();   // 旧任务对话入库（taskId 还没变，key 准确）
+  taskId.value = id;
+  chat.value = [];
+  history.value = [];
+  suggestedNext.value = null;
+  saveSel();
+  restoreChat();   // 切回已聊过的任务时，恢复其历史对话
+}
+function isTaskDone(task_id: string) {
+  return (student.value.completed_tasks || []).includes(task_id);
+}
+// 点击总进度卡：滚动到任务清单，快速回看"我做到哪一步"
+function scrollToTasks() {
+  document.querySelector('.teach__rail-scroll')?.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 教学任务清单：可收起（localStorage 持久化：'0' = 收起）
+const tasksOpen = ref(localStorage.getItem('xkz_teach_tasks') !== '0');
+function toggleTasks() {
+  tasksOpen.value = !tasksOpen.value;
+  localStorage.setItem('xkz_teach_tasks', tasksOpen.value ? '1' : '0');
+}
+
+// GitHub 状态卡 ↔ 输入框 双态：已连接=状态卡，修改/未连接=输入框
+const repoEditing = ref(false);
+const repoInput = ref<HTMLInputElement | null>(null);
+const repoName = computed(() => {
+  const u = repoUrl.value.trim().replace(/\/+$/, '');
+  const seg = u.split('/');
+  return seg[seg.length - 1] || u;
+});
+function editRepo() {
+  repoEditing.value = true;
+  nextTick(() => repoInput.value?.focus());
 }
 
 // ---------- 发送 ----------
@@ -761,7 +980,7 @@ async function send() {
     task_id: taskId.value, mode: mode.value, user_input: text,
     repo_url: repoUrl.value.trim() || null,
     api_key: settings.apiKey.trim(), base_url: settings.effectiveBaseUrl,
-    model: settings.effectiveModel, history: history.value.slice(-6),
+    model: settings.effectiveModel, history: history.value.slice(-20),
     // V2.2 对话附图（base64 内联；请求结束即释放，服务端不落盘）
     visual_images: visualImages,
   };
@@ -819,11 +1038,112 @@ function pushSystem(text: string) {
   scrollToBottom();
 }
 
+// ---------- 对话持久化（当前落 localStorage；预留后端升级点） ----------
+// 结构：xkz_chat_v1 = { "<course_id>|<project_id>|<task_id>": [消息快照...] }
+// 将来接服务器时只需替换 readChatAll / writeChatAll 为 HTTP 调用，key 语义不变。
+// 快照仅存可序列化字段（文本/payload/review/pass_bonus/feedback），运行截图是临时 blob 不恢复。
+const LS_CHAT = 'xkz_chat_v1';
+const CHAT_MAX_MSGS = 40;   // 每个任务最多保留的消息条数（防 localStorage 超限）
+function readChatAll(): Record<string, any[]> {
+  try { return JSON.parse(localStorage.getItem(LS_CHAT) || '{}'); } catch { return {}; }
+}
+function writeChatAll(all: Record<string, any[]>) {
+  const dump = () => JSON.stringify(all);
+  try { localStorage.setItem(LS_CHAT, dump()); }
+  catch {
+    // 超限降级：剔除最肥的字段（评审 base64 截图 / 自述答题内容）后重写，保证对话文本不丢
+    for (const k in all) {
+      all[k] = all[k].map(m => ({
+        ...m,
+        review: m.review ? { ...m.review, submission: m.review.submission ? { ...m.review.submission, previews: undefined } : undefined } : undefined,
+        pass_bonus: undefined,
+      }));
+    }
+    try { localStorage.setItem(LS_CHAT, dump()); } catch { /* 极端情况放弃写入，不影响当前会话 */ }
+  }
+}
+function chatKey() { return [courseId.value, projectId.value, taskId.value].filter(Boolean).join('|'); }
+
+// 把当前对话压成快照，存到指定任务的 key（默认当前任务）
+function saveChatTo(key: string) {
+  if (!chat.value.length) return;
+  const snap = chat.value
+    .filter(m => m.text || m.payload || m.review || m.pass_bonus)   // 滤掉临时 loading 占位
+    .slice(-CHAT_MAX_MSGS)
+    .map(m => {
+      const s: any = { role: m.role, text: m.text, payload: m.payload, review: m.review, pass_bonus: m.pass_bonus, feedback: m.feedback };
+      // 不入库最肥字段：验收截图 base64（单张数百 KB，会顶爆 localStorage 上限；截图本就是临时内容）
+      if (s.review?.submission?.previews) s.review.submission.previews = undefined;
+      return s;
+    });
+  const all = readChatAll();
+  all[key] = snap;
+  writeChatAll(all);
+}
+function saveChat() { saveChatTo(chatKey()); }
+
+// 拉取服务端会话历史（v1.1：SQLite 真相源；失败/无记录返回 null，前端降级本地缓存）
+async function fetchServerHistory() {
+  const skey = `${student.value.session_id}:${taskId.value}`;
+  if (!student.value.session_id || !taskId.value) return null;
+  try {
+    const r = await fetch(`/api/ai/session_history?session_key=${encodeURIComponent(skey)}`);
+    const j = await r.json();
+    return j && j.ok ? j.data : null;
+  } catch { return null; }   // 网络/服务端故障：不影响本地兜底渲染
+}
+
+// 恢复当前任务的对话：服务端 SQLite 为真相源（刷新/清缓存后仍可恢复显示），
+// localStorage 降级为显示缓存——本地仅补充服务端文本无法还原的富内容（评审卡/附图/pass_bonus）
+async function restoreChat() {
+  const local = readChatAll()[chatKey()] || [];
+  const server = await fetchServerHistory();
+  const toText = (m: any) => typeof m.payload === 'string' ? m.payload : (m.payload?.message || m.text || '');
+
+  if (server && Array.isArray(server.history) && server.history.length) {
+    // 以服务端顺序为骨架重建基础展示（纯文本气泡；结构化 payload 只存服务端消息文本）
+    chat.value = server.history.map((m: any) => m.role === 'user'
+      ? { role: 'user', text: m.content }
+      : { role: 'assistant', payload: { message: m.content } });
+    const key = (m: any) => `${m.role}|${toText(m)}`;
+    const have = new Set(chat.value.map(key));
+    for (const lm of local) {
+      if (lm.review || lm.pass_bonus || lm.images) {      // 服务端无法还原 → 本地补充
+        if (!have.has(key(lm))) chat.value.push(lm);
+      } else if (lm.images && have.has(key(lm))) {        // 同条消息本地有附图 → 用本地版覆盖
+        const i = chat.value.findIndex(m => key(m) === key(lm));
+        if (i >= 0) chat.value[i] = lm;
+      }
+    }
+  } else {
+    chat.value = local.map(m => ({ role: m.role, text: m.text, payload: m.payload, review: m.review, pass_bonus: m.pass_bonus, feedback: m.feedback }));
+  }
+  history.value = [];
+  for (const m of chat.value) {
+    if (m.role === 'system') continue;
+    history.value.push(m.role === 'user'
+      ? { role: 'user', content: toText(m) }
+      : { role: 'assistant', content: m.payload?.message || '' });
+  }
+  history.value = history.value.slice(-20);
+  scrollToBottom();
+}
+
+// 彻底删除当前任务的存档（用户主动「清空对话」用，勿与"切换任务"混淆）
+function dropChat() {
+  const all = readChatAll();
+  delete all[chatKey()];
+  writeChatAll(all);
+  chat.value = [];
+  history.value = [];
+}
+
 function pushMsg(role: 'user' | 'assistant', payload: any, review?: any, images?: string[]) {
   chat.value.push({ role, payload, review, images });
   if (role === 'user') history.value.push({ role: 'user', content: typeof payload === 'string' ? payload : payload.message });
   else history.value.push({ role: 'assistant', content: payload?.message || '' });
   if (history.value.length > 40) history.value = history.value.slice(-40);
+  saveChat();   // 每条消息落库，切换/离开页面不丢
 }
 
 function scrollToBottom() {
@@ -848,6 +1168,7 @@ function collectMaterial() {
   const summary = description || (blocks.length ? '（提交代码片段）' : '');
   return {
     submission: {
+      student_id: student.value.student_id,
       github_url: github,
       deployment_url: deployLink,
       code: blocks.join('\n\n'),
@@ -876,6 +1197,7 @@ async function doReview() {
   const material = collectMaterial();
   const body = {
     session_id: student.value.session_id, task_id: taskId.value,
+    student_id: student.value.student_id, project_id: projectId.value,
     submission: material.submission,
     api_key: settings.apiKey.trim(), base_url: settings.effectiveBaseUrl, model: settings.effectiveModel,
     // V2.1 视觉证据（base64 内联；请求结束即释放，服务端不落盘）
@@ -902,6 +1224,7 @@ async function doReview() {
       return;
     }
     chat.value.push({ role: 'assistant', payload: { message: `评审完成：${j.data.evaluation.status}（${j.data.score} 分）` }, review: j.data });
+    applyServerState(j.data);   // P6：评审响应内挂的项目/学生状态（服务端真相源）
     if (j.data.passed && !student.value.completed_tasks.includes(taskId.value)) {
       student.value.completed_tasks.push(taskId.value);
       saveStudent();
@@ -919,6 +1242,9 @@ async function doReview() {
     } else {
       saveStudent();
       pushSystem('评审有未通过项：切回「指导」按评审意见逐条修改，改好后重新提交验收。（对话记录已保留，可直接继续讨论未通过的原因）');
+      // P4：任务前置提示（仅提示，不阻断——如跨项目的 c3_t08 依赖未完成的 c3_t07）
+      if (j.data.blocked_reason?.blocked) pushSystem(j.data.blocked_reason.reason);
+      void fetchProjectRecord(projectId.value);   // P6：刷新项目复盘（评审响应不含 retro）
     }
   } catch (e: any) {
     toast('网络请求失败：' + e.message);
@@ -957,10 +1283,16 @@ async function loadPassBonus(reviewData: any) {
   saveCareerResult(projectId, entry);
 
   const bonus: PassBonus = { career: '', resume: { ...EMPTY_RESUME, tech: [], bullets: [], metrics: [] }, interview: [], answers: [], hintOpen: [], anchorOpen: [] };
+  // P6：简历取数走"服务端优先"——服务端历史不可用时回退 localStorage，避免简历模块整体为空
+  const record = await fetchProjectRecord(pid);
+  const serverResults = (record?.results || []).map((r: any) => ({
+    task_id: r.task_id, score: r.score, passed: r.passed, total: r.total, ci_conclusion: r.ci_conclusion,
+  }));
+  const results = serverResults.length ? serverResults : loadCareerResults(pid);
   try {
     const r = await fetch(`/api/career/text`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ project_id: pid, results: loadCareerResults(pid), github_url: repoUrl.value.trim() }),
+      body: JSON.stringify({ project_id: pid, results, github_url: repoUrl.value.trim() }),
     });
     const j = await r.json();
     if (j.ok) {
@@ -1077,22 +1409,24 @@ async function toggleStats() {
 
 // ---------- 其他操作 ----------
 function resetStudent() {
-  student.value = { session_id: 's_' + Math.random().toString(16).slice(2, 10), name: '匿名学生', skills: {}, completed_tasks: [], attempt_count: {}, timestamp: new Date().toISOString() };
+  const studentId = ensureStudentId();   // 稳定身份不随进度重置而改变
+  student.value = { student_id: studentId, session_id: 's_' + Math.random().toString(16).slice(2, 10), name: '匿名学生', skills: {}, completed_tasks: [], attempt_count: {}, timestamp: new Date().toISOString() };
   saveStudent();
   useAchievementStore().unlock('great_discipline_officer');
   toast('已重置学生进度，新会话 ' + student.value.session_id);
 }
 function clearChat() {
-  chat.value = [];
-  history.value = [];
+  dropChat();   // 主动清空：删除该任务的存档，与"切换任务"的保存行为区分
   useAchievementStore().unlock('traveler');
 }
 function applyAdvice(adv: any) {
   if (adv.task_id) {
     if (taskId.value !== adv.task_id) {
+      saveChat();   // 旧任务对话入库后再切换
       taskId.value = adv.task_id;   // 触发清单/中间标题更新；对话按任务隔离
       chat.value = [];
       history.value = [];
+      restoreChat();
     }
     suggestedNext.value = null;
     saveSel();
@@ -1129,6 +1463,12 @@ function toast(msg: string) {
   --t-fg: #E8E8E8; --t-dim: #999999; --t-mut: #666666;
   --t-acc: #FFD93D; --t-acc-dim: #C9A800;
   --t-green: #4ECCA3; --t-yellow: #FFD93D; --t-red: #FF5D6C;
+  /* 浮岛卡片：侧栏/对话区各自成卡（夜间玻璃底透出用户背景图） */
+  --t-glass: rgba(26, 26, 26, .78);
+  --t-glass-blur: blur(14px) saturate(1.05);
+  --t-chrome: rgba(255, 255, 255, .035);
+  --t-card-line: #3a3a3a;
+  --t-card-shadow: 0 18px 48px rgba(0, 0, 0, .38);
   display: flex; gap: 0; height: calc(100vh - 120px); min-height: 600px;
   border: 1px solid var(--t-line); border-radius: 14px; overflow: hidden;
   background: var(--t-bg);
@@ -1137,12 +1477,24 @@ function toast(msg: string) {
   max-width: 1400px;
   margin: 0 auto;
 }
-/* 日间 ak 主题 — 统一红白色调 */
+/* 浮岛布局：导师视图下 .teach 退化为透明容器，侧栏/对话区各自成独立圆角卡片 */
+.teach:not(.teach--select) {
+  gap: 12px;
+  background: transparent;
+  border: 0;
+  overflow: visible;
+}
+/* 日间 ak 主题 — 统一红白色调（浮岛为近实底白卡；日间无用户背景图） */
 .teach[data-theme='ak'] {
   --t-bg: #fafafa; --t-bg2: #ffffff; --t-bg3: #ffffff; --t-line: #e8e8e8;
   --t-fg: #1a1a1a; --t-dim: #555555; --t-mut: #999999;
   --t-acc: #c0392b; --t-acc-dim: #a93226;
   --t-green: #34d399; --t-yellow: #fbbf24; --t-red: #f87171;
+  --t-glass: rgba(255, 255, 255, .95);
+  --t-glass-blur: none;
+  --t-chrome: rgba(0, 0, 0, .02);
+  --t-card-line: #e8e8e8;
+  --t-card-shadow: 0 12px 32px rgba(0, 0, 0, .08);
 }
 
 .teach * { box-sizing: border-box; }
@@ -1180,7 +1532,7 @@ function toast(msg: string) {
 .teach[data-theme='ak'].teach--select { background: rgba(250, 250, 250, 0.45) !important; }
 .tw-stripe { position: absolute; inset: -15%; background: repeating-linear-gradient(-55deg, transparent 0 180px, var(--w-deco-line) 180px 183px); }
 .tw-tag { position: absolute; left: 0; top: 40px; z-index: 50; background: var(--w-acc); color: var(--w-btn-text); padding: 10px 30px 10px 18px; font-weight: 900; clip-path: polygon(0 0,100% 0,calc(100% - 24px) 100%,0 100%); }
-.tw-tag .t1 { font-size: 17px; letter-spacing: 2px; }
+.tw-tag .t1 { font-size: 17px; letter-spacing: 2px; margin: 0; }
 .tw-tag .t2 { font-size: 10px; font-weight: 400; letter-spacing: 3px; opacity: .7; }
 .tw-tag .num { font-size: 38px; line-height: 1.1; }
 .tw-arrow { position: absolute; top: 46%; z-index: 60; width: 72px; height: 62px; background: var(--w-arrow-bg); border: 2px solid var(--w-card-border); border-radius: 42% 58% 52% 48% / 58% 42% 58% 42%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .18s; }
@@ -1215,20 +1567,126 @@ function toast(msg: string) {
 .tw-bar i { display: block; height: 4px; background: var(--w-acc); border-radius: 2px; }
 .tw-btn { position: absolute; left: 20px; bottom: 22px; z-index: 3; padding: 10px 26px; font-size: 13px; font-weight: 700; letter-spacing: 2px; border: 0; border-radius: 4px; cursor: pointer; background: var(--w-btn-bg); color: var(--w-btn-text); }
 .tw-card.front .tw-btn:hover { transform: scale(1.04); }
-.tw-foot { position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; font-size: 12px; color: var(--w-mut); letter-spacing: 4px; z-index: 60; }
+.tw-foot { position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; font-size: 12px; color: var(--w-mut); letter-spacing: 4px; z-index: 60; display: flex; flex-direction: column; gap: 6px; }
+.tw-foot .tw-def { margin: 0; font-size: 13px; letter-spacing: 0; line-height: 1.7; }
+.tw-foot .tw-hint { letter-spacing: 4px; }
 
-/* ---------- 任务进度条 ---------- */
-.teach__progress { margin-bottom: 6px; }
-.teach__progress-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--t-dim); margin-bottom: 4px; }
-.teach__progress-row span:last-child { color: var(--t-acc); font-weight: 700; }
-.teach__progress-bar { height: 4px; background: var(--t-bg3); border-radius: 2px; overflow: hidden; }
-.teach__progress-bar i { display: block; height: 4px; background: var(--t-acc); border-radius: 2px; transition: width .3s; }
-.teach__stagechip { display: none; }
+/* ---------- 学习导航 / Task Rail ---------- */
+.teach__rail-fixed {
+  flex: none; display: flex; flex-direction: column; gap: 14px;
+  padding-bottom: 14px; border-bottom: 1px solid var(--t-line);
+}
+.teach__rail-scroll {
+  flex: 1; min-height: 0; overflow-y: auto; padding-top: 14px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.teach__rail-scroll::-webkit-scrollbar { width: 6px; }
+.teach__rail-scroll::-webkit-scrollbar-thumb { background: var(--t-line); border-radius: 20px; }
+.teach__rail-scroll::-webkit-scrollbar-track { background: transparent; }
+.teach__eyebrow {
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em;
+  color: var(--t-mut);
+}
+/* 侧栏 section 主标题（TASKS / PROJECT 等）：用前景色提亮，夜间白 / 日间黑 */
+.teach__eyebrow--sec { color: var(--t-fg); }
+.teach__railsec { display: flex; flex-direction: column; gap: 7px; }
+.teach__sec-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.teach__sec-tools { display: inline-flex; align-items: center; gap: 6px; }
+.teach__collapse {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; padding: 0;
+  background: var(--t-acc); border: 1px solid var(--t-acc); color: var(--t-bg);
+  border-radius: 8px; cursor: pointer; transition: filter .15s, transform .15s;
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--t-acc) 35%, transparent);
+}
+.teach__collapse:hover { filter: brightness(1.12); transform: translateY(-1px); }
+.teach__collapse svg { width: 14px; height: 14px; transition: transform .2s; }
+.teach__collapse svg.closed { transform: rotate(-90deg); }
+.teach__projsel { width: auto; max-width: 170px; padding: 4px 8px; font-size: 12px; border-radius: 6px; }
+.teach__course-title { font-size: 15px; font-weight: 800; color: var(--t-fg); line-height: 1.35; }
+
+/* 项目总进度：左栏视觉核心（黄色只表当前进度） */
+.teach__progcard {
+  border: 1px solid var(--t-line); border-radius: 10px;
+  background: var(--t-bg3); padding: 11px 12px; cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.teach__progcard:hover { border-color: color-mix(in srgb, var(--t-acc) 55%, transparent); }
+.teach__prog-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; margin-bottom: 8px; }
+.teach__prog-head .teach__eyebrow { font-size: 10px; }
+.teach__prog-count { color: var(--t-acc); font-weight: 900; font-size: 19px; line-height: 1; }
+.teach__prog-bar { height: 6px; background: var(--t-bg); border: 1px solid var(--t-line); border-radius: 10px; overflow: hidden; }
+.teach__prog-bar i { display: block; height: 100%; background: var(--t-acc); border-radius: 10px; transition: width .3s; }
+.teach__prog-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 8px; }
+.teach__prog-now { font-size: 11px; color: var(--t-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.teach__prog-link { flex: none; font-size: 11px; color: var(--t-acc); font-weight: 600; }
+
+/* 教学任务清单：按 stage 分组，黄色=当前，绿色=完成 */
+.teach__tasklist { display: flex; flex-direction: column; }
+.teach__stage-title {
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+  color: var(--t-mut); margin: 8px 0 2px; padding-left: 2px;
+}
+.teach__stage-title:first-child { margin-top: 0; }
+.teach__taskitem {
+  display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;
+  background: transparent; border: 0; border-left: 3px solid transparent;
+  border-radius: 6px; padding: 7px 8px; cursor: pointer;
+  color: var(--t-dim); font-size: 13px; transition: background .15s, color .15s;
+}
+.teach__taskitem:hover { background: var(--t-bg3); color: var(--t-fg); }
+.teach__taskitem.current {
+  background: color-mix(in srgb, var(--t-acc) 10%, transparent);
+  border-left-color: var(--t-acc); color: var(--t-fg);
+}
+.teach__taskmark { flex: none; width: 15px; display: inline-flex; align-items: center; justify-content: center; }
+.teach__taskmark .check { width: 13px; height: 13px; color: var(--t-green); }
+.teach__taskdot { width: 8px; height: 8px; border-radius: 50%; background: var(--t-acc); }
+.teach__tasko { width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--t-line); }
+.teach__taskname { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.teach__taskst { flex: none; font-size: 10px; font-weight: 700; color: var(--t-acc); }
+.teach__taskempty { font-size: 12px; color: var(--t-mut); padding: 6px 2px; }
+
+/* GitHub 项目状态卡（已连接） */
+.teach__repocard {
+  background: var(--t-bg3); border: 1px solid var(--t-line); border-radius: 8px;
+  padding: 9px 11px; display: flex; flex-direction: column; gap: 5px;
+}
+.teach__repo-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.teach__repo-name { flex: 1; min-width: 0; font-weight: 700; color: var(--t-fg); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.teach__repo-conn { flex: none; display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: var(--t-green); }
+.teach__repo-conn i { width: 7px; height: 7px; border-radius: 50%; background: var(--t-green); }
+.teach__repo-url { font-size: 11px; color: var(--t-mut); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.teach__repo-actions { display: flex; align-items: center; gap: 10px; }
+.teach__repo-open { font-size: 12px; font-weight: 600; color: var(--t-acc); text-decoration: none; }
+.teach__repo-open:hover { text-decoration: underline; }
+.teach__repo-edit { background: transparent; border: 1px solid var(--t-line); color: var(--t-dim); border-radius: 6px; font-size: 11px; padding: 2px 8px; cursor: pointer; transition: .15s; }
+.teach__repo-edit:hover { color: var(--t-fg); border-color: var(--t-acc); }
+
+/* AI Mentor：独立状态卡，绿色=在线 */
+.teach__mentorcard {
+  background: var(--t-bg3); border: 1px solid var(--t-line); border-left: 3px solid var(--t-acc);
+  border-radius: 8px; padding: 9px 11px; display: flex; flex-direction: column; gap: 5px;
+}
+.teach__mentor-line { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.teach__mentor-name { font-weight: 700; color: var(--t-fg); font-size: 13px; }
+.teach__online { flex: none; display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: var(--t-green); }
+.teach__online i { width: 7px; height: 7px; border-radius: 50%; background: var(--t-green); box-shadow: 0 0 0 3px color-mix(in srgb, var(--t-green) 18%, transparent); }
+.teach__mentor-desc { font-size: 11px; color: var(--t-mut); line-height: 1.55; }
+.teach__mentor-mode { font-size: 11px; color: var(--t-dim); }
+.teach__mentor-mode b { color: var(--t-acc); }
+.teach__student label { font-size: 12px; color: var(--t-dim); font-weight: 600; letter-spacing: .03em; }
 
 .teach__side {
-  width: 320px; min-width: 320px; border-right: 1px solid var(--t-line);
-  background: var(--t-bg2); padding: 16px 14px; overflow-y: auto;
-  display: flex; flex-direction: column; gap: 14px;
+  width: 352px; min-width: 352px;
+  background: var(--t-glass);
+  -webkit-backdrop-filter: var(--t-glass-blur);
+  backdrop-filter: var(--t-glass-blur);
+  border: 1px solid var(--t-card-line); border-radius: 12px;
+  box-shadow: var(--t-card-shadow);
+  padding: 14px 14px 16px; overflow: hidden;
+  display: flex; flex-direction: column;
+  transition: width .28s ease, min-width .28s ease, opacity .2s ease, border-color .2s ease;
 }
 .teach__group { display: flex; flex-direction: column; gap: 5px; }
 .teach__group label { font-size: 12px; color: var(--t-dim); font-weight: 600; letter-spacing: .03em; }
@@ -1308,15 +1766,38 @@ function toast(msg: string) {
 }
 .teach__stats { font-size: 11px; color: var(--t-dim); display: flex; flex-direction: column; gap: 3px; }
 .teach__stats b { color: var(--t-fg); }
+/* P6：项目复盘（侧栏，来自服务端提交/评审历史） */
+.teach__retro { display: flex; flex-direction: column; gap: 4px; background: var(--t-bg3); border: 1px solid var(--t-line); border-radius: 8px; padding: 8px 9px; }
+.teach__retro-head { font-size: 11px; font-weight: 600; color: var(--t-fg); }
+.teach__retro-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-size: 11px; color: var(--t-dim); }
+.teach__retro-t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.teach__retro-s { flex-shrink: 0; }
+.teach__retro-s.ok { color: var(--t-green); }
+.teach__retro-s.no { color: var(--t-yellow); }
 .teach__red { color: var(--t-red); }
 .teach__yellow { color: var(--t-yellow); }
 .teach__dim { color: var(--t-mut); }
 .teach__apifoot { margin-top: auto; }
 
-/* 右侧对话区 */
-.teach__main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-/* 侧栏收起：对话区占满 */
+/* 右侧对话区（浮岛卡片） */
+.teach__main {
+  flex: 1; display: flex; flex-direction: column; min-width: 0;
+  background: var(--t-glass);
+  -webkit-backdrop-filter: var(--t-glass-blur);
+  backdrop-filter: var(--t-glass-blur);
+  border: 1px solid var(--t-card-line); border-radius: 12px;
+  box-shadow: var(--t-card-shadow);
+  overflow: hidden;
+}
+/* 侧栏收起：移动端直接消失；桌面端（见 @media min-width: 761px）走宽度过渡动画 */
 .teach--noside .teach__side { display: none; }
+/* 桌面端收起动画：宽度塌缩 + 淡出（内容被 overflow:hidden 裁切，露出的背景图起视觉收尾） */
+@media (min-width: 761px) {
+  .teach--noside .teach__side {
+    display: flex; width: 0; min-width: 0; padding: 0;
+    border-width: 0; opacity: 0; pointer-events: none;
+  }
+}
 /* 侧栏开关：实心强调色按钮，醒目 */
 .teach__sidetoggle {
   cursor: pointer; border: 1px solid var(--t-acc);
@@ -1328,10 +1809,12 @@ function toast(msg: string) {
 .teach__sidetoggle:hover { filter: brightness(1.12); transform: translateY(-1px); }
 .teach__sidetoggle:active { transform: translateY(0); }
 .teach__chathead {
-  padding: 10px 18px; border-bottom: 1px solid var(--t-line); background: var(--t-bg2);
+  padding: 9px 18px; border-bottom: 1px solid var(--t-line); background: var(--t-chrome);
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
 }
-.teach__chathead .teach__task { margin: 0; font-size: 13px; color: var(--t-fg); }
+.teach__mission { min-width: 0; }
+.teach__mission-no { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .14em; color: var(--t-acc); }
+.teach__chathead .teach__task { margin: 3px 0 0; font-size: 13px; color: var(--t-fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .teach__chips { display: flex; gap: 8px; }
 .teach__metachip {
   font-size: 11px; color: var(--t-dim); background: var(--t-bg3); border: 1px solid var(--t-line);
@@ -1341,9 +1824,27 @@ function toast(msg: string) {
   flex: 1; overflow-y: auto; padding: 18px;
   display: flex; flex-direction: column; gap: 14px;
 }
-.teach__welcome { max-width: 560px; margin: auto auto; text-align: center; color: var(--t-mut); }
-.teach__welcome h2 { color: var(--t-dim); font-size: 20px; font-weight: 600; margin-bottom: 10px; line-height: 1.5; }
-.teach__welcome p { font-size: 13px; line-height: 1.7; color: var(--t-dim); }
+.teach__welcome {
+  max-width: 860px; margin: auto auto; text-align: center; color: var(--t-mut);
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.teach__wstatus {
+  display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700;
+  color: var(--t-green); background: var(--t-bg3); border: 1px solid var(--t-line);
+  border-radius: 999px; padding: 6px 14px;
+}
+.teach__wstatus i { width: 8px; height: 8px; border-radius: 50%; background: var(--t-green); box-shadow: 0 0 0 4px color-mix(in srgb, var(--t-green) 18%, transparent); }
+/* Hero 大标题：任务简报式排版，末句用主题色强调（见 taskObjectiveHtml） */
+.teach__welcome h2 {
+  color: var(--t-fg); font-size: clamp(22px, 2.6vw, 34px); font-weight: 800;
+  margin: 2px 0 0; line-height: 1.4;
+  overflow-wrap: anywhere; word-break: break-word;
+}
+.teach__welcome h2 a { word-break: break-all; overflow-wrap: anywhere; }
+.teach__welcome h2 em { font-style: normal; color: var(--t-acc); }
+.teach__welcome p { font-size: 13px; line-height: 1.8; color: var(--t-dim); margin: 0; max-width: 620px; overflow-wrap: anywhere; word-break: break-word; }
+.teach__wtips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 2px; }
+.teach__wtips span { font-size: 11px; color: var(--t-dim); background: var(--t-bg3); border: 1px solid var(--t-line); border-radius: 20px; padding: 4px 12px; }
 .teach__msg { display: flex; flex-direction: column; }
 .teach__msg.user { align-self: flex-end; align-items: flex-end; }
 .teach__msg.assistant { align-self: flex-start; align-items: flex-start; max-width: 88%; }
@@ -1353,27 +1854,28 @@ function toast(msg: string) {
 }
 .teach__msg.user .teach__bubble { background: var(--t-acc); border-color: var(--t-acc); color: #fff; }
 /* AI 消息 Markdown 正文 */
-.teach__bubble.md-body { white-space: normal; }
+.teach__bubble.md-body { white-space: normal; overflow-wrap: anywhere; word-break: break-word; }
 .md-body > :first-child { margin-top: 0; }
 .md-body > :last-child { margin-bottom: 0; }
 .md-body p { margin: 6px 0; }
 .md-body ul, .md-body ol { margin: 6px 0; padding-left: 20px; }
 .md-body li { margin: 3px 0; }
 .md-body h1, .md-body h2, .md-body h3, .md-body h4 { margin: 10px 0 6px; font-size: 15px; }
-.md-body blockquote { margin: 6px 0; padding: 4px 10px; border-left: 3px solid var(--t-acc-dim); color: var(--t-dim); }
+.md-body blockquote { margin: 6px 0; padding: 4px 10px; border-left: 3px solid var(--t-acc-dim); color: var(--t-dim); overflow-wrap: anywhere; word-break: break-word; }
 .md-body code:not(.hljs) {
   background: rgba(128, 128, 128, 0.18); border-radius: 4px; padding: 1px 5px;
   font-family: ui-monospace, Consolas, monospace; font-size: 12.5px;
+  word-break: break-all; /* 行内 code 中的文件名/长 token 换行，避免溢出 */
 }
 .md-body pre {
   background: #14161a; color: #e6e6e6; border-radius: 8px; padding: 10px 12px;
-  overflow-x: auto; margin: 8px 0; font-size: 12.5px; line-height: 1.55;
+  overflow-x: auto; margin: 8px 0; font-size: 12.5px; line-height: 1.55; max-width: 100%;
 }
-.md-body pre code { font-family: ui-monospace, Consolas, monospace; background: none; padding: 0; white-space: pre; }
-.md-body table { border-collapse: collapse; margin: 8px 0; font-size: 12.5px; }
+.md-body pre code { font-family: ui-monospace, Consolas, monospace; background: none; padding: 0; white-space: pre; word-break: normal; }
+.md-body table { border-collapse: collapse; margin: 8px 0; font-size: 12.5px; display: block; overflow-x: auto; max-width: 100%; }
 .md-body th, .md-body td { border: 1px solid var(--t-line); padding: 4px 8px; text-align: left; }
 .md-body th { background: rgba(128, 128, 128, 0.12); }
-.md-body a { color: var(--t-acc); }
+.md-body a { color: var(--t-acc); word-break: break-all; overflow-wrap: anywhere; }
 /* highlight.js 令牌配色（代码块固定深底，两主题通用） */
 .md-body .hljs-keyword, .md-body .hljs-built_in { color: #c792ea; }
 .md-body .hljs-string, .md-body .hljs-attr { color: #a5e075; }
@@ -1474,16 +1976,31 @@ function toast(msg: string) {
 
 /* 输入区 */
 .teach__composer {
-  border-top: 1px solid var(--t-line); padding: 10px 14px; background: var(--t-bg2);
+  border-top: 1px solid var(--t-line); padding: 10px 14px; background: var(--t-chrome);
   display: flex; flex-direction: column; align-items: stretch;
 }
 .teach__composer.dragging { outline: 2px dashed var(--t-acc); outline-offset: -6px; }
 .teach__composer-row { display: flex; gap: 8px; align-items: flex-end; }
-.teach__composer-row textarea { flex: 1; min-height: 44px; max-height: 140px; }
-.teach__clip { padding: 9px 11px; font-size: 15px; line-height: 1; }
-.teach__ghost-send { padding: 9px 14px; }
-.teach__submit { background: transparent; border: 1px solid var(--t-acc); color: var(--t-acc); white-space: nowrap; }
-.teach__submit:hover:not(:disabled) { background: var(--t-acc); color: #fff; }
+.teach__composer-row textarea { flex: 1; min-height: 50px; max-height: 140px; }
+.teach__clip { padding: 10px 11px; line-height: 1; display: inline-flex; align-items: center; }
+.teach__clip svg { width: 19px; height: 19px; }
+.teach__ghost:disabled { opacity: .45; cursor: not-allowed; }
+/* 发送=普通交流（深灰），验收=正式提交（高亮色） */
+.teach__send {
+  background: var(--t-bg3); border: 1px solid var(--t-line); color: var(--t-fg);
+  border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: border-color .15s, color .15s, background .15s;
+}
+.teach__send:hover:not(:disabled) { border-color: var(--t-acc); color: var(--t-acc); }
+.teach__send:disabled { opacity: .5; cursor: not-allowed; }
+.teach__submit {
+  background: var(--t-acc); border: 1px solid var(--t-acc); color: var(--t-bg);
+  border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: background .15s, border-color .15s, color .15s;
+  white-space: nowrap; box-shadow: 0 1px 4px color-mix(in srgb, var(--t-acc) 35%, transparent);
+}
+.teach__submit:hover:not(:disabled) { background: var(--t-acc-dim); border-color: var(--t-acc-dim); color: var(--t-bg); }
+.teach__submit:disabled { opacity: .5; cursor: not-allowed; }
 .teach__loading { display: inline-flex; gap: 4px; align-items: center; color: var(--t-mut); }
 .teach__loading i { width: 6px; height: 6px; border-radius: 50%; background: var(--t-acc); animation: tb 1.1s infinite; }
 .teach__loading i:nth-child(2) { animation-delay: .15s; }
@@ -1498,9 +2015,10 @@ function toast(msg: string) {
 
 @media (max-width: 760px) {
   .teach { flex-direction: column; height: auto; min-height: 70vh; }
-  .teach__side { width: 100%; min-width: 0; max-height: 46vh; border-right: 0; border-bottom: 1px solid var(--t-line); }
+  .teach__side { width: 100%; min-width: 0; max-height: 46vh; }
   .teach__messages { min-height: 300px; }
   .teach__reviewcard { min-width: 0; }
+  .teach__chips .teach__metachip:not(.teach__sidetoggle) { display: none; }
 }
 
 /* ============================================
@@ -1514,9 +2032,9 @@ function toast(msg: string) {
   --t-fg: #E8E8E8; --t-dim: #999999; --t-mut: #666666;
   --t-acc: #FFD93D; --t-acc-dim: #C9A800;
   --t-green: #4ECCA3; --t-yellow: #FFD93D; --t-red: #FF5D6C;
-  border-radius: 10px; border-color: #333; box-shadow: none; background: var(--t-bg);
 }
-.teach[data-theme='zzz'] .teach__side { border-right-color: #333; }
+/* 选课屏保留整块玻璃面板（10px 圆角）；导师视图为浮岛布局，见 :not(.teach--select) */
+.teach[data-theme='zzz'].teach--select { border-radius: 10px; border-color: #333; box-shadow: none; }
 .teach[data-theme='zzz'] .teach__chathead { border-bottom-color: #333; }
 .teach[data-theme='zzz'] .teach__composer { border-top-color: #333; }
 .teach[data-theme='zzz'] .teach__btn {
@@ -1546,7 +2064,15 @@ function toast(msg: string) {
 .teach[data-theme='zzz'] select:focus,
 .teach[data-theme='zzz'] input:focus,
 .teach[data-theme='zzz'] textarea:focus {
-  border-color: var(--t-acc); box-shadow: none;
+  border-color: var(--t-acc);
+  box-shadow: 0 0 0 2px rgba(244, 208, 0, .10);
+}
+/* 克制辉光（仅 zzz）：进度条光晕 + 验收按钮光晕 + focus ring，颜色与 --t-acc 同源，不扩散到 ak 主题 */
+.teach[data-theme='zzz'] .teach__prog-bar i {
+  box-shadow: 0 0 14px rgba(244, 208, 0, .20);
+}
+.teach[data-theme='zzz'] .teach__submit {
+  box-shadow: 0 0 18px rgba(244, 208, 0, .10), 0 1px 4px rgba(0, 0, 0, .28);
 }
 .teach[data-theme='zzz'] .teach__msg.user .teach__bubble {
   background: #2A2A2A !important; border: 1px solid #444; color: var(--t-fg) !important; border-left: 3px solid var(--t-acc);
@@ -1570,5 +2096,12 @@ function toast(msg: string) {
 .teach[data-theme='zzz'] .teach__warn {
   border-radius: 6px; clip-path: none;
 }
+.teach[data-theme='zzz'] .teach__progcard,
+.teach[data-theme='zzz'] .teach__repocard,
+.teach[data-theme='zzz'] .teach__mentorcard { border-radius: 8px; }
+.teach[data-theme='zzz'] .teach__send,
+.teach[data-theme='zzz'] .teach__submit,
+.teach[data-theme='zzz'] .teach__collapse,
+.teach[data-theme='zzz'] .teach__taskitem { border-radius: 6px; }
 </style>
 

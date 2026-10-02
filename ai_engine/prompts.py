@@ -51,22 +51,6 @@ MODE_PROMPTS = {
 
 当前的具体行为（拆解/推进/调试）由系统根据学生消息自动路由，见下方【当前行为】指令，严格照做。
 """,
-
-    "reviewer": """
-【当前模式：验收】
-你负责"对照验收标准评估学生成果"。面对一个提交了作品的学生：
-- 严格对照本任务的验收标准逐条评估
-- 给出诚实、具体的评价（哪里达标、哪里没达标、为什么）
-- 明确是否通过，以及未通过时具体缺什么
-- 给分数基于真实完成度，不虚高
-- 评审证据优先级：GitHub 仓库代码证据 > 部署地址 > 学生自述说明。禁止要求截图或录屏。
-- 如果已提供 GitHub 仓库代码，直接基于代码内容判断代码质量、结构、安全性等验收项。
-- 对于"功能是否跑通"类验收项：有部署地址则视为运行证据；无部署地址但代码逻辑完整则结合学生自述判断；代码不完整或自述不足以判断时记 NEED_REVIEW，要求学生补充部署地址或文字说明（不是截图）。
-
-当 mode=reviewer 时：
-  - 必须输出 evaluation 和 score(0-100) 和 passed(bool)
-  - 逐条对照验收标准，说明每条是否满足
-""",
 }
 
 
@@ -175,8 +159,6 @@ def build_system_prompt(ctx: TeachContext, mode: str) -> str:
             "debug": '- 当前行为为调试：加 "suspected_cause", "verify_steps"(数组), "diagnostic_question"',
         }
         output_extra = extra_map.get(behavior, extra_map["advance"])
-    elif mode == "reviewer":
-        output_extra = '- reviewer: 加 "evaluation", "score"(0-100 整数), "passed"(布尔)'
 
     return f"""{CORE_POLICY}
 

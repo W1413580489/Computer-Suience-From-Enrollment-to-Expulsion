@@ -12,6 +12,7 @@ V1 独立运行在 8099 端口，不托管静态资源（测试页为独立 HTML
 from __future__ import annotations
 
 import json
+import hashlib
 import time
 from datetime import datetime, timezone, timedelta
 
@@ -20,19 +21,23 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from schemas import (AISession, DebuggerState, DebugPhase, Evidence, EvidenceType, Mode, ReviewCriterion, ReviewRequest, ReviewStatus, TeachRequest)
+from schemas import (AISession, DebuggerState, DebugPhase, Evidence, EvidenceType, Mode, ReviewCriterion, ReviewRequest, ReviewStatus, Submission, TeachRequest)
 from course_data import get_project, list_projects, get_task, get_rubrics, list_courses, get_next_task, get_stage
 from context_builder import build_context
 from prompts import build_system_prompt, route_behavior, BEHAVIOR_LABELS
-from llm_client import LLMClient, DEFAULT_MODEL, DEFAULT_BASE_URL, EngineError, ProviderError
+from llm_client import (LLMClient, DEFAULT_MODEL, DEFAULT_BASE_URL, EngineError, ProviderError,
+                        MAX_TOKENS_BY_BEHAVIOR, DEFAULT_TEACH_MAX_TOKENS, REVIEW_MAX_TOKENS)
 from response_validator import validate
-from code_evidence import build_code_evidence
+from code_evidence import build_code_evidence, compare_revisions
 from career import build_career_text
 import vision as vision_mod
 from review import build_review_system_prompt, ci_direct_verdict, collect_evidence, compute_evaluation, evidence_precheck, evidence_text, snapshot_evidence
 from pydantic import Field
 import logs as logs_mod
 import hint as hint_mod
+import project_state as project_state_mod
+import learner_state as learner_state_mod
+import student_record as student_record_mod
 
 app = FastAPI(title="AI Teaching Engine", version="0.1.0")
 
@@ -45,33 +50,69 @@ app.add_middleware(
 
 TZ = timezone(timedelta(hours=8))
 
-# 会话缓存（进程内存，V1 够用；跨设备不持久）
-_sessions: dict[str, "AISession"] = {}
-
-# V1.5 Sprint 2：Evidence Store（进程内存，重启丢失）
-_evidence_store: dict[str, list[Evidence]] = {}  # task_id -> [Evidence]
-
-# V2 修改 6 · L5：评审幂等缓存（task_id + 快照hash → 评审响应，TTL 内重复评审不调 LLM）
-REVIEW_CACHE_TTL = 600  # 秒
-_REVIEW_CACHE: dict[str, tuple[float, dict]] = {}  # key -> (expires_at, response)
+# v1.1：会话/评审/证据持久化（SQLite 为真相源；替代原进程内存 dict，重启不丢）
+# 评审版本常量（rubric/prompt/engine）由 store 内部维护；改规则需在 store.py 手动 bump
+from store import store as db
 
 
 def store_evidence(ev: Evidence) -> None:
-    key = ev.task_id
-    if key not in _evidence_store:
-        _evidence_store[key] = []
-    _evidence_store[key].append(ev)
+    db.add_evidence(ev)
 
 
 def get_evidence(task_id: str, rubric_id: str | None = None) -> list[Evidence]:
-    evs = _evidence_store.get(task_id, [])
-    if rubric_id:
-        evs = [e for e in evs if e.rubric_id == rubric_id]
-    return evs
+    return db.list_evidence(task_id, rubric_id=rubric_id)
+
+
+# P2：把本次可用证据落库（evidence 表成为共享真相源，不再只是进程内存 dict）。
+# 幂等：id 由 task_id + snapshot_hash + 证据类型派生 → 同一快照重复写只覆盖、不新增。
+EVIDENCE_ROW_CHAR_CAP = 4000
+# 证据文本类型 → EvidenceType 语义映射（url=仓库链接、deployment 属运行证据）
+_EVIDENCE_TYPE_ALIAS = {"url": EvidenceType.GITHUB, "deployment": EvidenceType.RUNTIME}
+
+
+def persist_evidence(task_id: str, available: dict[str, str], snapshot_hash: str) -> None:
+    for typ, text in available.items():
+        eid = hashlib.sha1(f"{task_id}:{snapshot_hash}:{typ}".encode("utf-8")).hexdigest()[:12]
+        etype = _EVIDENCE_TYPE_ALIAS.get(typ)
+        if etype is None:
+            try:
+                etype = EvidenceType(typ)
+            except ValueError:
+                etype = EvidenceType.MANUAL
+        store_evidence(Evidence(id=eid, task_id=task_id, type=etype, source=typ,
+                                content=(text or "")[:EVIDENCE_ROW_CHAR_CAP]))
 
 
 def _now() -> str:
     return datetime.now(TZ).isoformat(timespec="seconds")
+
+
+def _ci_conclusion(ci_workflows) -> str:
+    """P6：把本次 CI 工作流结论归并为简历口径（success / failure / ''）。
+
+    与前端 build_career_text 的 ci 指标口径一致：任一工作流 conclusion=success → success。
+    """
+    flows = ci_workflows or []
+    if any((w.get("conclusion") or "").lower() == "success" for w in flows):
+        return "success"
+    has_conclusion = any((w.get("conclusion") or "") for w in flows)
+    return "failure" if has_conclusion else ""
+
+
+# ---------------------------------------------------------------------------
+# P4：Project State / Task Blocked Reason
+# ---------------------------------------------------------------------------
+def attach_student_state(data: dict, student_id: str, task_id: str, project_id: str) -> dict:
+    """把"随学生变化"的状态挂到评审响应上（blocked_reason + project_state + learner_state）。
+
+    硬约束：必须在 db.save_review_result() 之后调用——这些字段是学生态计算结果，
+    一旦写进幂等缓存，后续同一提交的缓存命中会返回陈旧的学生状态。
+    """
+    data["blocked_reason"] = project_state_mod.task_blocked_reason(student_id, task_id)
+    data["project_state"] = project_state_mod.compute_project_state(student_id, project_id)
+    # P5：Learner State（技能四态 + 学习缺口）——EVIDENCED ≠ MASTERED，两者并存返回
+    data["learner_state"] = learner_state_mod.compute_learner_state(student_id)
+    return data
 
 
 # ---------------------------------------------------------------------------
@@ -218,6 +259,64 @@ async def config():
     }}
 
 
+@app.get("/api/ai/project_state")
+async def project_state(student_id: str = "", project_id: str = "project_chatbot"):
+    """P4：项目状态只读聚合（服务端优先；前端可用它替代本地推算）。
+
+    状态：NOT_STARTED / IN_PROGRESS / COMPLETED / BLOCKED
+    完成判定只认 completion_required 的 Task（全部 PASS → COMPLETED）。
+    """
+    if not student_id:
+        return JSONResponse({"ok": False, "error": {
+            "code": "NO_STUDENT", "message": "需要提供 student_id"}}, status_code=400)
+    st = project_state_mod.compute_project_state(student_id, project_id)
+    if st is None:
+        return JSONResponse({"ok": False, "error": {
+            "code": "BAD_PROJECT", "message": "项目不存在"}}, status_code=404)
+    return {"ok": True, "data": st}
+
+
+@app.get("/api/ai/learner_state")
+async def learner_state(student_id: str = ""):
+    """P5：学生技能四态 + 学习缺口（只读聚合，可重复调用）。
+
+    四态：UNSEEN / EXPOSED / PRACTICED / EVIDENCED。
+    EVIDENCED 表示"产生了与技能相关的有效交付证据"，**不等于 MASTERED**——
+    因此同时返回 learning_gaps（theory 未达标产生的学习缺口）。
+    """
+    if not student_id:
+        return JSONResponse({"ok": False, "error": {
+            "code": "NO_STUDENT", "message": "需要提供 student_id"}}, status_code=400)
+    return {"ok": True, "data": learner_state_mod.compute_learner_state(student_id)}
+
+
+@app.get("/api/ai/project_record")
+async def project_record(student_id: str = "", project_id: str = "project_chatbot"):
+    """P6：项目记录（简历历史结果 + 项目复盘 + 项目/学生状态）——服务端真相源，零 LLM。
+
+    数据全部来自 submissions / evaluations / 课程配置，不调用模型。
+    前端采用"服务端优先 + localStorage 兜底"：本接口不可用时回退本地缓存，
+    不会因一次接口失败清空整个简历或进度模块。
+    """
+    if not student_id:
+        return JSONResponse({"ok": False, "error": {
+            "code": "NO_STUDENT", "message": "需要提供 student_id"}}, status_code=400)
+    project = get_project(project_id)
+    if not project:
+        return JSONResponse({"ok": False, "error": {
+            "code": "BAD_PROJECT", "message": "项目不存在"}}, status_code=404)
+    results = student_record_mod.build_career_results(student_id, project_id)
+    return {"ok": True, "data": {
+        "project_id": project.id,
+        "source": "server",
+        "results": results,
+        "completed_tasks": [r["task_id"] for r in results if r["status"] == "PASS"],
+        "retro": student_record_mod.build_project_retro(student_id, project_id),
+        "project_state": project_state_mod.compute_project_state(student_id, project_id),
+        "learner_state": learner_state_mod.compute_learner_state(student_id),
+    }}
+
+
 # ---------------------------------------------------------------------------
 # 核心辅导接口
 # ---------------------------------------------------------------------------
@@ -250,15 +349,21 @@ async def teach(req: TeachRequest, request: Request):
         from schemas import Student
         student = Student(session_id=req.session_id or "anon")
 
-    # 会话（单一连续对话流：会话身份 = 学生 + 任务；模式只是请求参数，切换不丢历史）
-    sid = student.session_id or "anon"
+    # P2 身份分离：student_id = 稳定身份（跨会话归属到"人"）；session_id = 纯会话标识（决定对话历史分档）
+    student_id = student.student_id or student.session_id or req.session_id or "anon"
+    sid = student.session_id or req.session_id or "anon"
+    db.upsert_student(student_id, student.name)
+
+    # 会话（单一连续对话流：会话身份 = 会话 + 任务；模式只是请求参数，切换不丢历史）
+    # v1.1：真相源是 SQLite sessions 表；req.history 仅当首次（库中无记录）时作初始化回退
     skey = f"{sid}:{req.task_id}"
-    sess = _sessions.get(skey)
+    sess = db.get_session(skey)
     if not sess or sess.task_id != req.task_id:
-        sess = AISession(session_id=sid, student_id=sid,
+        sess = AISession(session_id=sid, student_id=student_id,
                          task_id=req.task_id, mode=req.mode,
                          attempt_count=student.attempt_count.get(req.task_id, 0))
-        _sessions[skey] = sess
+        if req.history:  # 首次请求：用前端历史初始化（此后以库中为准）
+            sess.history = list(req.history)
     sess.mode = req.mode  # 记录最近一次使用的模式（不影响会话身份）
 
     # V2.2 对话附图：先读图（转录图中内容），结果同时用于行为路由与对话。
@@ -326,12 +431,17 @@ async def teach(req: TeachRequest, request: Request):
             evidence_status = {"status": "error", "code": ev["code"],
                                "error": ev["error"], "repo": req.repo_url}
 
+    db.lazy_cleanup()  # 惰性清理（幂等、低开销）
+
     # 组装 Prompt（含系统错误隔离声明：上一轮若有系统故障，本轮注入隔离说明）
     system_prompt = build_system_prompt(ctx, mode) + system_error_note(sess)
 
-    history = (req.history or [])
+    # v1.1：上下文真相源 = 服务端会话全量历史（sess.history 由 SQLite 恢复）；
+    # 窗口最近 12 轮原文（显式宽松，随 _trim 6000 字预算兜底）
+    full_history = sess.history or []
+    history = list(full_history)
     messages = [{"role": "system", "content": system_prompt}]
-    for h in history[-6:]:
+    for h in history[-12:]:
         if h.get("role") in ("user", "assistant") and h.get("content"):
             messages.append({"role": h["role"], "content": h["content"]})
     # 图片本身不进对话（只进"读图结果"）；学生只贴图没打字时用占位问句，保证消息非空
@@ -339,15 +449,17 @@ async def teach(req: TeachRequest, request: Request):
         messages.append({"role": "user", "content": visual_text})
     messages.append({"role": "user", "content": req.user_input.strip() or "请看上面的图片。"})
 
-    # 调用 LLM
+    # 调用 LLM（v1.1：按指导行为传入输出上限，杜绝输出被服务商默认额度截断）
     client = LLMClient(req.api_key, req.base_url, req.model)
+    teach_tokens = MAX_TOKENS_BY_BEHAVIOR.get(behavior, DEFAULT_TEACH_MAX_TOKENS)
     start_ts = time.time()
     try:
-        resp = await client.teach(messages, req.mode)
+        resp = await client.teach(messages, req.mode, max_tokens=teach_tokens)
     except (PermissionError, TimeoutError, EngineError, RuntimeError) as e:
         # 错误分类漏斗：系统错误记入会话标记（下一轮注入隔离声明），绝不进入学生评审结果
         if not isinstance(e, PermissionError):
             sess.last_system_error = str(e)[:200]
+            db.save_session(sess)  # v1.1：持久化隔离标记，重启后仍能在下一轮注入
         return llm_error_response(e)
     sess.last_system_error = None  # 本轮调用成功，清除上一轮的系统错误标记
 
@@ -368,7 +480,7 @@ async def teach(req: TeachRequest, request: Request):
             {"role": "user", "content": fix_prompt},
         ]
         try:
-            resp_retry = await client.teach(retry_messages, req.mode)
+            resp_retry = await client.teach(retry_messages, req.mode, max_tokens=teach_tokens)
             ok_retry, issues_retry = validate(resp_retry, ctx)
             # 只在改善时采纳
             if ok_retry or len(issues_retry) < len(issues):
@@ -395,12 +507,15 @@ async def teach(req: TeachRequest, request: Request):
             "last_diagnostic_question": sess.debug_state.last_diagnostic_question,
         }
 
+    # v1.1：会话持久化（历史 + hint + 调试状态 + 尝试次数，SQLite 真相源）
+    db.save_session(sess)
+
     # 结构化为日志（AI Evaluation 的数据基础）
     mode_advice = compute_mode_advice(mode, req, task)
     logs_mod.log_event(
         type="teach",
         session_id=sid,
-        student_id=sid,
+        student_id=student_id,
         project_id=req.project_id,
         task_id=req.task_id,
         mode=mode,
@@ -451,6 +566,8 @@ async def teach(req: TeachRequest, request: Request):
             "quality_warnings": issues,
             "latency_ms": int((time.time() - start_ts) * 1000),
             "session_id": sid,
+            # P4：任务前置提示（仅提示，不阻断；无前置或已满足时为 None）
+            "blocked_reason": project_state_mod.task_blocked_reason(student_id, req.task_id),
         },
     }
 
@@ -473,6 +590,21 @@ async def feedback(request: Request):
 async def stats():
     """AI Evaluation：从事件日志聚合教学指标。"""
     return {"ok": True, "data": logs_mod.compute_stats()}
+
+
+@app.get("/api/ai/session_history")
+async def session_history(session_key: str = ""):
+    """返回某会话的完整历史 + 结构化状态（调试轮次/hint 等级）。
+
+    v1.1 配套（评审意见 ⑨ 的必要补充）：浏览器刷新/清理 localStorage 后，
+    前端据此恢复对话显示（真相源仍是 SQLite，本地缓存只做即时渲染）。
+    """
+    if not session_key:
+        return JSONResponse({"ok": False, "error": {"code": "NO_SESSION", "message": "缺少 session_key"}}, status_code=400)
+    data = db.session_history(session_key)
+    if data is None:
+        return {"ok": True, "data": None}  # 首次对话/无历史：前端保持空状态
+    return {"ok": True, "data": data}
 
 
 @app.post("/api/ai/review")
@@ -502,6 +634,7 @@ async def review(req: ReviewRequest, request: Request):
     evidence_status = {"status": "none"}
     ci_status = {"status": "none"}
     readme_run_cmd = ""
+    repo_head_sha = ""   # P2：仓库 HEAD（只入 submissions/evaluations，不进快照/缓存 key）
     if repo_url:
         cc = task.code_context if task else None
         ev = await build_code_evidence(repo_url, task_id=req.task_id, code_context=cc)
@@ -509,6 +642,7 @@ async def review(req: ReviewRequest, request: Request):
             repo_code_text = ev["evidence_text"]
             evidence_status = {"status": "ok", "repo": ev["repo"], "file_count": ev["file_count"]}
             readme_run_cmd = ev.get("readme_run_cmd", "")
+            repo_head_sha = ev.get("head_sha", "") or ""
             if ev.get("ci"):
                 ci = ev["ci"]
                 ci_status = {
@@ -559,18 +693,76 @@ async def review(req: ReviewRequest, request: Request):
     if "runtime" not in available and readme_run_cmd:
         available["runtime"] = f"README 启动命令（本地可复现运行说明）：{readme_run_cmd}"
 
-    # V2 修改 6 · L4/L5：证据快照冻结 + 幂等缓存（同 task + 同快照 → 直接复用评审结果）
+    # V2 修改 6 · L4/L5：证据快照冻结 + 幂等缓存（同 task + 同快照 + 同版本 → 直接复用评审结果）
+    db.lazy_cleanup()  # v1.1：惰性清理（幂等、低开销）
     ci_workflows = []
     if ci_status.get("status") == "ok" and ci_status.get("workflows"):
         ci_workflows = ci_status["workflows"]
+    model_used = req.model or DEFAULT_MODEL
     snapshot_hash = snapshot_evidence(available, ci_workflows, task_id=req.task_id)
-    cache_key = f"{req.task_id}:{snapshot_hash}"
-    now_ts = time.time()
-    hit = _REVIEW_CACHE.get(cache_key)
-    if hit and now_ts < hit[0]:
-        cached_resp = dict(hit[1])
-        cached_resp["data"] = {**cached_resp["data"], "cached": True, "snapshot_hash": snapshot_hash}
-        return cached_resp
+    # 版本化 key（_review_cache_key）：rubric/prompt/engine 任一 bump → key 变化 → 必然重新评审
+
+    # P2：稳定学生身份（空则回退 session_id，兼容未升级前端）+ 学生档案 upsert
+    student_id = req.student_id or (sub.student_id if sub else "") or req.session_id or "anon"
+    db.upsert_student(student_id)
+
+    # P2：本次提交落库（独立历史事件）——head_sha / parent 只入 submissions 行，绝不进快照与缓存 key
+    submission = sub or Submission(task_id=req.task_id)
+    submission.task_id = req.task_id
+    submission.project_id = req.project_id
+    submission.student_id = student_id
+    submission.head_sha = repo_head_sha
+    prev_sub = db.latest_submission(student_id, req.task_id)
+    if prev_sub and prev_sub["id"] != submission.id:
+        submission.parent_submission_id = prev_sub["id"]
+
+    # P3：修订演进（GitHub compare）——仅当"上一版 HEAD ≠ 本次 HEAD"时才多一次请求。
+    # 结果只写入 submissions / evaluations 行，绝不进 evidence_text 与 review 缓存 key。
+    revision = {}
+    if (prev_sub and prev_sub["head_sha"] and repo_head_sha
+            and prev_sub["head_sha"] != repo_head_sha):
+        revision = await compare_revisions(repo_url, prev_sub["head_sha"], repo_head_sha)
+        if revision:
+            revision["parent_submission_id"] = submission.parent_submission_id
+    submission.revision_json = json.dumps(revision, ensure_ascii=False) if revision else ""
+
+    db.save_submission(submission)
+
+    # P2：证据落库（幂等；evidence 表成为共享真相源，评审链不再只依赖内存 dict）
+    persist_evidence(req.task_id, available, snapshot_hash)
+
+    def _record_eval(status: str, score: int, passed: bool, criteria: dict,
+                     ci_conclusion: str = "") -> None:
+        """评审历史落库（与 review_results 幂等缓存分离；缓存命中也要记，因为提交是真实事件）。"""
+        db.save_evaluation(submission_id=submission.id, student_id=student_id,
+                           task_id=req.task_id, project_id=req.project_id,
+                           snapshot_hash=snapshot_hash, model=model_used, status=status,
+                           score=score, passed=passed, head_sha=submission.head_sha,
+                           revision_json=submission.revision_json, ci_conclusion=ci_conclusion,
+                           criteria=criteria if isinstance(criteria, dict) else {})
+
+    # v1.1 失败熔断：同 key 5 分钟内直接复用失败结论，不再调 LLM 烧学生额度
+    breaker_error = db.get_review_failure(req.task_id, snapshot_hash, model_used)
+    if breaker_error:
+        return JSONResponse({"ok": False, "error": {
+            "code": "REVIEW_UNAVAILABLE",
+            "message": f"评审服务暂时不可用（短暂熔断，请 5 分钟后再试）：{breaker_error}"
+                      "（系统故障，与你提交的项目无关）"}}, status_code=500)
+
+    # v1.1 成功幂等：版本化 key 命中 → 重建 resp（刷新 session_id，不整体复用旧 session_id）
+    hit = db.get_review_result(req.task_id, snapshot_hash, model_used)
+    if hit is not None:
+        data = dict(hit.get("data") or {})
+        data.update({"cached": True, "snapshot_hash": snapshot_hash,
+                     "session_id": req.session_id or "review", "latency_ms": 0})
+        # P2：缓存命中同样记一行评审历史（归属本次提交；缓存只负责"同输入同输出"）
+        _record_eval(str(data.get("status") or "NEED_REVIEW"), int(data.get("score") or 0),
+                     bool(data.get("passed")),
+                     data.get("evaluation") if isinstance(data.get("evaluation"), dict) else {},
+                     ci_conclusion=_ci_conclusion(ci_workflows))
+        # P4：学生态在缓存之后挂（缓存里不含 blocked_reason / project_state）
+        attach_student_state(data, student_id, req.task_id, req.project_id)
+        return {"ok": True, "data": data}
 
     # V1.5 Sprint 2：Evidence 硬约束预检（修改 1：deployment 不再是硬性证据）
     precheck = evidence_precheck(rubrics, available)
@@ -622,7 +814,12 @@ async def review(req: ReviewRequest, request: Request):
                 "session_id": req.session_id or "review",
             },
         }
-        _REVIEW_CACHE[cache_key] = (time.time() + REVIEW_CACHE_TTL, resp)
+        # v1.1：确定性 NEED_REVIEW 结果也写入幂等缓存（重启后仍复用，避免重复预检/重复拉取）
+        # 注意：save 先执行（json.dumps 在调用时序列化），之后才挂学生态，缓存里不含 blocked_reason
+        db.save_review_result(req.task_id, snapshot_hash, model_used, resp)
+        _record_eval("NEED_REVIEW", 0, False, resp["data"]["evaluation"],
+                     ci_conclusion=_ci_conclusion(ci_workflows))
+        attach_student_state(resp["data"], student_id, req.task_id, req.project_id)
         return resp
 
     start_ts = time.time()
@@ -640,9 +837,17 @@ async def review(req: ReviewRequest, request: Request):
         ]
         client = LLMClient(req.api_key, req.base_url, req.model)
         try:
-            llm_out = await client.review(messages)
+            # v1.1：评审链严格模式——语义校验（rubric_id 必须属于送审清单、逐条覆盖、evidence/reason 非空）
+            llm_out = await client.review(
+                messages,
+                max_tokens=REVIEW_MAX_TOKENS,
+                allowed_rubric_ids=[r.id for r in llm_rubrics],
+            )
         except (PermissionError, TimeoutError, EngineError, RuntimeError) as e:
-            # 错误分类漏斗：评审链任何系统故障 → REVIEW_UNAVAILABLE，绝不写入学生 Evaluation
+            # 错误分类漏斗：评审链任何系统故障 → REVIEW_UNAVAILABLE，绝不写入学生 Evaluation；
+            # v1.1：非 Key 类故障写入熔断表（同 key 5 分钟不再重调 LLM）
+            if not isinstance(e, PermissionError):
+                db.save_review_failure(req.task_id, snapshot_hash, model_used, str(e))
             return llm_error_response(e, review=True)
         llm_criteria = llm_out.criteria
         next_step = llm_out.next_step
@@ -671,7 +876,7 @@ async def review(req: ReviewRequest, request: Request):
     logs_mod.log_event(
         type="review",
         session_id=req.session_id or "review",
-        student_id=req.session_id or "review",
+        student_id=student_id,
         project_id=req.project_id,
         task_id=req.task_id,
         mode="reviewer",
@@ -710,11 +915,13 @@ async def review(req: ReviewRequest, request: Request):
             "session_id": req.session_id or "review",
         },
     }
-    # L5：写入幂等缓存（进程内存，重启丢失即可接受——方案明确不建数据库）
-    if len(_REVIEW_CACHE) > 512:
-        for k in [k for k, (exp, _) in _REVIEW_CACHE.items() if exp < time.time()]:
-            _REVIEW_CACHE.pop(k, None)
-    _REVIEW_CACHE[cache_key] = (time.time() + REVIEW_CACHE_TTL, resp)
+    # L5：写入幂等缓存（v1.1：SQLite 永久幂等，版本化 key；重启不丢，杜绝重复评审烧学生额度）
+    db.save_review_result(req.task_id, snapshot_hash, model_used, resp)
+    # P2：评审历史落库（与幂等缓存分离；同一提交重复评审覆盖同一行）
+    _record_eval(status, score, status == "PASS", evaluation.model_dump(),
+                 ci_conclusion=_ci_conclusion(ci_workflows))
+    # P4：学生态必须在 save_review_result 之后挂（不污染幂等缓存）
+    attach_student_state(resp["data"], student_id, req.task_id, req.project_id)
     return resp
 
 
