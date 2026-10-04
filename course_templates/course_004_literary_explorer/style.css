@@ -1,0 +1,260 @@
+/* ===== 古典文学探索器 · 基础样式 ===== */
+/* 只做最基础的布局、间距与配色，方便零基础同学继续修改。 */
+
+/* 页面整体 */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  color: #2f2f2f;
+  background-color: #f5f3ee;
+  line-height: 1.7;
+}
+
+/* 顶部标题区 */
+.page-header {
+  padding: 32px 20px 24px;
+  text-align: center;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e4ded2;
+}
+
+.page-header h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  letter-spacing: 2px;
+  color: #5a4632;
+}
+
+.subtitle {
+  margin: 0;
+  color: #8a8377;
+  font-size: 14px;
+}
+
+/* 主体容器 */
+.page-main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+/* 通用区块标题 */
+.section-title {
+  margin: 0 0 12px;
+  font-size: 18px;
+  color: #5a4632;
+  border-left: 4px solid #b8a179;
+  padding-left: 10px;
+}
+
+/* 搜索与筛选区 */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+  background-color: #ffffff;
+  border: 1px solid #e4ded2;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.control-item {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 260px;
+}
+
+.control-item label {
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #6f6759;
+}
+
+.control-item input,
+.control-item select {
+  padding: 10px 12px;
+  font-size: 15px;
+  font-family: inherit;
+  border: 1px solid #d8d0c0;
+  border-radius: 6px;
+  background-color: #fdfcf9;
+  color: #2f2f2f;
+}
+
+.control-item input:focus,
+.control-item select:focus {
+  outline: none;
+  border-color: #b8a179;
+}
+
+/* 统计区 */
+.stats {
+  margin-bottom: 24px;
+}
+
+.stats-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+  padding: 14px 18px;
+  background-color: #ffffff;
+  border: 1px solid #e4ded2;
+  border-radius: 8px;
+}
+
+.stat-card-wide {
+  flex: 1 1 260px;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #8a8377;
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: bold;
+  color: #a9825a;
+}
+
+/* 列表 + 详情 两栏布局 */
+.content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.panel {
+  background-color: #ffffff;
+  border: 1px solid #e4ded2;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.list-panel {
+  flex: 1 1 300px;
+}
+
+.detail-panel {
+  flex: 1 1 380px;
+}
+
+/* 作品列表 */
+.poem-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.poem-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #f0ece3;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.poem-item:hover {
+  background-color: #faf6ee;
+}
+
+.poem-item.is-active {
+  background-color: #f3e9d8;
+}
+
+.poem-item-title {
+  font-size: 16px;
+  color: #3f3a31;
+}
+
+.poem-item-meta {
+  font-size: 13px;
+  color: #9a9284;
+  white-space: nowrap;
+}
+
+/* 无结果提示 */
+.empty-tip,
+.placeholder {
+  color: #9a9284;
+  font-size: 14px;
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* 详情区 */
+.poem-detail h3 {
+  margin: 0 0 4px;
+  font-size: 22px;
+  color: #5a4632;
+}
+
+.detail-meta {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: #8a8377;
+}
+
+.detail-content {
+  margin: 0 0 16px;
+  padding: 16px;
+  background-color: #faf8f3;
+  border-radius: 6px;
+  font-size: 17px;
+  line-height: 2;
+  text-align: center;
+  white-space: pre-line;
+}
+
+.detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  font-size: 13px;
+  padding: 3px 10px;
+  background-color: #f3e9d8;
+  color: #8a6d43;
+  border-radius: 12px;
+}
+
+/* 出错提示 */
+.error-tip {
+  padding: 16px;
+  background-color: #fdecea;
+  border: 1px solid #f5c6c0;
+  color: #a13b30;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* 小屏适配：两栏变一栏 */
+@media (max-width: 640px) {
+  .content {
+    flex-direction: column;
+  }
+
+  .poem-list {
+    max-height: 260px;
+  }
+}

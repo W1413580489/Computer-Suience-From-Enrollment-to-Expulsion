@@ -26,7 +26,8 @@ RAW_BASE = "https://raw.githubusercontent.com"
 # 本地可复现运行命令模式（V2 修改 1：三选一运行证据；review.py 复用）
 RUN_CMD_PATTERN = re.compile(
     r"(uvicorn|npm\s+run|yarn\s+(dev|start)|docker\s+compose|flask\s+run|"
-    r"python\s+[\w./-]+\.(py)|node\s+[\w./-]+\.(js|ts)|pnpm\s+(dev|start))",
+    r"python\s+[\w./-]+\.(py)|node\s+[\w./-]+\.(js|ts)|pnpm\s+(dev|start)|"
+    r"(?:python3?|py)\s+-m\s+http\.server)",
     re.IGNORECASE,
 )
 

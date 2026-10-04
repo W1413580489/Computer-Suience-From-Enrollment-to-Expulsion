@@ -705,6 +705,21 @@ from course03_data import COURSE_003, build_project_mcp_build, build_project_mcp
 _PROJECT_BUILDERS["project_mcp_build"] = build_project_mcp_build
 _PROJECT_BUILDERS["project_mcp_test"] = build_project_mcp_test
 _COURSES["course_003"] = COURSE_003
+# ---- 课程 04：古典文学探索器（一个课程 + 一个项目）----
+from course04_data import COURSE_004, build_project_lit_poem  # noqa: E402
+
+_PROJECT_BUILDERS["project_lit_poem"] = build_project_lit_poem
+_COURSES["course_004"] = COURSE_004
+# ---- 课程 05：红楼梦人物关系探索器（一个课程 + 一个项目）----
+from course05_data import COURSE_005, build_project_red_chamber  # noqa: E402
+
+_PROJECT_BUILDERS["project_red_chamber"] = build_project_red_chamber
+_COURSES["course_005"] = COURSE_005
+# ---- 课程 06：文学地图 / 数字叙事（一个课程 + 一个项目）----
+from course06_data import COURSE_006, build_project_lit_map  # noqa: E402
+
+_PROJECT_BUILDERS["project_lit_map"] = build_project_lit_map
+_COURSES["course_006"] = COURSE_006
 
 _project_cache: dict[str, Project] = {}
 
@@ -725,6 +740,15 @@ _P4_REQUIRED: set[str] = {
     "c3_t04", "c3_t05", "c3_t06", "c3_t07",
     # MCP Server 测试与迭代：真实使用 → 报告 → Issue → 修复 → 复盘
     "c3_t08", "c3_t09", "c3_t10", "c3_t11", "c3_t12",
+    # 古典文学探索器：核心链路全必做（数据替换为交付里程碑）
+    "lit04_t01", "lit04_t02", "lit04_t03", "lit04_t04",
+    "lit04_t05", "lit04_t06", "lit04_t07", "lit04_t08",
+    # 红楼梦人物关系探索器：核心链路全必做
+    "red05_t01", "red05_t02", "red05_t03", "red05_t04",
+    "red05_t05", "red05_t06", "red05_t07", "red05_t08",
+    # 文学地图 / 数字叙事：核心链路全必做
+    "map06_t01", "map06_t02", "map06_t03", "map06_t04",
+    "map06_t05", "map06_t06", "map06_t07", "map06_t08",
 }
 
 _P4_DEPENDS_ON: dict[str, list[str]] = {
@@ -750,6 +774,30 @@ _P4_DEPENDS_ON: dict[str, list[str]] = {
     "c3_t10": ["c3_t09"],
     "c3_t11": ["c3_t10"],
     "c3_t12": ["c3_t11", "c3_t07"],
+    # 古典文学探索器（项目内链式推进）
+    "lit04_t02": ["lit04_t01"],
+    "lit04_t03": ["lit04_t02"],
+    "lit04_t04": ["lit04_t03"],
+    "lit04_t05": ["lit04_t04"],
+    "lit04_t06": ["lit04_t05"],
+    "lit04_t07": ["lit04_t06"],
+    "lit04_t08": ["lit04_t07"],
+    # 红楼梦人物关系探索器（项目内链式推进）
+    "red05_t02": ["red05_t01"],
+    "red05_t03": ["red05_t02"],
+    "red05_t04": ["red05_t03"],
+    "red05_t05": ["red05_t04"],
+    "red05_t06": ["red05_t05"],
+    "red05_t07": ["red05_t06"],
+    "red05_t08": ["red05_t07"],
+    # 文学地图 / 数字叙事（项目内链式推进）
+    "map06_t02": ["map06_t01"],
+    "map06_t03": ["map06_t02"],
+    "map06_t04": ["map06_t03"],
+    "map06_t05": ["map06_t04"],
+    "map06_t06": ["map06_t05"],
+    "map06_t07": ["map06_t06"],
+    "map06_t08": ["map06_t07"],
 }
 
 

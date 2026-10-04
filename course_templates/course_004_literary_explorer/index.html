@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>古典文学探索器</title>
+  <!-- 样式文件：负责页面的长相 -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 顶部标题区 -->
+  <header class="page-header">
+    <h1>古典文学探索器</h1>
+    <p class="subtitle">搜索、筛选，然后点开作品查看详情</p>
+  </header>
+
+  <main class="page-main">
+    <!-- 搜索与筛选区 -->
+    <section class="controls" aria-label="搜索与筛选">
+      <div class="control-item">
+        <label for="search-input">关键词搜索（标题 / 作者）</label>
+        <input id="search-input" type="text" placeholder="例如：李白、月" autocomplete="off">
+      </div>
+      <div class="control-item">
+        <label for="dynasty-select">朝代筛选</label>
+        <!-- 选项由 app.js 根据数据自动生成 -->
+        <select id="dynasty-select">
+          <option value="">全部朝代</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- 统计区：数字全部由 app.js 从 JSON 实时计算，不要写死在这里 -->
+    <section class="stats" aria-label="数据统计">
+      <h2 class="section-title">数据统计</h2>
+      <div class="stats-list">
+        <div class="stat-card">
+          <span class="stat-label">作品总数</span>
+          <span class="stat-value" id="stat-total">--</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">作者数量</span>
+          <span class="stat-value" id="stat-authors">--</span>
+        </div>
+        <div class="stat-card stat-card-wide">
+          <span class="stat-label">朝代分布</span>
+          <span class="stat-value" id="stat-dynasty">--</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 列表区 + 详情区 -->
+    <section class="content">
+      <div class="panel list-panel">
+        <h2 class="section-title">作品列表</h2>
+        <!-- 列表项由 app.js 根据 data/poems.json 生成 -->
+        <ul id="poem-list" class="poem-list"></ul>
+      </div>
+
+      <div class="panel detail-panel">
+        <h2 class="section-title">作品详情</h2>
+        <!-- 详情内容由 app.js 生成 -->
+        <div id="poem-detail" class="poem-detail">
+          <p class="placeholder">请从左侧列表中点击一首作品。</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 逻辑文件：负责“怎么显示”，数据来自 data/poems.json -->
+  <script src="app.js"></script>
+</body>
+</html>

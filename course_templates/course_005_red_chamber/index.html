@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>红楼梦人物关系探索器</title>
+  <!-- 相对路径引用样式文件 -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 页面顶部：标题 -->
+  <header class="page-header">
+    <h1>红楼梦人物关系探索器</h1>
+    <p class="subtitle">点击人物查看关系，使用搜索与筛选快速定位</p>
+  </header>
+
+  <!-- 控制区：搜索框 + 关系类型筛选 -->
+  <section class="toolbar">
+    <label class="toolbar-item">
+      人物搜索：
+      <input id="search-input" type="text" placeholder="输入人物姓名，如：林黛玉">
+    </label>
+
+    <label class="toolbar-item">
+      关系类型：
+      <!-- 选项由 app.js 从 relations.json 中真实出现的 type 自动生成 -->
+      <select id="type-filter">
+        <option value="all">全部</option>
+      </select>
+    </label>
+  </section>
+
+  <!-- 主体区：左侧关系图 + 右侧信息面板 -->
+  <main class="layout">
+    <!-- SVG 关系图容器 -->
+    <div class="graph-wrapper">
+      <svg id="graph" width="900" height="620" viewBox="0 0 900 620">
+        <!-- 关系线与人物节点由 app.js 动态绘制 -->
+      </svg>
+    </div>
+
+    <!-- 信息面板：显示选中人物的名称、简介与关系说明 -->
+    <aside class="info-panel">
+      <h2>人物信息</h2>
+      <div id="info-content">
+        <p class="placeholder">点击图中任意人物查看详情。</p>
+      </div>
+    </aside>
+  </main>
+
+  <!-- 提示信息区域（加载失败等友好提示） -->
+  <div id="message" class="message" hidden></div>
+
+  <!-- 相对路径引用脚本文件 -->
+  <script src="app.js"></script>
+</body>
+</html>

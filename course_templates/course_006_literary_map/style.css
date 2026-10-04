@@ -1,0 +1,201 @@
+/* ===========================================================
+   文学地图 · 基础样式
+   只使用原生 CSS，不引入任何 UI 框架或外部字体。
+   =========================================================== */
+
+/* 让内边距、边框都算进元素宽度，布局更容易理解 */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  /* 只使用系统自带的中文字体，不加载外部字体 */
+  font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  background: #f5f3ec;
+  color: #2b2b2b;
+  line-height: 1.7;
+}
+
+/* ----- 页面标题 ----- */
+.page-header {
+  padding: 24px 20px 12px;
+  text-align: center;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: 4px;
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  color: #888;
+  font-size: 14px;
+}
+
+/* ----- 整体布局：左边地图，右边故事面板 ----- */
+.layout {
+  display: flex;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  align-items: flex-start;
+}
+
+/* ----- 地图区 ----- */
+.map-area {
+  flex: 1 1 600px;
+  background: #fbfaf6;
+  border: 1px solid #e2ded2;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+#map {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* 示意路线 */
+.route-line {
+  fill: none;
+  stroke: #b9ac8c;
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+}
+
+/* 地点节点（圆形） */
+.place-node {
+  fill: #8a9b7a;
+  stroke: #ffffff;
+  stroke-width: 2;
+  cursor: pointer;
+  transition: fill 0.2s, stroke-width 0.2s;
+}
+
+.place-node:hover {
+  fill: #6f8260;
+}
+
+/* 被选中的地点：明显高亮 */
+.place-node.place-active {
+  fill: #d1495b;
+  stroke: #ffd166;
+  stroke-width: 3;
+}
+
+/* 地点名称文字 */
+.place-label {
+  font-size: 14px;
+  fill: #4a4a4a;
+  text-anchor: middle;
+  cursor: pointer;
+  user-select: none;
+}
+
+.place-label-active {
+  fill: #d1495b;
+  font-weight: bold;
+}
+
+/* 加载失败时显示在地图上的提示文字 */
+.map-error {
+  font-size: 16px;
+  fill: #c0392b;
+}
+
+/* ----- 故事面板 ----- */
+.story-area {
+  flex: 0 1 380px;
+  min-width: 300px;
+}
+
+.current-place {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.current-place span {
+  color: #d1495b;
+  font-weight: bold;
+}
+
+.story-card {
+  background: #ffffff;
+  border: 1px solid #e2ded2;
+  border-radius: 10px;
+  padding: 18px;
+  min-height: 220px;
+}
+
+.story-time {
+  margin: 0 0 8px;
+  color: #999;
+  font-size: 13px;
+}
+
+.story-title {
+  margin: 0 0 12px;
+  font-size: 20px;
+}
+
+.story-body {
+  margin: 0;
+  color: #444;
+  /* 保留正文里的换行 */
+  white-space: pre-wrap;
+}
+
+/* ----- 按钮区 ----- */
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+button {
+  padding: 8px 18px;
+  border: 1px solid #b9ac8c;
+  background: #ffffff;
+  color: #4a4a4a;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: #efe9db;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.story-progress {
+  font-size: 13px;
+  color: #888;
+}
+
+.hint {
+  font-size: 12px;
+  color: #aaa;
+  margin-top: 12px;
+}
+
+/* ----- 小屏幕时改为上下排列 ----- */
+@media (max-width: 800px) {
+  .layout {
+    flex-direction: column;
+  }
+  .story-area {
+    width: 100%;
+  }
+}

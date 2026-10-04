@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文学地图</title>
+  <!-- 引用同目录下的样式文件 -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 页面标题 -->
+  <header class="page-header">
+    <h1>文学地图</h1>
+    <p class="subtitle">示意地图 + 故事面板（课程起始模板）</p>
+  </header>
+
+  <main class="layout">
+    <!-- 地图区：一个 SVG 示意地图，同时用来承载地点节点 -->
+    <section class="map-area">
+      <!-- 只使用示意坐标，不使用任何真实地理数据或经纬度 -->
+      <svg id="map" viewBox="0 0 900 520" preserveAspectRatio="xMidYMid meet"
+           role="img" aria-label="示意地图">
+        <!-- 路线与地点节点由 app.js 根据 JSON 数据动态生成 -->
+      </svg>
+    </section>
+
+    <!-- 故事面板 -->
+    <section class="story-area">
+      <div class="current-place">当前地点：<span id="current-place">—</span></div>
+
+      <article class="story-card">
+        <p class="story-time">时间：<span id="story-time">—</span></p>
+        <h2 class="story-title" id="story-title">—</h2>
+        <p class="story-body" id="story-body">—</p>
+      </article>
+
+      <!-- 顺序浏览按钮 -->
+      <div class="controls">
+        <button id="prev-btn" type="button">上一个</button>
+        <span id="story-progress" class="story-progress">—</span>
+        <button id="next-btn" type="button">下一个</button>
+      </div>
+
+      <p class="hint">提示：请先点击地图上的地点，再用“上一个 / 下一个”按顺序浏览故事。</p>
+    </section>
+  </main>
+
+  <!-- 引用同目录下的脚本文件 -->
+  <script src="app.js" defer></script>
+</body>
+</html>
